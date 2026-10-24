@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Одна проверка кандидата против эталона. Выполняется в фоне; текущее состояние — {@link #verdict()}.
@@ -27,6 +28,14 @@ final class GateJob implements Runnable {
     static final String CANDIDATE = "candidate";
     /** Прогонов на вход: оригинал дважды (детектор случайности) и кандидат. */
     private static final int RUNS_PER_INPUT = 3;
+    /** Номер прогона кандидата среди трёх прогонов входа (0 и 1 — эталон). */
+    private static final int CANDIDATE_SLOT = 2;
+    /**
+     * На скольких разных входах подряд эталон должен не уложиться во время, чтобы считать, что программа
+     * не завершается (см. {@link HangWatch}). Два — это первые прогоны двух из трёх параллельных процессов:
+     * решение через ~5–10 с вместо минут. Больше — дольше: после таймаута процесс перезапускается (~1–4 с).
+     */
+    static final int HANG_INPUTS_IN_A_ROW = 2;
 
     /** Что проверить: эталон, кандидат и намерение. */
     record Request(String fileName, String originalSource, String candidateSource, Intent intent) {}
@@ -35,16 +44,19 @@ final class GateJob implements Runnable {
     private final ProgramBuilder builder;
     private final ProgramRunner runner;
     private final InputGenerator inputs;
-    private final ChangedCoverageMeter coverage;
+    /** Замер покрытия на исполнителе этой проверки: при досрочной остановке он останавливается вместе с ней. */
+    private final Function<ProgramRunner, ChangedCoverageMeter> coverage;
     private final Duration timeout;
     private final int workers;
     private final long startNanos = System.nanoTime();
 
     private List<InputCheck> checks = List.of();
+    /** Сторож текущей серии прогонов; после срабатывания результаты этой серии больше не учитываются. */
+    private HangWatch watch = new HangWatch(Integer.MAX_VALUE, () -> {});
     private volatile Verdict verdict = Verdict.starting();
 
     GateJob(Request request, ProgramBuilder builder, ProgramRunner runner, InputGenerator inputs,
-            ChangedCoverageMeter coverage, Duration timeout, int workers) {
+            Function<ProgramRunner, ChangedCoverageMeter> coverage, Duration timeout, int workers) {
         this.request = request;
         this.builder = builder;
         this.runner = runner;
@@ -56,6 +68,16 @@ final class GateJob implements Runnable {
 
     Verdict verdict() {
         return verdict;
+    }
+
+    /** Что проверялось — для экспорта тестов (только чтение). */
+    Request request() {
+        return request;
+    }
+
+    /** Прогоны по входам — для экспорта тестов (только чтение, копия). */
+    synchronized List<InputCheck> checks() {
+        return List.copyOf(checks);
     }
 
     @Override
@@ -86,16 +108,23 @@ final class GateJob implements Runnable {
             return Verdict.buildError(candidate.errors(), elapsedMs());
         }
 
+        System.err.println("[DBG] built t=" + elapsedMs());
         List<LabeledInput> generated = inputs.generate(request.fileName(), request.originalSource());
         synchronized (this) {
             checks = new ArrayList<>(generated.stream().map(in -> new InputCheck(in, null, null, null)).toList());
             publish(false);
         }
-        CompletableFuture<CoverageMeasurement> measuring = measureChangedCode(original.mainClass(), generated);
+        // Свой исполнитель на проверку: его можно остановить досрочно, не задев другие проверки.
+        ProgramRunner checkRunner = runner.forCheck();
+        CompletableFuture<CoverageMeasurement> measuring = measureChangedCode(checkRunner, original.mainClass(), generated);
         boolean plainJvm = original.program().plainJvm() || candidate.program().plainJvm();
-        runner.runAll(List.of(original.program().withPlainJvm(plainJvm), candidate.program().withPlainJvm(plainJvm)),
-                jobs(generated), timeout, workers,
-                this::onResult);
+        List<WorkerProtocol.Program> programs =
+                List.of(original.program().withPlainJvm(plainJvm), candidate.program().withPlainJvm(plainJvm));
+        String exit = InputGenerator.exitCommand(request.originalSource()).orElse(null);
+        if (!runWatched(checkRunner, programs, generated, exitScenariosFirst(generated, exit))) {
+            // Эталон не завершается: замер остановлен вместе с прогонами, его итог не нужен.
+            return checkExitScenarios(programs, generated, exit);
+        }
         CoverageMeasurement measured = measuring.join();
         synchronized (this) {
             return VerdictAssembler.assemble(List.copyOf(checks), request.intent(), true, timeout.toMillis(), elapsedMs(),
@@ -108,10 +137,12 @@ final class GateJob implements Runnable {
      * с основными прогонами, в своём рабочем процессе. Вердикт по этой копии не выносится: она только отвечает,
      * дошли ли входы до изменённого кода. Сбой замера сохраняется как причина неполной проверки.
      */
-    private CompletableFuture<CoverageMeasurement> measureChangedCode(String mainClass, List<LabeledInput> generated) {
+    private CompletableFuture<CoverageMeasurement> measureChangedCode(ProgramRunner checkRunner, String mainClass,
+                                                                     List<LabeledInput> generated) {
         List<String> texts = generated.stream().map(LabeledInput::text).toList();
+        ChangedCoverageMeter meter = coverage.apply(checkRunner);
         return CompletableFuture.supplyAsync(
-                        () -> coverage.measure(request.originalSource(), request.candidateSource(), mainClass, texts, timeout),
+                        () -> meter.measure(request.originalSource(), request.candidateSource(), mainClass, texts, timeout),
                         task -> Thread.ofVirtual().name("coverage").start(task))
                 .exceptionally(error -> CoverageMeasurement.failed("Не удалось измерить покрытие изменённого кода: "
                         + error.getMessage()));
@@ -127,22 +158,89 @@ final class GateJob implements Runnable {
         return outcome == InputCheck.Outcome.MATCH || outcome == InputCheck.Outcome.MISMATCH;
     }
 
-    /** Для входа i: id 3i и 3i+1 — оригинал, 3i+2 — кандидат. Прогоны одного входа идут подряд. */
-    private static List<WorkerProtocol.Job> jobs(List<LabeledInput> generated) {
-        List<WorkerProtocol.Job> jobs = new ArrayList<>();
+    /**
+     * Порядок прогонов: сначала сценарии, которые заканчиваются командой выхода, потом остальные входы.
+     * Для обычной программы порядок ничего не меняет. Для меню, которое на конце ввода не выходит, к моменту
+     * досрочной остановки ({@link HangWatch}) сценарии с выходом обычно уже сравнены, и их не нужно гонять заново.
+     */
+    private static List<Integer> exitScenariosFirst(List<LabeledInput> generated, String exit) {
+        List<Integer> first = new ArrayList<>();
+        List<Integer> rest = new ArrayList<>();
         for (int i = 0; i < generated.size(); i++) {
+            (InputGenerator.endsWithExit(generated.get(i), exit) ? first : rest).add(i);
+        }
+        first.addAll(rest);
+        return first;
+    }
+
+    /** Для входа i: id 3i и 3i+1 — оригинал, 3i+2 — кандидат. Прогоны одного входа идут подряд. */
+    private static List<WorkerProtocol.Job> jobs(List<LabeledInput> generated, List<Integer> order) {
+        List<WorkerProtocol.Job> jobs = new ArrayList<>();
+        for (int i : order) {
             String text = generated.get(i).text();
             jobs.add(new WorkerProtocol.Job(i * RUNS_PER_INPUT, ORIGINAL, text));
             jobs.add(new WorkerProtocol.Job(i * RUNS_PER_INPUT + 1, ORIGINAL, text));
-            jobs.add(new WorkerProtocol.Job(i * RUNS_PER_INPUT + 2, CANDIDATE, text));
+            jobs.add(new WorkerProtocol.Job(i * RUNS_PER_INPUT + CANDIDATE_SLOT, CANDIDATE, text));
         }
         return jobs;
     }
 
+    /**
+     * Прогоны входов с номерами {@code order} под присмотром {@link HangWatch}.
+     *
+     * @return false — эталон на нескольких входах подряд не уложился во время, прогоны остановлены досрочно
+     */
+    private boolean runWatched(ProgramRunner checkRunner, List<WorkerProtocol.Program> programs,
+                               List<LabeledInput> generated, List<Integer> order) {
+        HangWatch current = new HangWatch(HANG_INPUTS_IN_A_ROW, checkRunner::cancel);
+        synchronized (this) {
+            watch = current;
+        }
+        checkRunner.runAll(programs, jobs(generated, order), timeout, workers, this::onResult);
+        return !current.tripped();
+    }
+
+    /**
+     * Эталон не завершается на обычных входах — так ведёт себя меню, которое на конце ввода не выходит.
+     * Сравниваем только сценарии, которые заканчиваются командой выхода из кода: на них программа должна
+     * завершиться штатно. Уже сравненные до остановки сценарии не повторяются, недоделанные прогоняются заново.
+     * Найденное расхождение — настоящий результат; иначе INCOMPLETE с причиной: остальные входы не сравнены.
+     */
+    private Verdict checkExitScenarios(List<WorkerProtocol.Program> programs, List<LabeledInput> generated, String exit) {
+        List<Integer> scenarios = new ArrayList<>();
+        List<Integer> unfinished = new ArrayList<>();
+        synchronized (this) {
+            for (int i = 0; i < generated.size(); i++) {
+                if (InputGenerator.endsWithExit(generated.get(i), exit)) {
+                    scenarios.add(i);
+                    if (!checks.get(i).finished()) {
+                        checks.set(i, new InputCheck(generated.get(i), null, null, null));
+                        unfinished.add(i);
+                    }
+                }
+            }
+        }
+        System.err.println("[DBG] phase2 t=" + elapsedMs() + " unfinished=" + unfinished);
+        boolean scenariosFinish = unfinished.isEmpty() || runWatched(runner.forCheck(), programs, generated, unfinished);
+        synchronized (this) {
+            List<InputCheck> scenarioChecks = scenarios.stream().map(checks::get).toList();
+            return VerdictAssembler.assembleNonTerminating(scenarioChecks, request.intent(), timeout.toMillis(),
+                    elapsedMs(), new NonTerminating(generated.size(), HANG_INPUTS_IN_A_ROW, exit, scenariosFinish));
+        }
+    }
+
     private synchronized void onResult(WorkerProtocol.Job job, RunResult result) {
+        if (watch.tripped()) {
+            return; // серия остановлена: это итоги убитых и отменённых прогонов
+        }
+        System.err.println("[DBG] t=" + elapsedMs() + " job=" + job.id() + " timedOut=" + result.timedOut() + " unknown=" + result.outputUnknown());
         int index = job.id() / RUNS_PER_INPUT;
-        checks.set(index, checks.get(index).with(job.id() % RUNS_PER_INPUT, result));
+        int slot = job.id() % RUNS_PER_INPUT;
+        checks.set(index, checks.get(index).with(slot, result));
         publish(false);
+        if (slot != CANDIDATE_SLOT) {
+            watch.original(index, result.timedOut());
+        }
     }
 
     private void publish(boolean finished) {

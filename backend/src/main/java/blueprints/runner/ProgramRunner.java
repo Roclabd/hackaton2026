@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +47,9 @@ public final class ProgramRunner {
     private static final Executor SPAWNER = Thread.ofVirtual().name("worker-spawn")::start;
 
     private final List<String> command;
+    /** Процессы, которые сейчас выполняют прогоны этого исполнителя: их останавливает {@link #cancel()}. */
+    private final Set<WorkerSession> active = ConcurrentHashMap.newKeySet();
+    private volatile boolean cancelled;
 
     /** Рабочий процесс видит те же классы, что и сервер: java.class.path (в jar — сам jar). */
     public ProgramRunner() {
@@ -58,6 +62,32 @@ public final class ProgramRunner {
         cmd.add(classpath);
         cmd.add(RunWorker.class.getName());
         this.command = List.copyOf(cmd);
+    }
+
+    private ProgramRunner(List<String> command) {
+        this.command = command;
+    }
+
+    /**
+     * Отдельный исполнитель для одной проверки: те же JDK и флаги, но своя отмена. {@link #cancel()} у него
+     * останавливает только прогоны этой проверки, не трогая параллельные.
+     */
+    public ProgramRunner forCheck() {
+        return new ProgramRunner(command);
+    }
+
+    /**
+     * Досрочно остановить все прогоны этого исполнителя: убить его рабочие процессы и не запускать новые.
+     * Зачем: программа-меню, которая на конце ввода ждёт ввод вечно, иначе съедала бы по 5 с на каждый прогон.
+     * Невыполненные задания получают итог {@link RunResult#cancelled()} — «вывод неизвестен», не совпадение.
+     */
+    public void cancel() {
+        cancelled = true;
+        active.forEach(WorkerSession::stop);
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     /** Один прогон — для кнопки «Запустить» в интерфейсе. */
@@ -107,7 +137,9 @@ public final class ProgramRunner {
         List<WorkerProtocol.Job> workerJobs = new ArrayList<>();
         for (WorkerProtocol.Job job : part) {
             WorkerProtocol.Program program = byName.get(job.program());
-            if (program != null && program.plainJvm()) {
+            if (cancelled) {
+                notify(listener, job, RunResult.cancelled());
+            } else if (program != null && program.plainJvm()) {
                 if (!workerJobs.isEmpty()) {
                     runWorkerPart(programs, List.copyOf(workerJobs), timeout.toMillis(), listener);
                     workerJobs.clear();
@@ -123,7 +155,11 @@ public final class ProgramRunner {
     private void runWorkerPart(List<WorkerProtocol.Program> programs, List<WorkerProtocol.Job> part, long timeoutMs,
                          ResultListener listener) {
         List<WorkerProtocol.Job> remaining = new ArrayList<>(part);
-        WorkerSession session = WorkerSession.start(command);
+        if (cancelled) {
+            remaining.forEach(job -> notify(listener, job, RunResult.cancelled()));
+            return;
+        }
+        WorkerSession session = track(WorkerSession.start(command));
         Deque<CompletableFuture<WorkerSession>> spares = new ArrayDeque<>();
         try {
             while (!remaining.isEmpty()) {
@@ -131,28 +167,43 @@ public final class ProgramRunner {
                         .collect(Collectors.toMap(WorkerProtocol.Job::id, Function.identity()));
                 Set<Integer> done = session.run(new WorkerProtocol.Request(programs, List.copyOf(remaining), timeoutMs),
                         (id, result) -> notify(listener, byId.get(id), result));
+                active.remove(session);
+                remaining.removeIf(job -> done.contains(job.id()));
+                if (cancelled) {
+                    remaining.forEach(job -> notify(listener, job, RunResult.cancelled()));
+                    return;
+                }
                 if (done.isEmpty()) {
                     // Процесс не сделал ни одного прогона — повторять бессмысленно, отдаём причину.
                     String reason = ("[рабочий процесс не запустился] " + session.stderrTail()).strip();
                     remaining.forEach(job -> notify(listener, job, RunResult.lost(null, reason, 0)));
                     return;
                 }
-                remaining.removeIf(job -> done.contains(job.id()));
                 if (remaining.isEmpty()) {
                     return;
                 }
                 // Процесс умер раньше времени (System.exit программы, таймаут). Раз такое случилось, вероятно,
                 // случится снова: следующий процесс берём уже запущенный и держим запасные наготове —
                 // запуск JVM на Windows доходит до ~1 с, а прогон длится ~20 мс.
-                session = spares.isEmpty() ? WorkerSession.start(command) : spares.poll().join();
+                session = track(spares.isEmpty() ? WorkerSession.start(command) : spares.poll().join());
                 while (spares.size() < SPARE_WORKERS) {
                     spares.add(CompletableFuture.supplyAsync(() -> WorkerSession.start(command), SPAWNER));
                 }
             }
         } finally {
             session.stop();
+            active.remove(session);
             spares.forEach(spare -> spare.thenAccept(WorkerSession::stop));
         }
+    }
+
+    /** Запомнить процесс для отмены; если отмена уже была — сразу остановить, он не нужен. */
+    private WorkerSession track(WorkerSession session) {
+        active.add(session);
+        if (cancelled) {
+            session.stop();
+        }
+        return session;
     }
 
     /** Ошибка в слушателе не должна оборвать прогоны остальных заданий. */

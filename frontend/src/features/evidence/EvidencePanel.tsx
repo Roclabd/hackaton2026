@@ -5,7 +5,8 @@ import { methodName } from '../../state/selectors'
 import { useAppState } from '../../state/store'
 import { linesText, openFindingDrawer, showFindingLines, viewPatch } from './findingActions'
 import { GrowthChart } from './GrowthChart'
-import { findingCategory, findingGrowth, growthEstimate } from './findingPresentation'
+import { GrowthMeasure } from './GrowthMeasure'
+import { findingCategory, findingGrowth } from './findingPresentation'
 
 type Tab = 'summary' | 'findings' | 'growth'
 const TABS: [Tab, string, IconName][] = [['summary', 'Обзор', 'list'], ['findings', 'Находки', 'search'], ['growth', 'График роста', 'chart']]
@@ -33,7 +34,6 @@ export function EvidencePanel() {
   const findings = useAppState((s) => s.findings)
   const speedup = useAppState((s) => s.job?.verdict?.speedup ?? null)
   const first = findings[0] ?? null
-  const estimate = growthEstimate(first)
 
   const toggle = (next: boolean) => { setOpen(next); rememberOpen(next) }
   const chooseTab = (id: Tab) => { setTab(id); if (!open) toggle(true) }
@@ -57,15 +57,15 @@ export function EvidencePanel() {
         ><Icon name="down" /></button>
       </div>
       {open && <div className="evidence-body">
-        {tab === 'summary' && <Summary finding={first} speedup={speedup} estimate={estimate} />}
+        {tab === 'summary' && <Summary finding={first} speedup={speedup} />}
         {tab === 'findings' && <FindingList findings={findings} />}
-        {tab === 'growth' && <div className="growth-row"><GrowthChart speedup={speedup} estimate={estimate} /><div><strong>Счётчики вместо догадок</strong><p>График строится по замеру проверки: размер входа и время «до» и «после».</p></div></div>}
+        {tab === 'growth' && <div className="growth-row"><GrowthMeasure finding={first} speedup={speedup} /><div><strong>Счётчики вместо догадок</strong><p>Копии оригинала и заплатки со счётчиком в теле каждого цикла запускаются на входах n = 100…1600. Модель роста подбирается по числу выполнений — это операции, а не время: результат не зависит от загрузки машины.</p></div></div>}
       </div>}
     </section>
   )
 }
 
-function Summary({ finding, speedup, estimate }: { finding: Finding | null; speedup: Parameters<typeof GrowthChart>[0]['speedup']; estimate: { before: string; after: string } | null }) {
+function Summary({ finding, speedup }: { finding: Finding | null; speedup: Parameters<typeof GrowthChart>[0]['speedup'] }) {
   if (!finding) {
     return <div className="summary-finding"><div className="section-label"><Icon name="search" />Находки</div><p>Находок нет — или проект ещё не загружен.</p></div>
   }
@@ -83,7 +83,7 @@ function Summary({ finding, speedup, estimate }: { finding: Finding | null; spee
     </div>
     <div className="summary-growth">
       <div className="section-label"><Icon name="chart" />График роста</div>
-      <GrowthChart speedup={speedup} estimate={estimate} />
+      <GrowthMeasure finding={finding} speedup={speedup} />
     </div>
   </>
 }

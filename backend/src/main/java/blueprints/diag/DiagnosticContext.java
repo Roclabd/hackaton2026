@@ -84,9 +84,53 @@ final class DiagnosticContext {
             if (parameters.size() == 1 && parameters.getFirst().getParentNode().orElse(null) == callable.get()) {
                 return Optional.of(parameters.getFirst().getType());
             }
+            if (locals.isEmpty() && parameters.isEmpty()) {
+                return enclosingType(name).flatMap(type -> fieldType(type, name.getNameAsString()));
+            }
         }
-        // Поля не анализируем: без разрешения имён трудно исключить наследование и затенение.
         return Optional.empty();
+    }
+
+    /**
+     * Поле, объявленное в самом классе, где стоит имя. По правилам Java собственное поле класса скрывает и поля
+     * внешнего класса, и унаследованные, поэтому здесь нет угадывания. Поля предков и внешних классов не ищем:
+     * там без разрешения имён легко ошибиться.
+     */
+    private static Optional<TypeDeclaration<?>> enclosingType(Node node) {
+        for (Node parent = node.getParentNode().orElse(null); parent != null; parent = parent.getParentNode().orElse(null)) {
+            if (parent instanceof TypeDeclaration<?> type) return Optional.of(type);
+            if (parent instanceof com.github.javaparser.ast.expr.ObjectCreationExpr) return Optional.empty(); // анонимный класс
+        }
+        return Optional.empty();
+    }
+
+    /** Тип поля {@code name}, объявленного прямо в {@code type}; при нескольких объявлениях — пусто. */
+    private static Optional<Type> fieldType(TypeDeclaration<?> type, String name) {
+        List<VariableDeclarator> fields = type.getFields().stream()
+                .flatMap(f -> f.getVariables().stream())
+                .filter(v -> v.getNameAsString().equals(name)).toList();
+        return fields.size() == 1 ? Optional.of(fields.getFirst().getType()) : Optional.empty();
+    }
+
+    /**
+     * {@code x.поле} или {@code this.поле}: тип x — класс из этого же файла (ровно один с таким именем, без
+     * параметров типа), поле объявлено прямо в нём. Иначе — пусто: наследование и дженерики не разбираем.
+     */
+    private Optional<Type> fieldAccessType(FieldAccessExpr access) {
+        Expression scope = unwrapped(access.getScope());
+        if (scope instanceof ThisExpr thisExpr && thisExpr.getTypeName().isEmpty()) {
+            return enclosingType(access).flatMap(type -> fieldType(type, access.getNameAsString()));
+        }
+        if (!(scope instanceof NameExpr owner)) return Optional.empty();
+        Optional<Type> ownerType = declaredType(owner).filter(Type::isClassOrInterfaceType);
+        if (ownerType.isEmpty() || ownerType.get().asClassOrInterfaceType().getTypeArguments().isPresent()) {
+            return Optional.empty();
+        }
+        String className = ownerType.get().asClassOrInterfaceType().getNameAsString();
+        List<TypeDeclaration> classes = unit.findAll(TypeDeclaration.class).stream()
+                .filter(t -> t.getNameAsString().equals(className)).toList();
+        if (classes.size() != 1) return Optional.empty();
+        return fieldType(classes.getFirst(), access.getNameAsString());
     }
 
     private boolean localTo(VariableDeclarator variable, Node callable) {
@@ -124,6 +168,7 @@ final class DiagnosticContext {
                 || unary.getOperator() == UnaryExpr.Operator.PLUS)) return type(unary.getExpression());
         if (value instanceof FieldAccessExpr field && field.getNameAsString().equals("length")
                 && field.getScope() instanceof NameExpr name && declaredType(name).filter(Type::isArrayType).isPresent()) return "int";
+        if (value instanceof FieldAccessExpr field) return fieldAccessType(field).map(Type::asString).orElse("");
         if (value instanceof BinaryExpr binary && integral(binary.getLeft()) && integral(binary.getRight())) {
             return switch (binary.getOperator()) {
                 case PLUS, MINUS, MULTIPLY, DIVIDE, REMAINDER, BINARY_AND, BINARY_OR, XOR, LEFT_SHIFT,

@@ -68,6 +68,26 @@ final class VerdictAssembler {
                 smallestMismatch, example, groups(checks, intent), coverage, null, durationMs);
     }
 
+    /**
+     * Итог досрочно остановленной проверки: эталон не завершается на обычных входах ({@link NonTerminating}),
+     * прогнаны только сценарии с командой выхода. Расхождение на них — настоящее (MISMATCH / BEHAVIOR_CHANGE);
+     * иначе INCOMPLETE: большая часть входов не сравнена, и «совпало» было бы неправдой.
+     *
+     * @param scenarioChecks прогоны сценариев с командой выхода; недоделанные (сторож сработал и на них) отбрасываются
+     */
+    static Verdict assembleNonTerminating(List<InputCheck> scenarioChecks, Intent intent, long timeoutMs, long durationMs,
+                                          NonTerminating stopped) {
+        List<InputCheck> run = scenarioChecks.stream().filter(InputCheck::finished).toList();
+        Verdict base = assemble(run, intent, true, timeoutMs, durationMs);
+        if (base.status() == VerdictStatus.MISMATCH || base.status() == VerdictStatus.BEHAVIOR_CHANGE) {
+            return base;
+        }
+        int compared = base.matched() + base.mismatches();
+        return new Verdict(VerdictStatus.INCOMPLETE, Phase.DONE, 1.0, base.inputs(), base.checked(), base.matched(),
+                base.mismatches(), base.nondeterministic(), stopped.reason(compared, scenarioChecks.size(), timeoutMs),
+                List.of(), base.smallestMismatch(), base.example(), base.groups(), null, null, durationMs);
+    }
+
     /** null — проверка полная. Иначе — что именно не проверено, по-русски. */
     private static String incompleteReason(List<InputCheck> checks, Intent intent, int unknown, int matched,
                                            int nondeterministic, long timeoutMs) {

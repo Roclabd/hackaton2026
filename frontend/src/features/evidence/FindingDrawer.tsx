@@ -4,6 +4,7 @@ import { currentFinding, methodName } from '../../state/selectors'
 import { dispatch, useAppState } from '../../state/store'
 import { linesText, viewPatch } from './findingActions'
 import { findingCategory, growthEstimate } from './findingPresentation'
+import { GrowthMeasure } from './GrowthMeasure'
 
 /** Боковая панель находки: почему, условия, варианты заплаток (BUGFIX подписан «меняет поведение»). */
 export function FindingDrawer() {
@@ -17,6 +18,10 @@ export function FindingDrawer() {
       <h3>Почему это находка</h3>
       <p>{finding.why}</p>
       {growth && <p>Рост: {growth.before} → {growth.after} (оценка по структуре кода)</p>}
+      {(finding.category === 'INEFFICIENCY' || growth) && <>
+        <h3>Замер роста</h3>
+        <GrowthMeasure finding={finding} />
+      </>}
       <h3>Условия применения</h3>
       <ul className="check-list">{finding.conditions.map((c) => <li key={c}><Icon name="check" />{c}</li>)}</ul>
       <h3>Варианты изменения</h3>

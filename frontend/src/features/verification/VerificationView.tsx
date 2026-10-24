@@ -1,8 +1,11 @@
+import { useCallback, useState } from 'react'
 import { Icon } from '../../components/Icon'
 import { navigate } from '../../state/route'
 import type { JobState } from '../../state/reducer'
 import { useAppState } from '../../state/store'
 import { GrowthChart } from '../evidence/GrowthChart'
+import { ExportDialog } from './ExportDialog'
+import { canExport, exportHint } from './exportText'
 import { RunComparison, ScenarioTable } from './RunComparison'
 import { ProgressPanel, ResultPanel } from './VerdictPanels'
 
@@ -61,9 +64,24 @@ function RunConditions({ job }: { job: JobState }) {
         <div className="pane-header"><strong>Рост времени</strong></div>
         <GrowthChart speedup={verdict?.speedup ?? null} />
       </section>
-      <button type="button" className="btn export-button" disabled title="Скоро: экспорт JUnit-теста по найденному входу">
-        <Icon name="download" />Экспорт теста · скоро
-      </button>
+      <ExportButton job={job} />
     </aside>
+  )
+}
+
+/** «Экспорт теста»: активна у завершённой проверки, которая реально сравнила версии. */
+function ExportButton({ job }: { job: JobState }) {
+  const projectId = useAppState((s) => s.project?.id ?? null)
+  const [open, setOpen] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
+  const enabled = projectId !== null && canExport(job.verdict)
+  return (
+    <>
+      <button type="button" className="btn export-button" disabled={!enabled} title={exportHint(job.verdict)}
+        onClick={() => setOpen(true)}>
+        <Icon name="download" />Экспорт теста
+      </button>
+      {open && projectId !== null && <ExportDialog projectId={projectId} jobId={job.id} onClose={close} />}
+    </>
   )
 }

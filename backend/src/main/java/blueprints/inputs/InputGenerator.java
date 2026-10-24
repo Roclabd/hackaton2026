@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -67,7 +68,7 @@ public final class InputGenerator {
         Random wide = new Random(SEED + 1);
         add(unique, WIDE, 4, () -> join(lines, i -> wideNumbers(wide, 1 + wide.nextInt(4))));
         EDGE_TOKENS.forEach(token -> put(unique, EDGE, join(lines, i -> token)));
-        commandScenarios(profile.commands(), random).forEach(text -> put(unique, COMMANDS, text));
+        commandScenarios(profile.commands(), profile.exitCommand(), random).forEach(text -> put(unique, COMMANDS, text));
         corpusInputs(fileName).forEach(text -> put(unique, CORPUS, text));
         return List.copyOf(unique.values());
     }
@@ -93,18 +94,42 @@ public final class InputGenerator {
         return result;
     }
 
-    /** Для программ-меню: последовательности команд, которые встречаются в коде. */
-    private static List<String> commandScenarios(List<String> commands, Random random) {
+    /**
+     * Для программ-меню: последовательности команд, которые встречаются в коде. Если в коде есть команда выхода,
+     * она дописывается в конец каждого сценария — так сценарий завершается штатно, как у человека за клавиатурой,
+     * а не падением или вечным ожиданием на конце ввода.
+     */
+    private static List<String> commandScenarios(List<String> commands, String exit, Random random) {
         if (commands.isEmpty()) {
             return List.of();
         }
         List<String> result = new ArrayList<>();
-        commands.forEach(command -> result.add(command)); // каждая команда по одной
+        commands.forEach(command -> result.add(withExit(command, exit))); // каждая команда по одной
         for (int k = 0; k < 4; k++) {
             int length = 2 + random.nextInt(5);
-            result.add(join(length, i -> commands.get(random.nextInt(commands.size()))));
+            result.add(withExit(join(length, i -> commands.get(random.nextInt(commands.size()))), exit));
         }
         return result;
+    }
+
+    private static String withExit(String scenario, String exit) {
+        return exit == null || endsWith(scenario, exit) ? scenario : scenario + "\n" + exit;
+    }
+
+    /** Последняя строка входа — команда выхода. */
+    private static boolean endsWith(String text, String exit) {
+        String[] lines = text.strip().split("\n");
+        return lines[lines.length - 1].strip().equals(exit.strip());
+    }
+
+    /** Команда выхода из меню, найденная в коде («0», «exit», «выход»…), или пусто. */
+    public static Optional<String> exitCommand(String source) {
+        return Optional.ofNullable(ReadingProfile.of(source).exitCommand());
+    }
+
+    /** Вход, последняя строка которого — команда выхода: на нём меню должно завершиться штатно. */
+    public static boolean endsWithExit(LabeledInput input, String exit) {
+        return exit != null && !input.text().isBlank() && endsWith(input.text(), exit);
     }
 
     private List<String> corpusInputs(String fileName) {

@@ -35,6 +35,11 @@ public record RunResult(String stdout, String stderr, Integer exitCode, Exceptio
         return new RunResult(stdout, stderr, null, null, true, durationMs, false, false);
     }
 
+    /** Прогон не выполнялся: проверку остановили досрочно (см. ProgramRunner#cancel). Сравнивать нечего. */
+    static RunResult cancelled() {
+        return lost(null, "[прогон отменён: проверка остановлена досрочно]", 0);
+    }
+
     /** Процесс завершился посреди прогона, не отдав вывод (например, Runtime.halt или падение JVM). */
     static RunResult lost(Integer exitCode, String reason, long durationMs) {
         return new RunResult("", reason, exitCode, null, false, durationMs, true, false);

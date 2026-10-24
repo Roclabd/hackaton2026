@@ -1,0 +1,12 @@
+/* Замер роста: кнопка, строка статуса и график по счётчикам. График занимает оставшуюся высоту панели. */
+.growth-measure{display:flex;flex-direction:column;gap:4px;min-width:0;min-height:0}
+.growth-measure-bar{display:flex;align-items:center;gap:10px;min-width:0;flex:none}
+.growth-measure-status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.growth-measure .growth-placeholder{margin:4px 0}
+/* SVG внутри — абсолютно, чтобы его размер не влиял на размер коробки (иначе ResizeObserver зациклится). */
+.profile-chart-box{position:relative;flex:1 1 auto;min-height:110px;width:100%}
+.profile-chart{position:absolute;inset:0;display:block}
+.growth-row>.growth-measure{align-self:stretch}
+.summary-growth .growth-measure{height:calc(100% - 22px)}
+.side-drawer .growth-measure{margin:6px 0 4px}
+.side-drawer .profile-chart-box{flex:none;height:190px}
