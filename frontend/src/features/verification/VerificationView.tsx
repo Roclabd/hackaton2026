@@ -3,7 +3,6 @@ import { Icon } from '../../components/Icon'
 import { navigate } from '../../state/route'
 import type { JobState } from '../../state/reducer'
 import { useAppState } from '../../state/store'
-import { GrowthChart } from '../evidence/GrowthChart'
 import { ExportDialog } from './ExportDialog'
 import { canExport, exportHint } from './exportText'
 import { RunComparison, ScenarioTable } from './RunComparison'
@@ -59,10 +58,6 @@ function RunConditions({ job }: { job: JobState }) {
           <div><dt>Время</dt><dd>{done ? `${verdict.durationMs} мс` : '—'}</dd></div>
         </dl>
         <div className="scope-note"><Icon name="info" />Результат относится только к выполненным входам.</div>
-      </section>
-      <section className="pane growth-side">
-        <div className="pane-header"><strong>Рост времени</strong></div>
-        <GrowthChart speedup={verdict?.speedup ?? null} />
       </section>
       <ExportButton job={job} />
     </aside>

@@ -46,7 +46,6 @@ export interface State {
   findingId: string | null
   patchId: string | null
   job: JobState | null
-  heat: boolean
   zoom: number
   dialog: DialogKind
   toast: Toast | null
@@ -55,7 +54,7 @@ export interface State {
 export const initialState: State = {
   project: null, draft: '', baseline: null, level: 'map', methodId: null, blueprint: null,
   selectedNodeId: null, selectedExprId: null, detailedExpressions: true, findings: [], findingId: null, patchId: null, job: null,
-  heat: false, zoom: 100, dialog: null, toast: null,
+  zoom: 100, dialog: null, toast: null,
 }
 
 export type Action =
@@ -76,7 +75,6 @@ export type Action =
   | { type: 'jobStarted'; job: JobState }
   | { type: 'jobUpdated'; jobId: string; verdict: Verdict }
   | { type: 'jobFailed'; jobId: string }
-  | { type: 'toggleHeat' }
   | { type: 'zoom'; value: number }
   | { type: 'openDialog'; dialog: DialogKind }
   | { type: 'closeDialog' }
@@ -136,8 +134,6 @@ export function reducer(state: State, action: Action): State {
       return state.job?.id === action.jobId ? { ...state, job: { ...state.job, verdict: action.verdict } } : state
     case 'jobFailed':
       return state.job?.id === action.jobId ? { ...state, job: null } : state
-    case 'toggleHeat':
-      return { ...state, heat: !state.heat }
     case 'zoom':
       return { ...state, zoom: action.value }
     case 'openDialog':

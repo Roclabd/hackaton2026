@@ -14,7 +14,6 @@ export function GraphPane() {
   const level = useAppState((s) => s.level)
   const methodId = useAppState((s) => s.methodId)
   const blueprint = useAppState((s) => s.blueprint)
-  const heat = useAppState((s) => s.heat)
   const detailed = useAppState((s) => s.detailedExpressions)
   const zoom = useAppState((s) => s.zoom)
   const node = useAppState(selectedNode)
@@ -37,14 +36,6 @@ export function GraphPane() {
             onClick={() => dispatch({ type: 'toggleExpressions' })}>{detailed ? 'Подробно' : 'Кратко'}</button>}
           <button
             type="button"
-            className={`icon-button ${heat ? 'is-on' : ''}`}
-            aria-pressed={heat}
-            aria-label="Тепловая карта"
-            title="Число выполнений"
-            onClick={() => dispatch({ type: 'toggleHeat' })}
-          ><Icon name="heat" /></button>
-          <button
-            type="button"
             className="btn btn-small"
             disabled={!onMethod || !node?.editable}
             onClick={() => dispatch({ type: 'openDialog', dialog: 'nodeEditor' })}
@@ -54,9 +45,7 @@ export function GraphPane() {
       <div className="graph-canvas" aria-label={onMethod ? 'Чертёж метода' : 'Карта классов'}>
         {onMethod ? <BlueprintView /> : <ClassMap />}
         <div className="canvas-hint">
-          {heat
-            ? <><span className="heat-swatch" /> Число выполнений появится после прогона</>
-            : onMethod ? 'Клик — выбрать узел · двойной клик — изменить' : 'Клик по методу — открыть чертёж'}
+          {onMethod ? 'Клик — выбрать узел · двойной клик — изменить' : 'Клик по методу — открыть чертёж'}
         </div>
         {onMethod && (
           <div className="canvas-controls">

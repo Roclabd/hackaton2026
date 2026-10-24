@@ -44,7 +44,6 @@
 /* График роста: заглушка без данных или полосы по speedup */
 .growth-placeholder{display:flex;flex-direction:column;gap:6px;justify-content:center;align-items:flex-start;min-height:96px;border:1px dashed var(--line-strong);border-radius:5px;padding:12px 14px;color:var(--muted);font-size:13px;margin:8px 0}
 .growth-placeholder strong{color:var(--ink);font-weight:500}
-.growth-side .growth-placeholder{margin:12px 14px}
 .growth-svg{width:100%;height:auto;max-height:130px;display:block}
 .finding-list{flex:1;overflow:auto}
 

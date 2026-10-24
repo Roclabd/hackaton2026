@@ -17,7 +17,6 @@ const SYMBOLS: Record<string, string> = {
   undo: '<path d="m8 4-5 5 5 5M3 9h10a7 7 0 1 1 0 14"/>',
   download: '<path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/>',
   maximize: '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
-  heat: '<path d="M13 3c1 5-2 6-2 9-2-1-2-3-2-4-3 3-5 5-5 8a8 8 0 0 0 16 0c0-5-4-9-7-13Z"/>',
   nodes: '<rect x="9" y="2" width="6" height="5" rx="1"/><rect x="1" y="17" width="6" height="5" rx="1"/><rect x="17" y="17" width="6" height="5" rx="1"/><path d="M12 7v5M4 17v-5h16v5"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 8.5a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4m0 4h.01"/>',
