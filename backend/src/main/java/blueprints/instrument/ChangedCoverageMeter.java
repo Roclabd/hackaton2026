@@ -64,8 +64,10 @@ public final class ChangedCoverageMeter {
         String issue = DeclarationChanges.between(original, candidate)
                 ? "Покрытие части изменений не измерено: изменены поля, сигнатуры или другие объявления" : null;
         try {
-            measureSide(candidate, changed.inCandidate(), mainClass, inputs, timeout, false).ifPresent(runs::add);
-            measureSide(original, changed.removed(), mainClass, inputs, timeout, true).ifPresent(runs::add);
+            List<Side> sides = new ArrayList<>();
+            prepareSide(candidate, changed.inCandidate(), mainClass, false).ifPresent(sides::add);
+            prepareSide(original, changed.removed(), mainClass, true).ifPresent(sides::add);
+            runs.addAll(runSides(sides, inputs, timeout));
         } catch (RuntimeException error) {
             issue = "Не удалось измерить покрытие изменённого кода: " + error.getMessage();
         }
@@ -75,29 +77,51 @@ public final class ChangedCoverageMeter {
         return new CoverageMeasurement(runs, issue);
     }
 
-    private Optional<CoverageRuns> measureSide(String measured, SortedSet<Integer> lines, String mainClass,
-                                               List<String> inputs, Duration timeout, boolean onOriginal) {
+    /** Одна сторона замера: копия со счётчиками, собранная и готовая к запуску. */
+    private record Side(InstrumentedSource instrumented, WorkerProtocol.Program program, boolean onOriginal) {}
+
+    private Optional<Side> prepareSide(String measured, SortedSet<Integer> lines, String mainClass, boolean onOriginal) {
         if (lines.isEmpty()) return Optional.empty();
         Optional<InstrumentedSource> instrumented = CoverageInstrumenter.instrument(measured, lines);
         if (instrumented.isEmpty()) {
             return Optional.empty();
         }
-        Optional<WorkerProtocol.Program> program = compile(instrumented.get().source(), mainClass);
+        String name = onOriginal ? PROGRAM + "-original" : PROGRAM + "-candidate";
+        Optional<WorkerProtocol.Program> program = compile(name, instrumented.get().source(), mainClass);
         if (program.isEmpty()) {
             throw new IllegalStateException("копия " + (onOriginal ? "эталона" : "кандидата") + " со счётчиками не собирается");
         }
-        int[][] hits = new int[inputs.size()][];
-        List<WorkerProtocol.Job> jobs = new ArrayList<>();
-        for (int i = 0; i < inputs.size(); i++) {
-            jobs.add(new WorkerProtocol.Job(i, PROGRAM, inputs.get(i)));
+        return Optional.of(new Side(instrumented.get(), program.get(), onOriginal));
+    }
+
+    /**
+     * Обе стороны — одним пулом рабочих процессов: запуск JVM на Windows стоит до секунды, а раньше замер
+     * поднимал свой пул дважды подряд. id задания = номер стороны × число входов + номер входа.
+     */
+    private List<CoverageRuns> runSides(List<Side> sides, List<String> inputs, Duration timeout) {
+        if (sides.isEmpty()) {
+            return List.of();
         }
-        runner.runAll(List.of(program.get()), jobs, timeout, workers,
-                (job, result) -> hits[job.id()] = result.unknown() ? null : result.coverageHits());
-        return Optional.of(new CoverageRuns(instrumented.get(), onOriginal, hits));
+        int[][][] hits = new int[sides.size()][inputs.size()][];
+        List<WorkerProtocol.Job> jobs = new ArrayList<>();
+        for (int s = 0; s < sides.size(); s++) {
+            for (int i = 0; i < inputs.size(); i++) {
+                jobs.add(new WorkerProtocol.Job(s * inputs.size() + i, sides.get(s).program().name(), inputs.get(i)));
+            }
+        }
+        runner.runAll(sides.stream().map(Side::program).toList(), jobs, timeout, workers, (job, result) -> {
+            int side = job.id() / inputs.size();
+            hits[side][job.id() % inputs.size()] = result.unknown() ? null : result.coverageHits();
+        });
+        List<CoverageRuns> runs = new ArrayList<>();
+        for (int s = 0; s < sides.size(); s++) {
+            runs.add(new CoverageRuns(sides.get(s).instrumented(), sides.get(s).onOriginal(), hits[s]));
+        }
+        return runs;
     }
 
     /** Копия собирается тем же компилятором, что и проверяемые версии; ловушка System.exit — по тем же правилам. */
-    private Optional<WorkerProtocol.Program> compile(String source, String mainClass) {
+    private Optional<WorkerProtocol.Program> compile(String name, String source, String mainClass) {
         ParseOutcome parsed = new SourceParser().parse(source);
         if (parsed.unit().isEmpty()) {
             return Optional.empty();
@@ -106,6 +130,6 @@ public final class ChangedCoverageMeter {
         if (!compiled.ok()) {
             return Optional.empty();
         }
-        return Optional.of(new WorkerProtocol.Program(PROGRAM, mainClass, compiled.classes(), ExitTrap.safeFor(source)));
+        return Optional.of(new WorkerProtocol.Program(name, mainClass, compiled.classes(), ExitTrap.safeFor(source)));
     }
 }
