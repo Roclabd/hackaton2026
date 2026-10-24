@@ -1,0 +1,10 @@
+{
+  "source": "class Broken {\n    int value = missing;\n}\n",
+  "compileErrors": [{ "line": 2, "column": 17, "text": "Не найдена переменная missing" }],
+  "findingCases": [
+    { "rule": "R1", "growthBefore": "n²", "growthAfter": "n", "expectedCategory": "Неэффективность", "expectedGrowth": true },
+    { "rule": "R2", "category": "DEFECT", "growthBefore": null, "growthAfter": null, "expectedCategory": "Дефект", "expectedGrowth": false },
+    { "rule": "R3", "category": "DEAD_CODE", "growthBefore": null, "growthAfter": null, "expectedCategory": "Мёртвый код", "expectedGrowth": false },
+    { "rule": "future", "category": "UNKNOWN", "expectedCategory": "Находка", "expectedGrowth": false }
+  ]
+}

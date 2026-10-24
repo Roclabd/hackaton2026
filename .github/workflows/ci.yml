@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+
+      - name: Фронт — проверка типов и сборка
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm run build
+
+      - name: Бэк — тесты и сборка jar (фронт уже внутри)
+        working-directory: backend
+        run: |
+          chmod +x mvnw
+          ./mvnw -B package
+
+      - name: Отчёт тестов
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: backend/target/surefire-reports/

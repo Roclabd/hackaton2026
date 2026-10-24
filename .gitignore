@@ -1,0 +1,41 @@
+# Секреты
+.env
+
+# Java / Maven
+backend/target/
+*.class
+
+# Фронт
+frontend/node_modules/
+frontend/dist/
+backend/src/main/resources/web/
+
+# IDE и система
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Кэш ответов ИИ и временные прогоны
+.cache/
+
+# Папки сборки субагентов
+backend/target-*/
+
+# Внутренние планы, стратегия, аудиты и передача между ассистентами
+ПЛАН_ПРОЕКТА.md
+docs/0*_*.md
+docs/АУДИТ*
+docs/аудит_v*/
+docs/ПРОМПТ_*
+docs/ПЕРЕДАЧА_*.md
+docs/Axenix_Хабр_сцепки.md
+docs/README.md
+docs/эксперименты/*.md
+docs/design/
+прототипы/
+CLAUDE.md
+
+# Пробные сборки фронта субагентов
+.build-*/

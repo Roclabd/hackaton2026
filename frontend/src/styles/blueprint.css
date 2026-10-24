@@ -1,0 +1,55 @@
+/* Чертёж метода: вложенные блоки HTML/CSS в стиле graph() из макета.
+   Контейнеры — рамки с заголовком и ветками, операторы — моноширинные блоки, между соседями — стрелка вниз. */
+
+:root{--bp-ink:#173153;--bp-line:#9eb3c9;--bp-pale:#eaf2ff;--bp-grid:#e8eff7}
+
+.bp-scroll{position:absolute;inset:0;overflow:auto;padding:14px 16px 52px}
+.bp-canvas{display:flex;flex-direction:column;align-items:center;width:fit-content;min-width:100%;transform-origin:top center;transition:transform 150ms}
+
+.bp-pill{border:1.4px solid var(--bp-line);background:white;border-radius:5px;padding:5px 14px;font:600 13px/19px var(--font-code);color:var(--bp-ink);white-space:nowrap}
+.bp-pill.muted{color:var(--muted);font-weight:400}
+
+.bp-arrow{width:2px;height:14px;background:var(--bp-line);position:relative;flex:none;margin-bottom:7px}
+.bp-arrow::after{content:'';position:absolute;left:-4px;bottom:-7px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--bp-line)}
+
+.bp-sequence{display:flex;flex-direction:column;align-items:center;width:100%}
+.bp-empty{font:12px var(--font-code);color:#9aa6b6;border:1px dashed var(--line-strong);border-radius:4px;padding:3px 10px;background:white}
+
+.bp-node{display:flex;align-items:center;gap:4px;max-width:560px;border:1.4px solid var(--bp-line);background:white;border-radius:5px;padding:6px 12px;color:var(--bp-ink);text-align:left}
+.bp-node code{font:500 13px/19px var(--font-code);white-space:pre-wrap;overflow-wrap:anywhere}
+.bp-node:hover{border-color:#6f8fb6}
+.bp-node.terminal{border-radius:18px;border-color:#5c7699;background:#f6f9fd}
+.bp-node.terminal code{font-weight:600}
+.bp-node.raw{flex-direction:column;align-items:flex-start;background:#f2f4f7;border-style:dashed;color:var(--muted)}
+.bp-raw-caption{font:11px var(--font-ui);color:#7a8698}
+
+.bp-frame{border:1.3px solid var(--bp-line);border-radius:5px;background:rgba(255,255,255,.88);padding:0 12px 12px;min-width:260px;max-width:100%}
+.bp-frame-header{display:flex;align-items:baseline;gap:14px;width:100%;border:0;background:transparent;padding:7px 2px 6px;text-align:left;color:var(--bp-ink)}
+.bp-frame-title{font:700 14px/20px var(--font-ui);flex:none}
+.bp-frame-code{font:500 13px/20px var(--font-code);color:var(--muted);margin-left:auto;overflow-wrap:anywhere}
+.bp-frame.kind-if>.bp-frame-header .bp-frame-code{color:var(--bp-ink)}
+
+.bp-branches{display:flex;flex-direction:column;gap:10px}
+.bp-branches.side-by-side{flex-direction:row;align-items:flex-start;gap:14px}
+.bp-branch{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0;border-top:1px dashed var(--bp-grid);padding-top:6px}
+.bp-branch-label{align-self:flex-start;font:12px/16px var(--font-code);color:var(--muted)}
+
+.bp-node.is-selected,.bp-frame.is-selected{border-color:var(--blue);border-width:2px;background:var(--bp-pale);box-shadow:0 0 0 3px rgba(0,63,169,.1)}
+.bp-frame.is-selected>.bp-frame-header{color:var(--blue)}
+.bp-node:focus-visible,.bp-frame-header:focus-visible{outline:3px solid #6499ef;outline-offset:2px}
+
+/* Дерево — проекция expr из AST; отдельные кнопки не вложены в кнопку оператора. */
+.bp-statement{max-width:560px;min-width:0}
+.bp-statement>.bp-node{width:100%}
+.bp-expressions{list-style:none;margin:4px 0 7px;padding:0 4px;font:12px/18px var(--font-code);max-width:560px}
+.bp-expressions ul{list-style:none;margin:0 0 0 10px;padding:0 0 0 8px;border-left:1px solid var(--bp-line)}
+.bp-expression{display:flex;align-items:baseline;gap:6px;width:100%;min-width:0;padding:2px 5px;border:1px solid transparent;border-radius:3px;background:transparent;color:var(--bp-ink);text-align:left}
+.bp-expression code{font:inherit;overflow-wrap:anywhere;min-width:0}
+.bp-expression-role{color:#48617e;flex:none;font:11px/18px var(--font-ui)}
+.bp-expression-kind{color:#52647b;font:11px/18px var(--font-ui);margin-left:auto;flex-shrink:0}
+.bp-expression:hover:not(:disabled){background:var(--bp-pale);border-color:var(--bp-line)}
+.bp-expression.is-selected{background:#dbe9ff;border-color:var(--blue)}
+.bp-expression:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.bp-expression:disabled{opacity:.55;cursor:default}
+.bp-frame-header{min-width:0;flex-wrap:wrap}
+@media(max-width:700px){.bp-expression{flex-wrap:wrap}.bp-expression-kind{margin-left:0}.bp-branches.side-by-side{flex-direction:column}}

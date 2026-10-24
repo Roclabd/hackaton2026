@@ -1,0 +1,3 @@
+java.lang.IllegalStateException: для stderr
+	at Scope4Exceptions.throwableApi(Scope4Exceptions.java:487)
+	at Scope4Exceptions.main(Scope4Exceptions.java:144)

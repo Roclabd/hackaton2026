@@ -1,0 +1,3214 @@
+{
+  "methodId": "M:MiniLang.Interpreter#evaluate(Expr)",
+  "label": "Object evaluate(Expr)",
+  "nodes": [
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee",
+      "kind": "if",
+      "label": "if (e instanceof Literal)",
+      "code": "e instanceof Literal",
+      "lines": [
+        720,
+        720
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/e",
+        "kind": "instanceof",
+        "label": "instanceof Literal",
+        "code": "e instanceof Literal",
+        "range": [
+          720,
+          17,
+          720,
+          36
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              720,
+              17,
+              720,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/then.return:3427007e",
+      "kind": "return",
+      "label": "return ((Literal) e).value;",
+      "code": "return ((Literal) e).value;",
+      "lines": [
+        720,
+        720
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/then.return:3427007e/e",
+        "kind": "field",
+        "label": ".value",
+        "code": "((Literal) e).value",
+        "range": [
+          720,
+          46,
+          720,
+          64
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/then.return:3427007e/e/0",
+            "kind": "cast",
+            "label": "(Literal)",
+            "code": "(Literal) e",
+            "range": [
+              720,
+              47,
+              720,
+              57
+            ],
+            "role": "объект",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee/then.return:3427007e/e/0/0",
+                "kind": "name",
+                "label": "e",
+                "code": "e",
+                "range": [
+                  720,
+                  57,
+                  720,
+                  57
+                ],
+                "role": "значение",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019",
+      "kind": "if",
+      "label": "if (e instanceof Variable)",
+      "code": "e instanceof Variable",
+      "lines": [
+        721,
+        721
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/e",
+        "kind": "instanceof",
+        "label": "instanceof Variable",
+        "code": "e instanceof Variable",
+        "range": [
+          721,
+          17,
+          721,
+          37
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              721,
+              17,
+              721,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471",
+      "kind": "return",
+      "label": "return env.get(((Variable) e).name);",
+      "code": "return env.get(((Variable) e).name);",
+      "lines": [
+        721,
+        721
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471/e",
+        "kind": "call",
+        "label": "get",
+        "code": "env.get(((Variable) e).name)",
+        "range": [
+          721,
+          47,
+          721,
+          74
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471/e/0",
+            "kind": "name",
+            "label": "env",
+            "code": "env",
+            "range": [
+              721,
+              47,
+              721,
+              49
+            ],
+            "role": "объект",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471/e/1",
+            "kind": "field",
+            "label": ".name",
+            "code": "((Variable) e).name",
+            "range": [
+              721,
+              55,
+              721,
+              73
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471/e/1/0",
+                "kind": "cast",
+                "label": "(Variable)",
+                "code": "(Variable) e",
+                "range": [
+                  721,
+                  56,
+                  721,
+                  67
+                ],
+                "role": "объект",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019/then.return:28fc8471/e/1/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      721,
+                      67,
+                      721,
+                      67
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "kind": "if",
+      "label": "if (e instanceof Assign)",
+      "code": "e instanceof Assign",
+      "lines": [
+        722,
+        727
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/e",
+        "kind": "instanceof",
+        "label": "instanceof Assign",
+        "code": "e instanceof Assign",
+        "range": [
+          722,
+          17,
+          722,
+          35
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              722,
+              17,
+              722,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91",
+      "kind": "stmt",
+      "label": "Assign a = (Assign) e;",
+      "code": "Assign a = (Assign) e;",
+      "lines": [
+        723,
+        723
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91/e",
+        "kind": "declare",
+        "label": "Assign",
+        "code": "Assign a = (Assign) e",
+        "range": [
+          723,
+          17,
+          723,
+          37
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91/e/0",
+            "kind": "name",
+            "label": "a",
+            "code": "a = (Assign) e",
+            "range": [
+              723,
+              24,
+              723,
+              37
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91/e/0/0",
+                "kind": "cast",
+                "label": "(Assign)",
+                "code": "(Assign) e",
+                "range": [
+                  723,
+                  28,
+                  723,
+                  37
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91/e/0/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      723,
+                      37,
+                      723,
+                      37
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a",
+      "kind": "stmt",
+      "label": "Object value = evaluate(a.value);",
+      "code": "Object value = evaluate(a.value);",
+      "lines": [
+        724,
+        724
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a/e",
+        "kind": "declare",
+        "label": "Object",
+        "code": "Object value = evaluate(a.value)",
+        "range": [
+          724,
+          17,
+          724,
+          48
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a/e/0",
+            "kind": "name",
+            "label": "value",
+            "code": "value = evaluate(a.value)",
+            "range": [
+              724,
+              24,
+              724,
+              48
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a/e/0/0",
+                "kind": "call",
+                "label": "evaluate",
+                "code": "evaluate(a.value)",
+                "range": [
+                  724,
+                  32,
+                  724,
+                  48
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a/e/0/0/0",
+                    "kind": "field",
+                    "label": ".value",
+                    "code": "a.value",
+                    "range": [
+                      724,
+                      41,
+                      724,
+                      47
+                    ],
+                    "role": "арг 1",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "a",
+                        "code": "a",
+                        "range": [
+                          724,
+                          41,
+                          724,
+                          41
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f",
+      "kind": "stmt",
+      "label": "env.assign(a.name, value);",
+      "code": "env.assign(a.name, value);",
+      "lines": [
+        725,
+        725
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f/e",
+        "kind": "call",
+        "label": "assign",
+        "code": "env.assign(a.name, value)",
+        "range": [
+          725,
+          17,
+          725,
+          41
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f/e/0",
+            "kind": "name",
+            "label": "env",
+            "code": "env",
+            "range": [
+              725,
+              17,
+              725,
+              19
+            ],
+            "role": "объект",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f/e/1",
+            "kind": "field",
+            "label": ".name",
+            "code": "a.name",
+            "range": [
+              725,
+              28,
+              725,
+              33
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f/e/1/0",
+                "kind": "name",
+                "label": "a",
+                "code": "a",
+                "range": [
+                  725,
+                  28,
+                  725,
+                  28
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f/e/2",
+            "kind": "name",
+            "label": "value",
+            "code": "value",
+            "range": [
+              725,
+              36,
+              725,
+              40
+            ],
+            "role": "арг 2",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.return:718891da",
+      "kind": "return",
+      "label": "return value;",
+      "code": "return value;",
+      "lines": [
+        726,
+        726
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.return:718891da/e",
+        "kind": "name",
+        "label": "value",
+        "code": "value",
+        "range": [
+          726,
+          24,
+          726,
+          28
+        ],
+        "role": null,
+        "children": []
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234",
+      "kind": "if",
+      "label": "if (e instanceof Binary)",
+      "code": "e instanceof Binary",
+      "lines": [
+        728,
+        728
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/e",
+        "kind": "instanceof",
+        "label": "instanceof Binary",
+        "code": "e instanceof Binary",
+        "range": [
+          728,
+          17,
+          728,
+          35
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              728,
+              17,
+              728,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/then.return:da441fd2",
+      "kind": "return",
+      "label": "return evalBinary((Binary) e);",
+      "code": "return evalBinary((Binary) e);",
+      "lines": [
+        728,
+        728
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/then.return:da441fd2/e",
+        "kind": "call",
+        "label": "evalBinary",
+        "code": "evalBinary((Binary) e)",
+        "range": [
+          728,
+          45,
+          728,
+          66
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/then.return:da441fd2/e/0",
+            "kind": "cast",
+            "label": "(Binary)",
+            "code": "(Binary) e",
+            "range": [
+              728,
+              56,
+              728,
+              65
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234/then.return:da441fd2/e/0/0",
+                "kind": "name",
+                "label": "e",
+                "code": "e",
+                "range": [
+                  728,
+                  65,
+                  728,
+                  65
+                ],
+                "role": "значение",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "kind": "if",
+      "label": "if (e instanceof Logical)",
+      "code": "e instanceof Logical",
+      "lines": [
+        729,
+        734
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/e",
+        "kind": "instanceof",
+        "label": "instanceof Logical",
+        "code": "e instanceof Logical",
+        "range": [
+          729,
+          17,
+          729,
+          36
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              729,
+              17,
+              729,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c",
+      "kind": "stmt",
+      "label": "Logical l = (Logical) e;",
+      "code": "Logical l = (Logical) e;",
+      "lines": [
+        730,
+        730
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c/e",
+        "kind": "declare",
+        "label": "Logical",
+        "code": "Logical l = (Logical) e",
+        "range": [
+          730,
+          17,
+          730,
+          39
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c/e/0",
+            "kind": "name",
+            "label": "l",
+            "code": "l = (Logical) e",
+            "range": [
+              730,
+              25,
+              730,
+              39
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c/e/0/0",
+                "kind": "cast",
+                "label": "(Logical)",
+                "code": "(Logical) e",
+                "range": [
+                  730,
+                  29,
+                  730,
+                  39
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c/e/0/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      730,
+                      39,
+                      730,
+                      39
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf",
+      "kind": "stmt",
+      "label": "Object left = evaluate(l.left);",
+      "code": "Object left = evaluate(l.left);",
+      "lines": [
+        731,
+        731
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf/e",
+        "kind": "declare",
+        "label": "Object",
+        "code": "Object left = evaluate(l.left)",
+        "range": [
+          731,
+          17,
+          731,
+          46
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf/e/0",
+            "kind": "name",
+            "label": "left",
+            "code": "left = evaluate(l.left)",
+            "range": [
+              731,
+              24,
+              731,
+              46
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf/e/0/0",
+                "kind": "call",
+                "label": "evaluate",
+                "code": "evaluate(l.left)",
+                "range": [
+                  731,
+                  31,
+                  731,
+                  46
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf/e/0/0/0",
+                    "kind": "field",
+                    "label": ".left",
+                    "code": "l.left",
+                    "range": [
+                      731,
+                      40,
+                      731,
+                      45
+                    ],
+                    "role": "арг 1",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "l",
+                        "code": "l",
+                        "range": [
+                          731,
+                          40,
+                          731,
+                          40
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea",
+      "kind": "if",
+      "label": "if (l.op.type == Tok.OR ? isTruthy(left) : !isTruthy(left))",
+      "code": "l.op.type == Tok.OR ? isTruthy(left) : !isTruthy(left)",
+      "lines": [
+        732,
+        732
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e",
+        "kind": "ternary",
+        "label": "?:",
+        "code": "l.op.type == Tok.OR ? isTruthy(left) : !isTruthy(left)",
+        "range": [
+          732,
+          21,
+          732,
+          74
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/0",
+            "kind": "binary",
+            "label": "==",
+            "code": "l.op.type == Tok.OR",
+            "range": [
+              732,
+              21,
+              732,
+              39
+            ],
+            "role": "условие",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/0/0",
+                "kind": "field",
+                "label": ".type",
+                "code": "l.op.type",
+                "range": [
+                  732,
+                  21,
+                  732,
+                  29
+                ],
+                "role": "слева",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/0/0/0",
+                    "kind": "field",
+                    "label": ".op",
+                    "code": "l.op",
+                    "range": [
+                      732,
+                      21,
+                      732,
+                      24
+                    ],
+                    "role": "объект",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "l",
+                        "code": "l",
+                        "range": [
+                          732,
+                          21,
+                          732,
+                          21
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/0/1",
+                "kind": "field",
+                "label": "Tok.OR",
+                "code": "Tok.OR",
+                "range": [
+                  732,
+                  34,
+                  732,
+                  39
+                ],
+                "role": "справа",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/1",
+            "kind": "call",
+            "label": "isTruthy",
+            "code": "isTruthy(left)",
+            "range": [
+              732,
+              43,
+              732,
+              56
+            ],
+            "role": "да",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/1/0",
+                "kind": "name",
+                "label": "left",
+                "code": "left",
+                "range": [
+                  732,
+                  52,
+                  732,
+                  55
+                ],
+                "role": "арг 1",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/2",
+            "kind": "unary",
+            "label": "!",
+            "code": "!isTruthy(left)",
+            "range": [
+              732,
+              60,
+              732,
+              74
+            ],
+            "role": "нет",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/2/0",
+                "kind": "call",
+                "label": "isTruthy",
+                "code": "isTruthy(left)",
+                "range": [
+                  732,
+                  61,
+                  732,
+                  74
+                ],
+                "role": "значение",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/e/2/0/0",
+                    "kind": "name",
+                    "label": "left",
+                    "code": "left",
+                    "range": [
+                      732,
+                      70,
+                      732,
+                      73
+                    ],
+                    "role": "арг 1",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/then.return:d9d40e24",
+      "kind": "return",
+      "label": "return left;",
+      "code": "return left;",
+      "lines": [
+        732,
+        732
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea/then.return:d9d40e24/e",
+        "kind": "name",
+        "label": "left",
+        "code": "left",
+        "range": [
+          732,
+          84,
+          732,
+          87
+        ],
+        "role": null,
+        "children": []
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed",
+      "kind": "return",
+      "label": "return evaluate(l.right);",
+      "code": "return evaluate(l.right);",
+      "lines": [
+        733,
+        733
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed/e",
+        "kind": "call",
+        "label": "evaluate",
+        "code": "evaluate(l.right)",
+        "range": [
+          733,
+          24,
+          733,
+          40
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed/e/0",
+            "kind": "field",
+            "label": ".right",
+            "code": "l.right",
+            "range": [
+              733,
+              33,
+              733,
+              39
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed/e/0/0",
+                "kind": "name",
+                "label": "l",
+                "code": "l",
+                "range": [
+                  733,
+                  33,
+                  733,
+                  33
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "kind": "if",
+      "label": "if (e instanceof Unary)",
+      "code": "e instanceof Unary",
+      "lines": [
+        735,
+        739
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/e",
+        "kind": "instanceof",
+        "label": "instanceof Unary",
+        "code": "e instanceof Unary",
+        "range": [
+          735,
+          17,
+          735,
+          34
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              735,
+              17,
+              735,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3",
+      "kind": "stmt",
+      "label": "Unary u = (Unary) e;",
+      "code": "Unary u = (Unary) e;",
+      "lines": [
+        736,
+        736
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3/e",
+        "kind": "declare",
+        "label": "Unary",
+        "code": "Unary u = (Unary) e",
+        "range": [
+          736,
+          17,
+          736,
+          35
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3/e/0",
+            "kind": "name",
+            "label": "u",
+            "code": "u = (Unary) e",
+            "range": [
+              736,
+              23,
+              736,
+              35
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3/e/0/0",
+                "kind": "cast",
+                "label": "(Unary)",
+                "code": "(Unary) e",
+                "range": [
+                  736,
+                  27,
+                  736,
+                  35
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3/e/0/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      736,
+                      35,
+                      736,
+                      35
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae",
+      "kind": "stmt",
+      "label": "Object right = evaluate(u.right);",
+      "code": "Object right = evaluate(u.right);",
+      "lines": [
+        737,
+        737
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae/e",
+        "kind": "declare",
+        "label": "Object",
+        "code": "Object right = evaluate(u.right)",
+        "range": [
+          737,
+          17,
+          737,
+          48
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae/e/0",
+            "kind": "name",
+            "label": "right",
+            "code": "right = evaluate(u.right)",
+            "range": [
+              737,
+              24,
+              737,
+              48
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae/e/0/0",
+                "kind": "call",
+                "label": "evaluate",
+                "code": "evaluate(u.right)",
+                "range": [
+                  737,
+                  32,
+                  737,
+                  48
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae/e/0/0/0",
+                    "kind": "field",
+                    "label": ".right",
+                    "code": "u.right",
+                    "range": [
+                      737,
+                      41,
+                      737,
+                      47
+                    ],
+                    "role": "арг 1",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "u",
+                        "code": "u",
+                        "range": [
+                          737,
+                          41,
+                          737,
+                          41
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519",
+      "kind": "return",
+      "label": "return u.op.type == Tok.BANG ? (Object) !isTruthy(right) : (Object) (-num(u.op, right));",
+      "code": "return u.op.type == Tok.BANG ? (Object) !isTruthy(right) : (Object) (-num(u.op, right));",
+      "lines": [
+        738,
+        738
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e",
+        "kind": "ternary",
+        "label": "?:",
+        "code": "u.op.type == Tok.BANG ? (Object) !isTruthy(right) : (Object) (-num(u.op, right))",
+        "range": [
+          738,
+          24,
+          738,
+          103
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/0",
+            "kind": "binary",
+            "label": "==",
+            "code": "u.op.type == Tok.BANG",
+            "range": [
+              738,
+              24,
+              738,
+              44
+            ],
+            "role": "условие",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/0/0",
+                "kind": "field",
+                "label": ".type",
+                "code": "u.op.type",
+                "range": [
+                  738,
+                  24,
+                  738,
+                  32
+                ],
+                "role": "слева",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/0/0/0",
+                    "kind": "field",
+                    "label": ".op",
+                    "code": "u.op",
+                    "range": [
+                      738,
+                      24,
+                      738,
+                      27
+                    ],
+                    "role": "объект",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "u",
+                        "code": "u",
+                        "range": [
+                          738,
+                          24,
+                          738,
+                          24
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/0/1",
+                "kind": "field",
+                "label": "Tok.BANG",
+                "code": "Tok.BANG",
+                "range": [
+                  738,
+                  37,
+                  738,
+                  44
+                ],
+                "role": "справа",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/1",
+            "kind": "cast",
+            "label": "(Object)",
+            "code": "(Object) !isTruthy(right)",
+            "range": [
+              738,
+              48,
+              738,
+              72
+            ],
+            "role": "да",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/1/0",
+                "kind": "unary",
+                "label": "!",
+                "code": "!isTruthy(right)",
+                "range": [
+                  738,
+                  57,
+                  738,
+                  72
+                ],
+                "role": "значение",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/1/0/0",
+                    "kind": "call",
+                    "label": "isTruthy",
+                    "code": "isTruthy(right)",
+                    "range": [
+                      738,
+                      58,
+                      738,
+                      72
+                    ],
+                    "role": "значение",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/1/0/0/0",
+                        "kind": "name",
+                        "label": "right",
+                        "code": "right",
+                        "range": [
+                          738,
+                          67,
+                          738,
+                          71
+                        ],
+                        "role": "арг 1",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2",
+            "kind": "cast",
+            "label": "(Object)",
+            "code": "(Object) (-num(u.op, right))",
+            "range": [
+              738,
+              76,
+              738,
+              103
+            ],
+            "role": "нет",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2/0",
+                "kind": "unary",
+                "label": "-",
+                "code": "-num(u.op, right)",
+                "range": [
+                  738,
+                  86,
+                  738,
+                  102
+                ],
+                "role": "значение",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2/0/0",
+                    "kind": "call",
+                    "label": "num",
+                    "code": "num(u.op, right)",
+                    "range": [
+                      738,
+                      87,
+                      738,
+                      102
+                    ],
+                    "role": "значение",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2/0/0/0",
+                        "kind": "field",
+                        "label": ".op",
+                        "code": "u.op",
+                        "range": [
+                          738,
+                          91,
+                          738,
+                          94
+                        ],
+                        "role": "арг 1",
+                        "children": [
+                          {
+                            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2/0/0/0/0",
+                            "kind": "name",
+                            "label": "u",
+                            "code": "u",
+                            "range": [
+                              738,
+                              91,
+                              738,
+                              91
+                            ],
+                            "role": "объект",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519/e/2/0/0/1",
+                        "kind": "name",
+                        "label": "right",
+                        "code": "right",
+                        "range": [
+                          738,
+                          97,
+                          738,
+                          101
+                        ],
+                        "role": "арг 2",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "kind": "if",
+      "label": "if (e instanceof Call)",
+      "code": "e instanceof Call",
+      "lines": [
+        740,
+        746
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/e",
+        "kind": "instanceof",
+        "label": "instanceof Call",
+        "code": "e instanceof Call",
+        "range": [
+          740,
+          17,
+          740,
+          33
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              740,
+              17,
+              740,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1",
+      "kind": "stmt",
+      "label": "Call c = (Call) e;",
+      "code": "Call c = (Call) e;",
+      "lines": [
+        741,
+        741
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1/e",
+        "kind": "declare",
+        "label": "Call",
+        "code": "Call c = (Call) e",
+        "range": [
+          741,
+          17,
+          741,
+          33
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1/e/0",
+            "kind": "name",
+            "label": "c",
+            "code": "c = (Call) e",
+            "range": [
+              741,
+              22,
+              741,
+              33
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1/e/0/0",
+                "kind": "cast",
+                "label": "(Call)",
+                "code": "(Call) e",
+                "range": [
+                  741,
+                  26,
+                  741,
+                  33
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1/e/0/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      741,
+                      33,
+                      741,
+                      33
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6",
+      "kind": "stmt",
+      "label": "Object callee = evaluate(c.callee);",
+      "code": "Object callee = evaluate(c.callee);",
+      "lines": [
+        742,
+        742
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6/e",
+        "kind": "declare",
+        "label": "Object",
+        "code": "Object callee = evaluate(c.callee)",
+        "range": [
+          742,
+          17,
+          742,
+          50
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6/e/0",
+            "kind": "name",
+            "label": "callee",
+            "code": "callee = evaluate(c.callee)",
+            "range": [
+              742,
+              24,
+              742,
+              50
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6/e/0/0",
+                "kind": "call",
+                "label": "evaluate",
+                "code": "evaluate(c.callee)",
+                "range": [
+                  742,
+                  33,
+                  742,
+                  50
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6/e/0/0/0",
+                    "kind": "field",
+                    "label": ".callee",
+                    "code": "c.callee",
+                    "range": [
+                      742,
+                      42,
+                      742,
+                      49
+                    ],
+                    "role": "арг 1",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6/e/0/0/0/0",
+                        "kind": "name",
+                        "label": "c",
+                        "code": "c",
+                        "range": [
+                          742,
+                          42,
+                          742,
+                          42
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88",
+      "kind": "stmt",
+      "label": "List<Object> args = new ArrayList<>();",
+      "code": "List<Object> args = new ArrayList<>();",
+      "lines": [
+        743,
+        743
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88/e",
+        "kind": "declare",
+        "label": "List<Object>",
+        "code": "List<Object> args = new ArrayList<>()",
+        "range": [
+          743,
+          17,
+          743,
+          53
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88/e/0",
+            "kind": "name",
+            "label": "args",
+            "code": "args = new ArrayList<>()",
+            "range": [
+              743,
+              30,
+              743,
+              53
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88/e/0/0",
+                "kind": "new",
+                "label": "new ArrayList<>",
+                "code": "new ArrayList<>()",
+                "range": [
+                  743,
+                  37,
+                  743,
+                  53
+                ],
+                "role": "инициализация",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2",
+      "kind": "loop",
+      "label": "for (Expr a : c.args)",
+      "code": null,
+      "lines": [
+        744,
+        744
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "branch": "then",
+      "badges": [],
+      "editable": false,
+      "branches": [
+        {
+          "key": "body",
+          "label": "тело"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/e",
+        "kind": "forEachHeader",
+        "label": "for each",
+        "code": "for (Expr a : c.args)",
+        "range": [
+          744,
+          17,
+          744,
+          37
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/e/0",
+            "kind": "declare",
+            "label": "Expr",
+            "code": "Expr a",
+            "range": [
+              744,
+              22,
+              744,
+              27
+            ],
+            "role": "элемент",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/e/0/0",
+                "kind": "name",
+                "label": "a",
+                "code": "a",
+                "range": [
+                  744,
+                  27,
+                  744,
+                  27
+                ],
+                "role": "переменная",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/e/1",
+            "kind": "field",
+            "label": ".args",
+            "code": "c.args",
+            "range": [
+              744,
+              31,
+              744,
+              36
+            ],
+            "role": "коллекция",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/e/1/0",
+                "kind": "name",
+                "label": "c",
+                "code": "c",
+                "range": [
+                  744,
+                  31,
+                  744,
+                  31
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/body.stmt:74384f31",
+      "kind": "stmt",
+      "label": "args.add(evaluate(a));",
+      "code": "args.add(evaluate(a));",
+      "lines": [
+        744,
+        744
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/body.stmt:74384f31/e",
+        "kind": "call",
+        "label": "add",
+        "code": "args.add(evaluate(a))",
+        "range": [
+          744,
+          39,
+          744,
+          59
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/body.stmt:74384f31/e/0",
+            "kind": "name",
+            "label": "args",
+            "code": "args",
+            "range": [
+              744,
+              39,
+              744,
+              42
+            ],
+            "role": "объект",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/body.stmt:74384f31/e/1",
+            "kind": "call",
+            "label": "evaluate",
+            "code": "evaluate(a)",
+            "range": [
+              744,
+              48,
+              744,
+              58
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2/body.stmt:74384f31/e/1/0",
+                "kind": "name",
+                "label": "a",
+                "code": "a",
+                "range": [
+                  744,
+                  57,
+                  744,
+                  57
+                ],
+                "role": "арг 1",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29",
+      "kind": "return",
+      "label": "return callValue(callee, args, c.paren);",
+      "code": "return callValue(callee, args, c.paren);",
+      "lines": [
+        745,
+        745
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29/e",
+        "kind": "call",
+        "label": "callValue",
+        "code": "callValue(callee, args, c.paren)",
+        "range": [
+          745,
+          24,
+          745,
+          55
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29/e/0",
+            "kind": "name",
+            "label": "callee",
+            "code": "callee",
+            "range": [
+              745,
+              34,
+              745,
+              39
+            ],
+            "role": "арг 1",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29/e/1",
+            "kind": "name",
+            "label": "args",
+            "code": "args",
+            "range": [
+              745,
+              42,
+              745,
+              45
+            ],
+            "role": "арг 2",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29/e/2",
+            "kind": "field",
+            "label": ".paren",
+            "code": "c.paren",
+            "range": [
+              745,
+              48,
+              745,
+              54
+            ],
+            "role": "арг 3",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29/e/2/0",
+                "kind": "name",
+                "label": "c",
+                "code": "c",
+                "range": [
+                  745,
+                  48,
+                  745,
+                  48
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b",
+      "kind": "if",
+      "label": "if (e instanceof Index)",
+      "code": "e instanceof Index",
+      "lines": [
+        747,
+        747
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/e",
+        "kind": "instanceof",
+        "label": "instanceof Index",
+        "code": "e instanceof Index",
+        "range": [
+          747,
+          17,
+          747,
+          34
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              747,
+              17,
+              747,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/then.return:a5da6114",
+      "kind": "return",
+      "label": "return evalIndex((Index) e);",
+      "code": "return evalIndex((Index) e);",
+      "lines": [
+        747,
+        747
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/then.return:a5da6114/e",
+        "kind": "call",
+        "label": "evalIndex",
+        "code": "evalIndex((Index) e)",
+        "range": [
+          747,
+          44,
+          747,
+          63
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/then.return:a5da6114/e/0",
+            "kind": "cast",
+            "label": "(Index)",
+            "code": "(Index) e",
+            "range": [
+              747,
+              54,
+              747,
+              62
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b/then.return:a5da6114/e/0/0",
+                "kind": "name",
+                "label": "e",
+                "code": "e",
+                "range": [
+                  747,
+                  62,
+                  747,
+                  62
+                ],
+                "role": "значение",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5",
+      "kind": "if",
+      "label": "if (e instanceof IndexSet)",
+      "code": "e instanceof IndexSet",
+      "lines": [
+        748,
+        748
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/e",
+        "kind": "instanceof",
+        "label": "instanceof IndexSet",
+        "code": "e instanceof IndexSet",
+        "range": [
+          748,
+          17,
+          748,
+          37
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              748,
+              17,
+              748,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/then.return:9e95e734",
+      "kind": "return",
+      "label": "return evalIndexSet((IndexSet) e);",
+      "code": "return evalIndexSet((IndexSet) e);",
+      "lines": [
+        748,
+        748
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/then.return:9e95e734/e",
+        "kind": "call",
+        "label": "evalIndexSet",
+        "code": "evalIndexSet((IndexSet) e)",
+        "range": [
+          748,
+          47,
+          748,
+          72
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/then.return:9e95e734/e/0",
+            "kind": "cast",
+            "label": "(IndexSet)",
+            "code": "(IndexSet) e",
+            "range": [
+              748,
+              60,
+              748,
+              71
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5/then.return:9e95e734/e/0/0",
+                "kind": "name",
+                "label": "e",
+                "code": "e",
+                "range": [
+                  748,
+                  71,
+                  748,
+                  71
+                ],
+                "role": "значение",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "kind": "if",
+      "label": "if (e instanceof ListLit)",
+      "code": "e instanceof ListLit",
+      "lines": [
+        749,
+        753
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/e",
+        "kind": "instanceof",
+        "label": "instanceof ListLit",
+        "code": "e instanceof ListLit",
+        "range": [
+          749,
+          17,
+          749,
+          36
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              749,
+              17,
+              749,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67",
+      "kind": "stmt",
+      "label": "List<Object> list = new ArrayList<>();",
+      "code": "List<Object> list = new ArrayList<>();",
+      "lines": [
+        750,
+        750
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67/e",
+        "kind": "declare",
+        "label": "List<Object>",
+        "code": "List<Object> list = new ArrayList<>()",
+        "range": [
+          750,
+          17,
+          750,
+          53
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67/e/0",
+            "kind": "name",
+            "label": "list",
+            "code": "list = new ArrayList<>()",
+            "range": [
+              750,
+              30,
+              750,
+              53
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67/e/0/0",
+                "kind": "new",
+                "label": "new ArrayList<>",
+                "code": "new ArrayList<>()",
+                "range": [
+                  750,
+                  37,
+                  750,
+                  53
+                ],
+                "role": "инициализация",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c",
+      "kind": "loop",
+      "label": "for (Expr item : ((ListLit) e).items)",
+      "code": null,
+      "lines": [
+        751,
+        751
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "branch": "then",
+      "badges": [],
+      "editable": false,
+      "branches": [
+        {
+          "key": "body",
+          "label": "тело"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e",
+        "kind": "forEachHeader",
+        "label": "for each",
+        "code": "for (Expr item : ((ListLit) e).items)",
+        "range": [
+          751,
+          17,
+          751,
+          53
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e/0",
+            "kind": "declare",
+            "label": "Expr",
+            "code": "Expr item",
+            "range": [
+              751,
+              22,
+              751,
+              30
+            ],
+            "role": "элемент",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e/0/0",
+                "kind": "name",
+                "label": "item",
+                "code": "item",
+                "range": [
+                  751,
+                  27,
+                  751,
+                  30
+                ],
+                "role": "переменная",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e/1",
+            "kind": "field",
+            "label": ".items",
+            "code": "((ListLit) e).items",
+            "range": [
+              751,
+              34,
+              751,
+              52
+            ],
+            "role": "коллекция",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e/1/0",
+                "kind": "cast",
+                "label": "(ListLit)",
+                "code": "(ListLit) e",
+                "range": [
+                  751,
+                  35,
+                  751,
+                  45
+                ],
+                "role": "объект",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/e/1/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      751,
+                      45,
+                      751,
+                      45
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/body.stmt:a237f690",
+      "kind": "stmt",
+      "label": "list.add(evaluate(item));",
+      "code": "list.add(evaluate(item));",
+      "lines": [
+        751,
+        751
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/body.stmt:a237f690/e",
+        "kind": "call",
+        "label": "add",
+        "code": "list.add(evaluate(item))",
+        "range": [
+          751,
+          55,
+          751,
+          78
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/body.stmt:a237f690/e/0",
+            "kind": "name",
+            "label": "list",
+            "code": "list",
+            "range": [
+              751,
+              55,
+              751,
+              58
+            ],
+            "role": "объект",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/body.stmt:a237f690/e/1",
+            "kind": "call",
+            "label": "evaluate",
+            "code": "evaluate(item)",
+            "range": [
+              751,
+              64,
+              751,
+              77
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c/body.stmt:a237f690/e/1/0",
+                "kind": "name",
+                "label": "item",
+                "code": "item",
+                "range": [
+                  751,
+                  73,
+                  751,
+                  76
+                ],
+                "role": "арг 1",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.return:d9d6106d",
+      "kind": "return",
+      "label": "return list;",
+      "code": "return list;",
+      "lines": [
+        752,
+        752
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.return:d9d6106d/e",
+        "kind": "name",
+        "label": "list",
+        "code": "list",
+        "range": [
+          752,
+          24,
+          752,
+          27
+        ],
+        "role": null,
+        "children": []
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "kind": "if",
+      "label": "if (e instanceof Lambda)",
+      "code": "e instanceof Lambda",
+      "lines": [
+        754,
+        757
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/e",
+        "kind": "instanceof",
+        "label": "instanceof Lambda",
+        "code": "e instanceof Lambda",
+        "range": [
+          754,
+          17,
+          754,
+          35
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/e/0",
+            "kind": "name",
+            "label": "e",
+            "code": "e",
+            "range": [
+              754,
+              17,
+              754,
+              17
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c",
+      "kind": "stmt",
+      "label": "Lambda l = (Lambda) e;",
+      "code": "Lambda l = (Lambda) e;",
+      "lines": [
+        755,
+        755
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c/e",
+        "kind": "declare",
+        "label": "Lambda",
+        "code": "Lambda l = (Lambda) e",
+        "range": [
+          755,
+          17,
+          755,
+          37
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c/e/0",
+            "kind": "name",
+            "label": "l",
+            "code": "l = (Lambda) e",
+            "range": [
+              755,
+              24,
+              755,
+              37
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c/e/0/0",
+                "kind": "cast",
+                "label": "(Lambda)",
+                "code": "(Lambda) e",
+                "range": [
+                  755,
+                  28,
+                  755,
+                  37
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c/e/0/0/0",
+                    "kind": "name",
+                    "label": "e",
+                    "code": "e",
+                    "range": [
+                      755,
+                      37,
+                      755,
+                      37
+                    ],
+                    "role": "значение",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995",
+      "kind": "return",
+      "label": "return new MiniFunction(\"lambda\", l.params, l.body, env);",
+      "code": "return new MiniFunction(\"lambda\", l.params, l.body, env);",
+      "lines": [
+        756,
+        756
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e",
+        "kind": "new",
+        "label": "new MiniFunction",
+        "code": "new MiniFunction(\"lambda\", l.params, l.body, env)",
+        "range": [
+          756,
+          24,
+          756,
+          72
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/0",
+            "kind": "literal",
+            "label": "\"lambda\"",
+            "code": "\"lambda\"",
+            "range": [
+              756,
+              41,
+              756,
+              48
+            ],
+            "role": "арг 1",
+            "children": []
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/1",
+            "kind": "field",
+            "label": ".params",
+            "code": "l.params",
+            "range": [
+              756,
+              51,
+              756,
+              58
+            ],
+            "role": "арг 2",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/1/0",
+                "kind": "name",
+                "label": "l",
+                "code": "l",
+                "range": [
+                  756,
+                  51,
+                  756,
+                  51
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/2",
+            "kind": "field",
+            "label": ".body",
+            "code": "l.body",
+            "range": [
+              756,
+              61,
+              756,
+              66
+            ],
+            "role": "арг 3",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/2/0",
+                "kind": "name",
+                "label": "l",
+                "code": "l",
+                "range": [
+                  756,
+                  61,
+                  756,
+                  61
+                ],
+                "role": "объект",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995/e/3",
+            "kind": "name",
+            "label": "env",
+            "code": "env",
+            "range": [
+              756,
+              69,
+              756,
+              71
+            ],
+            "role": "арг 4",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954",
+      "kind": "throw",
+      "label": "throw new IllegalStateException(\"Неизвестное выражение: \" + e.getClass().getSimpleName());",
+      "code": "throw new IllegalStateException(\"Неизвестное выражение: \" + e.getClass().getSimpleName());",
+      "lines": [
+        758,
+        758
+      ],
+      "parent": "M:MiniLang.Interpreter#evaluate(Expr)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e",
+        "kind": "new",
+        "label": "new IllegalStateException",
+        "code": "new IllegalStateException(\"Неизвестное выражение: \" + e.getClass().getSimpleName())",
+        "range": [
+          758,
+          19,
+          758,
+          101
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e/0",
+            "kind": "concat",
+            "label": "+",
+            "code": "\"Неизвестное выражение: \" + e.getClass().getSimpleName()",
+            "range": [
+              758,
+              45,
+              758,
+              100
+            ],
+            "role": "арг 1",
+            "children": [
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e/0/0",
+                "kind": "literal",
+                "label": "\"Неизвестное выражение: \"",
+                "code": "\"Неизвестное выражение: \"",
+                "range": [
+                  758,
+                  45,
+                  758,
+                  69
+                ],
+                "role": "слева",
+                "children": []
+              },
+              {
+                "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e/0/1",
+                "kind": "call",
+                "label": "getSimpleName",
+                "code": "e.getClass().getSimpleName()",
+                "range": [
+                  758,
+                  73,
+                  758,
+                  100
+                ],
+                "role": "справа",
+                "children": [
+                  {
+                    "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e/0/1/0",
+                    "kind": "call",
+                    "label": "getClass",
+                    "code": "e.getClass()",
+                    "range": [
+                      758,
+                      73,
+                      758,
+                      84
+                    ],
+                    "role": "объект",
+                    "children": [
+                      {
+                        "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954/e/0/1/0/0",
+                        "kind": "name",
+                        "label": "e",
+                        "code": "e",
+                        "range": [
+                          758,
+                          73,
+                          758,
+                          73
+                        ],
+                        "role": "объект",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee->M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3d3d74ee",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91->M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:360e3d91",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a->M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:e0ef9d7a",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f->M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.return:718891da",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.stmt:623c115f",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06/then.return:718891da",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019->M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:922bf019",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06->M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:1faddb06",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c->M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:88968e9c",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf->M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.stmt:eb1595cf",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea->M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.if:7dd652ea",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4/then.return:d875cfed",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234->M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4339b234",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3->M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:e25a92f3",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae->M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.stmt:fb7073ae",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e/then.return:c8d46519",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4->M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:64a564d4",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1->M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:ab18d8f1",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6->M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:f62913e6",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88->M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.stmt:afeb7b88",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2->M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.loop:701565c2",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77/then.return:47240a29",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e->M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:bfbf416e",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77->M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:cb5d9a77",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b->M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:ab46462b",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67->M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.stmt:82c9ae67",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c->M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.return:d9d6106d",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.loop:b1d1673c",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4/then.return:d9d6106d",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5->M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:66f426e5",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c->M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.stmt:ae9f980c",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e/then.return:c0f33995",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4->M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:3c4ad5c4",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e->M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954",
+      "from": "M:MiniLang.Interpreter#evaluate(Expr)/body.if:4683632e",
+      "to": "M:MiniLang.Interpreter#evaluate(Expr)/body.throw:e91fc954",
+      "kind": "exec",
+      "label": null
+    }
+  ]
+}

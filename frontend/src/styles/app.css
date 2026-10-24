@@ -1,0 +1,58 @@
+/* Дополнения к классам макета для React-версии: редактор Monaco, карта классов, пустые состояния. */
+
+#root{min-height:100dvh}
+.status-bar.neutral{background:#f5f7fa;border-color:var(--line);color:var(--muted)}
+#toast.toast-error{background:#8f1d21}
+
+/* Код: Monaco занимает всё место между шапкой панели и подвалом */
+.code-editor{flex:1;min-height:0;position:relative}
+.code-selected-line{background:#e8f2ff}
+.code-selected-gutter{background:var(--blue);width:3px!important;margin-left:4px}
+.parse-banner{display:flex;gap:8px;align-items:flex-start;padding:8px 13px;background:var(--danger-soft);color:var(--danger);border-bottom:1px solid #efc6c7;font-size:13px;line-height:19px;flex:none}
+.parse-banner .icon{width:16px;height:16px;margin-top:2px}
+
+/* Карта классов: сетка карточек в стиле classMap() макета */
+.graph-canvas{background-color:#fcfdff;background-image:linear-gradient(#e8eff7 1px,transparent 1px),linear-gradient(90deg,#e8eff7 1px,transparent 1px);background-size:24px 24px}
+.class-map{position:absolute;inset:0;overflow:auto;padding:18px 18px 52px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));grid-auto-rows:max-content;gap:14px;align-content:start;align-items:start}
+.class-card{border:1.5px solid #9eb3c9;border-radius:12px;background:white;overflow:hidden}
+.class-card.is-selected{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,63,169,.1)}
+.class-card-header{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;border:0;border-bottom:1px solid #e8eff7;background:transparent;padding:10px 14px;text-align:left}
+.class-card-header:hover{background:#f8faff}
+.class-card-header strong{font:700 15px/22px var(--font-code);color:#173153}
+.class-card-header .muted{font-size:12px}
+.class-methods{list-style:none;margin:0;padding:6px}
+.method-row{width:100%;display:flex;align-items:center;gap:6px;border:0;background:transparent;text-align:left;padding:4px 8px;border-radius:4px;font:13px/21px var(--font-code);color:#173153}
+.method-row:hover{background:#f0f5fd;color:var(--blue)}
+.method-row.is-selected{background:var(--blue-soft);color:var(--blue);font-weight:500}
+.method-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.class-calls{font-size:11px;line-height:16px;color:var(--muted);padding:6px 14px 9px;border-top:1px solid #edf0f5}
+.canvas-hint{background:rgba(252,253,255,.92);padding:2px 6px;border-radius:3px}
+.canvas-empty{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--muted)}
+.node-badge{display:inline-block;margin-left:8px;padding:0 5px;border-radius:3px;border:1px solid #f7c39f;background:#fff0e5;color:#a8480c;font:600 11px/17px var(--font-ui);flex:none}
+
+/* Пустые состояния экранов */
+.empty-view{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;min-height:0}
+.empty-card{max-width:540px;margin:40px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.empty-card p{color:var(--muted);line-height:22px;margin:4px 0 14px}
+.empty-icon{width:40px;height:40px;color:var(--blue)}
+
+/* Диалоги */
+.compile-errors{margin:12px 0 0;padding:10px 12px 10px 28px;background:var(--danger-soft);color:var(--danger);border-radius:4px;font:13px/20px var(--font-code)}
+.node-text{resize:vertical;min-height:46px;line-height:22px}
+.example-option:disabled{opacity:.6}
+
+/* График роста: заглушка без данных или полосы по speedup */
+.growth-placeholder{display:flex;flex-direction:column;gap:6px;justify-content:center;align-items:flex-start;min-height:96px;border:1px dashed var(--line-strong);border-radius:5px;padding:12px 14px;color:var(--muted);font-size:13px;margin:8px 0}
+.growth-placeholder strong{color:var(--ink);font-weight:500}
+.growth-side .growth-placeholder{margin:12px 14px}
+.growth-svg{width:100%;height:auto;max-height:130px;display:block}
+.finding-list{flex:1;overflow:auto}
+
+/* Экран «Изменение»: один DiffEditor вместо двух панелей */
+.diff-grid-single{grid-template-columns:1fr}
+.diff-pane .pane-header{display:grid;grid-template-columns:1fr 1fr}
+.diff-pane .pane-header>div{display:flex;gap:9px;align-items:baseline}
+.diff-pane .pane-header .muted{font-size:12px}
+.diff-pane .code-editor{flex:1;min-height:0}
+.pane-note{padding:14px 18px;color:var(--muted);font-size:13px;margin:0}
+.verification-main>.pane{flex:none}

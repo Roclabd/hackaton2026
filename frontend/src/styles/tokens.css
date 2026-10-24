@@ -1,0 +1,23 @@
+/* Токены и базовые правила — перенесены из docs/design/Java-Blueprints-demo.html как есть. */
+:root{
+ --orange:#f37022;--orange-hover:#e56418;--blue:#003fa9;--blue-hover:#003486;--blue-soft:#eaf2ff;
+ --ink:#121820;--muted:#5b687d;--line:#dbe2ec;--line-strong:#c6d0df;--surface:#fff;--background:#f5f6f8;
+ --success:#187544;--success-soft:#eff9f3;--warning:#9a4e08;--warning-soft:#fff7e8;--danger:#b42327;--danger-soft:#fff1f1;
+ --font-ui:'IBM Plex Sans','Segoe UI',sans-serif;--font-code:'JetBrains Mono',Consolas,monospace;
+ --radius:5px;--shadow:0 14px 48px rgba(18,24,32,.16);
+ font-family:var(--font-ui);font-size:14px;color:var(--ink);background:var(--background);font-synthesis:none;
+}
+*{box-sizing:border-box}
+body{margin:0}
+button,input,select,textarea{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}button:disabled{cursor:default;opacity:.5}
+a{color:var(--blue);text-decoration:none}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid #6499ef;outline-offset:3px}
+button,input,a{transition:background-color 150ms,border-color 150ms,color 150ms}
+input{caret-color:var(--blue)}
+::selection{background:#c9defd;color:#102d59}
+*{scrollbar-width:thin;scrollbar-color:#b7c3d2 transparent}
+.icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.icon-definitions{width:0;height:0;position:absolute;overflow:hidden}
+.skip-link{position:fixed;top:-80px;left:16px;background:var(--blue);color:white;padding:12px;z-index:100}.skip-link:focus{top:10px}

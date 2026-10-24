@@ -1,0 +1,71 @@
+12 -> ok;finally
+0 -> multi:ArithmeticException:/ by zero;finally
+abc -> NFE:For input string: "abc";finally
+7 -> ok;finally
+-3 -> multi:ArrayIndexOutOfBoundsException:Index -3 out of bounds for length 5;finally
+осталось 70
+не хватает средств, не хватает 400
+валидация: отрицательная сумма -5 true
+ioWork без ошибок 0
+mode 0 обработан
+IO ошибка ввода-вывода
+mode 1 обработан
+FNF нет файла
+mode 2 обработан
+INT прервано
+mode 3 обработан
+порядок: try;return;finally;
+try;return;
+внутренний finally
+внешний поймал For input string: "x1"
+обёртка <- NumberFormatException
+внешний finally
+finally перед выбросом нового
+поймано первое
+открыт A
+открыт B
+используем A
+используем B
+закрыт B
+закрыт A
+открыт C
+используем C
+закрыт C
+сбой в C подавлено: 1 не закрывается C
+открыт D
+используем D
+закрыт D
+finally после ресурсов
+java.lang: NullPointerException
+java.lang: ClassCastException
+java.lang: IndexOutOfBoundsException(Index 0 out of bounds for length 0)
+java.lang: ArrayIndexOutOfBoundsException(Index 3 out of bounds for length 3)
+java.lang: StringIndexOutOfBoundsException
+java.lang: NegativeArraySizeException(-1)
+java.lang: UnsupportedOperationException
+java.lang: IllegalStateException(состояние)
+java.lang: CloneNotSupportedException
+java.lang: RuntimeException(базовое)
+java.lang: Exception(общее)
+StackOverflowError true
+OutOfMemoryError
+AssertionError утверждение
+Error серьёзная ошибка false
+Throwable через Throwable
+NoSuchElementException (итератор)
+NoSuchElementException (Optional) No value present
+InputMismatchException true
+ConcurrentModificationException [1, 3, 4]
+EmptyStackException
+FileNotFoundException из FileInputStream
+обёрнуто <- диск true
+верх
+причина true
+java.lang.IllegalStateException: верх
+throwableApi
+java.lang.IllegalStateException: верх
+1 подавленное
+вот причина поздняя причина
+1: ValidationException уровень 3
+2: ValidationException уровень 2
+3: IllegalArgumentException уровень 1

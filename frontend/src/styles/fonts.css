@@ -1,0 +1,8 @@
+/* Шрифты из дизайн-макета (docs/design/Java-Blueprints-demo.html), извлечены в .ttf и лежат локально:
+   демо работает без интернета. Лицензия SIL OFL 1.1 — FONTS-LICENSE.txt рядом. */
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('./fonts/IBMPlexSans-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url('./fonts/IBMPlexSans-Medium.ttf') format('truetype'); }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url('./fonts/IBMPlexSans-SemiBold.ttf') format('truetype'); }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url('./fonts/IBMPlexSans-Bold.ttf') format('truetype'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('./fonts/JetBrainsMono-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('./fonts/JetBrainsMono-Medium.ttf') format('truetype'); }

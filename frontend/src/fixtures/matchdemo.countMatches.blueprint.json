@@ -1,0 +1,373 @@
+{
+  "methodId": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)",
+  "label": "static long countMatches(List<Integer>, List<Integer>)",
+  "nodes": [
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e",
+      "kind": "stmt",
+      "label": "long total = 0;",
+      "code": "long total = 0;",
+      "lines": [
+        13,
+        13
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e/e",
+        "kind": "declare",
+        "label": "long",
+        "code": "long total = 0",
+        "range": [
+          13,
+          9,
+          13,
+          22
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e/e/0",
+            "kind": "name",
+            "label": "total",
+            "code": "total = 0",
+            "range": [
+              13,
+              14,
+              13,
+              22
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e/e/0/0",
+                "kind": "literal",
+                "label": "0",
+                "code": "0",
+                "range": [
+                  13,
+                  22,
+                  13,
+                  22
+                ],
+                "role": "инициализация",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49",
+      "kind": "loop",
+      "label": "for (Integer x : a)",
+      "code": null,
+      "lines": [
+        14,
+        20
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)",
+      "branch": "body",
+      "badges": [],
+      "editable": false,
+      "branches": [
+        {
+          "key": "body",
+          "label": "тело"
+        }
+      ],
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/e",
+        "kind": "forEachHeader",
+        "label": "for each",
+        "code": "for (Integer x : a)",
+        "range": [
+          14,
+          9,
+          14,
+          27
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/e/0",
+            "kind": "declare",
+            "label": "Integer",
+            "code": "Integer x",
+            "range": [
+              14,
+              14,
+              14,
+              22
+            ],
+            "role": "элемент",
+            "children": [
+              {
+                "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/e/0/0",
+                "kind": "name",
+                "label": "x",
+                "code": "x",
+                "range": [
+                  14,
+                  22,
+                  14,
+                  22
+                ],
+                "role": "переменная",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/e/1",
+            "kind": "name",
+            "label": "a",
+            "code": "a",
+            "range": [
+              14,
+              26,
+              14,
+              26
+            ],
+            "role": "коллекция",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707",
+      "kind": "loop",
+      "label": "for (Integer y : b)",
+      "code": null,
+      "lines": [
+        15,
+        19
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49",
+      "branch": "body",
+      "badges": [],
+      "editable": false,
+      "branches": [
+        {
+          "key": "body",
+          "label": "тело"
+        }
+      ],
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/e",
+        "kind": "forEachHeader",
+        "label": "for each",
+        "code": "for (Integer y : b)",
+        "range": [
+          15,
+          13,
+          15,
+          31
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/e/0",
+            "kind": "declare",
+            "label": "Integer",
+            "code": "Integer y",
+            "range": [
+              15,
+              18,
+              15,
+              26
+            ],
+            "role": "элемент",
+            "children": [
+              {
+                "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/e/0/0",
+                "kind": "name",
+                "label": "y",
+                "code": "y",
+                "range": [
+                  15,
+                  26,
+                  15,
+                  26
+                ],
+                "role": "переменная",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/e/1",
+            "kind": "name",
+            "label": "b",
+            "code": "b",
+            "range": [
+              15,
+              30,
+              15,
+              30
+            ],
+            "role": "коллекция",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937",
+      "kind": "if",
+      "label": "if (Objects.equals(x, y))",
+      "code": "Objects.equals(x, y)",
+      "lines": [
+        16,
+        18
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "then",
+          "label": "да"
+        }
+      ],
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/e",
+        "kind": "call",
+        "label": "Objects.equals",
+        "code": "Objects.equals(x, y)",
+        "range": [
+          16,
+          21,
+          16,
+          40
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/e/0",
+            "kind": "name",
+            "label": "x",
+            "code": "x",
+            "range": [
+              16,
+              36,
+              16,
+              36
+            ],
+            "role": "арг 1",
+            "children": []
+          },
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/e/1",
+            "kind": "name",
+            "label": "y",
+            "code": "y",
+            "range": [
+              16,
+              39,
+              16,
+              39
+            ],
+            "role": "арг 2",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/then.stmt:cd56d517",
+      "kind": "stmt",
+      "label": "total++;",
+      "code": "total++;",
+      "lines": [
+        17,
+        17
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937",
+      "branch": "then",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/then.stmt:cd56d517/e",
+        "kind": "unary",
+        "label": "x++",
+        "code": "total++",
+        "range": [
+          17,
+          21,
+          17,
+          27
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49/body.loop:ec83d707/body.if:f1b3f937/then.stmt:cd56d517/e/0",
+            "kind": "name",
+            "label": "total",
+            "code": "total",
+            "range": [
+              17,
+              21,
+              17,
+              25
+            ],
+            "role": "значение",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.return:6ee78267",
+      "kind": "return",
+      "label": "return total;",
+      "code": "return total;",
+      "lines": [
+        21,
+        21
+      ],
+      "parent": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.return:6ee78267/e",
+        "kind": "name",
+        "label": "total",
+        "code": "total",
+        "range": [
+          21,
+          16,
+          21,
+          20
+        ],
+        "role": null,
+        "children": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e->M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49",
+      "from": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.stmt:db7aa44e",
+      "to": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49->M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.return:6ee78267",
+      "from": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.loop:eacefe49",
+      "to": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)/body.return:6ee78267",
+      "kind": "exec",
+      "label": null
+    }
+  ]
+}
