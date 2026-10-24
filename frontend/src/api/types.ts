@@ -14,6 +14,15 @@ export interface GraphBranch {
   label: string
 }
 
+/** Оценка сложности по структуре кода — у методов на карте и у циклов на чертеже. */
+export interface Complexity {
+  /** «O(1)», «O(log n)», «O(n)», «O(n log n)», «O(n²)»… или «рекурсия» */
+  big: string
+  level: 'low' | 'linear' | 'high' | 'unknown'
+  /** откуда оценка, по-русски, со строками */
+  why: string
+}
+
 export interface GraphNode {
   id: string
   kind: NodeKind
@@ -31,6 +40,8 @@ export interface GraphNode {
   branches?: GraphBranch[] | null
   /** дерево выражения оператора — только на чертеже метода; нет выражения — null */
   expr?: ExprNode | null
+  /** оценка сложности; на бэке без неё поля нет */
+  complexity?: Complexity | null
 }
 
 export type ExprKind =

@@ -35,6 +35,7 @@ public final class FindingsService {
         findings.addAll(new ConditionAssignmentRule().find(context));
         findings.addAll(new StringEqualityRule().find(context));
         findings.addAll(new IntegerDivisionRule().find(context));
+        findings.addAll(new StringConcatLoopRule().find(context));
         return List.copyOf(findings);
     }
 }

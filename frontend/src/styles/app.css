@@ -56,3 +56,12 @@
 .diff-pane .code-editor{flex:1;min-height:0}
 .pane-note{padding:14px 18px;color:var(--muted);font-size:13px;margin:0}
 .verification-main>.pane{flex:none}
+
+/* Значок сложности O(…): цвет по уровню, без крика — оранжевым только n² и выше */
+.cx-badge{display:inline-block;margin-left:8px;padding:0 5px;border-radius:3px;border:1px solid var(--line);background:#f4f6f9;color:var(--muted);font:600 11px/17px var(--font-code);white-space:nowrap;flex:none;cursor:help}
+.cx-badge.cx-linear{border-color:#c5d8f7;background:var(--blue-soft);color:var(--blue)}
+.cx-badge.cx-high{border-color:#f7c39f;background:#fff0e5;color:#a8480c}
+.cx-badge.cx-unknown{border-style:dashed;background:transparent;font-family:var(--font-ui);font-weight:500}
+.method-row .cx-badge{margin-left:auto}
+.method-row .cx-badge+.node-badge{margin-left:6px}
+.bp-pill .cx-badge{vertical-align:1px}

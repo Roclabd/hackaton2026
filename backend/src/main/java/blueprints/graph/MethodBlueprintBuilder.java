@@ -26,7 +26,8 @@ public final class MethodBlueprintBuilder {
     private static final int MAX_LABEL = 90;
 
     public Blueprint build(String methodId, String label, Node declaration, SourceText source) {
-        Builder builder = new Builder(source);
+        Builder builder = new Builder(source,
+                declaration.findCompilationUnit().map(ComplexityEstimator::new).orElse(null));
         bodyOf(declaration).ifPresent(body -> builder.addAll(body.getStatements(), methodId, "body"));
         return new Blueprint(methodId, label, new Graph(List.copyOf(builder.nodes), List.copyOf(builder.edges)),
                 Collections.unmodifiableMap(builder.astById));
@@ -48,10 +49,13 @@ public final class MethodBlueprintBuilder {
         final Map<String, Node> astById = new LinkedHashMap<>();
         private final SourceText source;
         private final ExprTreeBuilder exprs;
+        /** Оценка сложности циклов (фрагментов); null — если у объявления нет файла. */
+        private final ComplexityEstimator complexity;
 
-        Builder(SourceText source) {
+        Builder(SourceText source, ComplexityEstimator complexity) {
             this.source = source;
             this.exprs = new ExprTreeBuilder(source);
+            this.complexity = complexity;
         }
 
         /** Операторы одной ветки: узлы по порядку, между соседями — ребро exec. */
@@ -120,7 +124,8 @@ public final class MethodBlueprintBuilder {
             String code = editable ? text(editTarget) : null;
             List<GraphBranch> branchList = children.stream().map(c -> new GraphBranch(c.key(), c.label())).toList();
             nodes.add(new GraphNode(id, kind, shorten(header), code, ProjectMapBuilder.lines(statement),
-                    parentId, branch, List.of(), editable, branchList, exprs.forStatement(statement, id)));
+                    parentId, branch, List.of(), editable, branchList, exprs.forStatement(statement, id),
+                    kind == NodeKind.LOOP && complexity != null ? complexity.ofLoop(statement) : null));
             astById.put(id, editTarget);
             for (Child child : children) {
                 addAll(child.statements(), id, child.key());

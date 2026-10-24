@@ -1,3 +1,4 @@
+import { ComplexityBadge } from '../../components/ComplexityBadge'
 import { useMemo, useState } from 'react'
 import { openMethod } from '../../state/actions'
 import { useAppState } from '../../state/store'
@@ -45,6 +46,7 @@ function ClassCardView({ card, selectedId }: { card: ClassCard; selectedId: stri
                 title={`${method.label} · строки ${method.lines[0]}–${method.lines[1]}`}
               >
                 <span className="method-name">{methodSignature(method.label)}</span>
+                <ComplexityBadge complexity={method.complexity} />
                 {method.badges.map((badge) => <span key={badge} className="node-badge">{badge}</span>)}
               </button>
             </li>

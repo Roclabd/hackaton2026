@@ -16,7 +16,7 @@ import java.util.*;
 public final class ProjectMapBuilder {
 
     public Graph build(CompilationUnit unit) {
-        Collector collector = new Collector();
+        Collector collector = new Collector(new ComplexityEstimator(unit));
         for (TypeDeclaration<?> type : unit.getTypes()) {
             collector.addType(type, null, type.getNameAsString());
         }
@@ -29,7 +29,7 @@ public final class ProjectMapBuilder {
      * Нужен чертежу метода и командам правки: по id с карты найти, что именно рисовать и менять.
      */
     public Map<String, Node> declarations(CompilationUnit unit) {
-        Collector collector = new Collector();
+        Collector collector = new Collector(null);
         for (TypeDeclaration<?> type : unit.getTypes()) {
             collector.addType(type, null, type.getNameAsString());
         }
@@ -43,6 +43,12 @@ public final class ProjectMapBuilder {
         final Map<String, CallResolver.TypeInfo> types = new LinkedHashMap<>();
         final Map<String, Node> declarations = new LinkedHashMap<>();
         private final Set<String> usedIds = new HashSet<>();
+        /** Оценка сложности методов; null — когда нужна только связь id → объявление. */
+        private final ComplexityEstimator complexity;
+
+        Collector(ComplexityEstimator complexity) {
+            this.complexity = complexity;
+        }
 
         void addType(TypeDeclaration<?> type, String parentId, String typeName) {
             String id = unique(NodeIds.type(typeName));
@@ -84,7 +90,7 @@ public final class ProjectMapBuilder {
             String id = unique(NodeIds.method(typeName, method.getNameAsString(), parameterTypes));
             String prefix = method.isStatic() ? "static " : "";
             String label = prefix + method.getTypeAsString() + " " + method.getNameAsString() + "(" + String.join(", ", parameterTypes) + ")";
-            nodes.add(node(id, NodeKind.METHOD, label, null, method, parentId));
+            nodes.add(methodNode(id, label, method, parentId));
             declarations.put(id, method);
             methods.add(new CallResolver.MethodInfo(id, typeName, method.getNameAsString(), String.join(",", parameterTypes),
                     method.getParameters().size(), hasVarargs(method.getParameters()), method));
@@ -94,7 +100,7 @@ public final class ProjectMapBuilder {
             List<String> parameterTypes = parameterTypes(constructor.getParameters());
             String id = unique(NodeIds.method(typeName, "<init>", parameterTypes));
             String label = "new " + constructor.getNameAsString() + "(" + String.join(", ", parameterTypes) + ")";
-            nodes.add(node(id, NodeKind.METHOD, label, null, constructor, parentId));
+            nodes.add(methodNode(id, label, constructor, parentId));
             declarations.put(id, constructor);
             methods.add(new CallResolver.MethodInfo(id, typeName, "<init>", String.join(",", parameterTypes),
                     constructor.getParameters().size(), hasVarargs(constructor.getParameters()), constructor));
@@ -103,7 +109,7 @@ public final class ProjectMapBuilder {
         private void addInitializer(InitializerDeclaration initializer, String parentId, String typeName) {
             String id = unique(NodeIds.method(typeName, "<clinit>", List.of()));
             String label = initializer.isStatic() ? "static { … }" : "{ … }";
-            nodes.add(node(id, NodeKind.METHOD, label, null, initializer, parentId));
+            nodes.add(methodNode(id, label, initializer, parentId));
             declarations.put(id, initializer);
             // Блок сам вызывать нельзя, но он вызывает методы — регистрируем как источник рёбер (аудит v2).
             methods.add(new CallResolver.MethodInfo(id, typeName, "<clinit>", "", 0, false, initializer));
@@ -143,6 +149,13 @@ public final class ProjectMapBuilder {
                 candidate = id + "~" + repeat;
             }
             return candidate;
+        }
+
+        /** Метод на карте — вместе с оценкой сложности по структуре его тела. */
+        private GraphNode methodNode(String id, String label, Node declaration, String parentId) {
+            Complexity estimate = complexity == null ? null : complexity.ofDeclaration(declaration);
+            return new GraphNode(id, NodeKind.METHOD, label, null, lines(declaration), parentId, null, List.of(), false, null,
+                    null, estimate);
         }
 
         private static GraphNode node(String id, NodeKind kind, String label, String code, Node source, String parentId) {

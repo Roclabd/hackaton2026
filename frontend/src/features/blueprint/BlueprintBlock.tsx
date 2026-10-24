@@ -1,3 +1,4 @@
+import { ComplexityBadge } from '../../components/ComplexityBadge'
 import { Fragment } from 'react'
 import { dispatch, useAppState } from '../../state/store'
 import type { GraphNode } from '../../api/types'
@@ -67,6 +68,7 @@ function ContainerBlock({ item, selectedId }: BlockProps) {
       >
         <span className="bp-frame-title">{containerTitle(node.kind)}</span>
         <code className="bp-frame-code">{node.label}</code>
+        <ComplexityBadge complexity={node.complexity} />
         <Badges badges={node.badges} />
       </button>
       <Expressions node={node} />

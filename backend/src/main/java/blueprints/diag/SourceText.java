@@ -8,6 +8,7 @@ import com.github.javaparser.ast.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -77,6 +78,32 @@ final class SourceText {
         String piece = text.substring(span.get()[0], span.get()[1]);
         boolean matches = node.getTokenRange().map(TokenRange::toString).filter(piece::equals).isPresent();
         return matches ? Optional.of(piece) : Optional.empty();
+    }
+
+    /**
+     * Текст узла {@code container}, в котором диапазоны вложенных узлов заменены. Пусто — если текст контейнера
+     * не совпал с лексемами (см. {@link #textOf}) или правка выходит за его границы.
+     */
+    Optional<String> textWithEdits(Node container, Map<Node, String> edits) {
+        Optional<int[]> outer = span(container);
+        if (textOf(container).isEmpty() || outer.isEmpty()) {
+            return Optional.empty();
+        }
+        List<Map.Entry<int[], String>> spans = new ArrayList<>();
+        for (Map.Entry<Node, String> edit : edits.entrySet()) {
+            Optional<int[]> inner = span(edit.getKey());
+            if (inner.isEmpty() || inner.get()[0] < outer.get()[0] || inner.get()[1] > outer.get()[1]) {
+                return Optional.empty();
+            }
+            spans.add(Map.entry(inner.get(), edit.getValue()));
+        }
+        // С конца к началу: тогда смещения ещё не тронутых правок остаются верными.
+        spans.sort((a, b) -> Integer.compare(b.getKey()[0], a.getKey()[0]));
+        StringBuilder piece = new StringBuilder(text.substring(outer.get()[0], outer.get()[1]));
+        for (Map.Entry<int[], String> s : spans) {
+            piece.replace(s.getKey()[0] - outer.get()[0], s.getKey()[1] - outer.get()[0], s.getValue());
+        }
+        return Optional.of(piece.toString());
     }
 
     /** Новый полный текст: диапазон узла заменён на replacement. Вызывать после успешного textOf. */
