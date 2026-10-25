@@ -257,6 +257,10 @@ final class GateJob implements Runnable {
         List<Integer> scenarios = new ArrayList<>();
         List<Integer> unfinished = new ArrayList<>();
         synchronized (this) {
+            if (checks.stream().anyMatch(c -> c.outcome() == InputCheck.Outcome.MISMATCH)) {
+                // Расхождение, найденное до остановки, — настоящий результат: сценарии выхода его не отменят.
+                return nonTerminatingVerdict(generated.size(), 0, exit, true);
+            }
             for (int i = 0; i < generated.size(); i++) {
                 if (InputGenerator.endsWithExit(generated.get(i), exit)) {
                     scenarios.add(i);
@@ -271,11 +275,17 @@ final class GateJob implements Runnable {
         if (overBudget) {
             return overBudgetVerdict();
         }
-        synchronized (this) {
-            List<InputCheck> scenarioChecks = scenarios.stream().map(checks::get).toList();
-            return VerdictAssembler.assembleNonTerminating(scenarioChecks, request.intent(), timeout.toMillis(),
-                    elapsedMs(), new NonTerminating(generated.size(), HANG_INPUTS_IN_A_ROW, exit, scenariosFinish));
-        }
+        return nonTerminatingVerdict(generated.size(), scenarios.size(), exit, scenariosFinish);
+    }
+
+    /**
+     * Итог по всем законченным входам — и сценариям выхода, и обычным входам, сравненным до остановки:
+     * их расхождения и совпадения не теряются.
+     */
+    private synchronized Verdict nonTerminatingVerdict(int total, int scenarios, String exit, boolean scenariosFinish) {
+        List<InputCheck> finished = checks.stream().filter(InputCheck::finished).toList();
+        return VerdictAssembler.assembleNonTerminating(finished, scenarios, request.intent(), timeout.toMillis(),
+                elapsedMs(), new NonTerminating(total, HANG_INPUTS_IN_A_ROW, exit, scenariosFinish));
     }
 
     private synchronized Verdict overBudgetVerdict() {
