@@ -170,6 +170,27 @@ final class StringConcatLoopRule {
         return context.source.textOf(part).orElse(part.toString());
     }
 
+    /**
+     * s к началу цикла точно не null: объявлена со значением, и это значение и все присваивания s вне цикла —
+     * строковый литерал или склейка «+» (у String «+» всегда даёт новую строку, не null). {@code += } тоже не даёт null.
+     * null, параметр, поле, вызов метода, объявление без значения — не доказано, заплатки нет.
+     */
+    private static boolean neverNull(CallableDeclaration<?> method, String name, Statement loop) {
+        boolean declaredNonNull = method.findAll(VariableDeclarator.class).stream()
+                .filter(v -> v.getNameAsString().equals(name))
+                .allMatch(v -> v.getInitializer().map(StringConcatLoopRule::nonNullString).orElse(false));
+        boolean assignedNonNull = method.findAll(AssignExpr.class).stream()
+                .filter(a -> a.getTarget() instanceof NameExpr target && target.getNameAsString().equals(name) && !loop.isAncestorOf(a))
+                .allMatch(a -> a.getOperator() == AssignExpr.Operator.PLUS || nonNullString(a.getValue()));
+        return declaredNonNull && assignedNonNull;
+    }
+
+    private static boolean nonNullString(Expression value) {
+        Expression e = DiagnosticContext.unwrapped(value);
+        return e instanceof StringLiteralExpr || e instanceof TextBlockLiteralExpr
+                || e instanceof BinaryExpr binary && binary.getOperator() == BinaryExpr.Operator.PLUS;
+    }
+
     private static NameExpr leftmost(Expression value) {
         while (value instanceof BinaryExpr binary) value = binary.getLeft();
         return (NameExpr) value;
@@ -182,7 +203,9 @@ final class StringConcatLoopRule {
         Map<Node, String> edits = new LinkedHashMap<>();
         appends.forEach((statement, parts) -> edits.put(statement, builder + parts.stream()
                 .map(p -> ".append(" + appendArgument(p, context) + ")").reduce("", String::concat) + ";"));
-        List<Patch> patches = context.source.textWithEdits(loopStatement, edits).map(loopText -> {
+        // new StringBuilder(null) бросает NPE, а склейка с null даёт «null…»: заплатку даём, только если s точно не null.
+        List<Patch> patches = !neverNull(method, name, loopStatement) ? List.of()
+                : context.source.textWithEdits(loopStatement, edits).map(loopText -> {
             int line = DiagnosticContext.lines(loopStatement)[0];
             String indent = context.source.indentOf(line);
             String sep = context.source.lineSeparator();

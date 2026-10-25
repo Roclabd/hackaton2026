@@ -69,6 +69,17 @@ class StringConcatLoopRuleTest {
         assertSameOutput(CHAIN, patch.source(), "");
     }
 
+    /** s может быть null: склейка даёт «nullx», а new StringBuilder(null) бросает NPE — находка есть, заплатки нет. */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "void f(int n) { String s = null; for (int i = 0; i < n; i++) s += \"x\"; System.out.println(s); }",
+            "void f(String start, int n) { String s = start; for (int i = 0; i < n; i++) s += \"x\"; System.out.println(s); }",
+            "void f(int n) { String s = \"\"; s = null; for (int i = 0; i < n; i++) s += \"x\"; System.out.println(s); }"
+    })
+    void noBuilderPatchWhenStartMayBeNull(String body) {
+        assertEquals(List.of(), one("class Sample { " + body + " }").patches());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             // s читается внутри цикла
