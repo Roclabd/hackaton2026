@@ -41,7 +41,11 @@
 /* Дерево — проекция expr из AST; отдельные кнопки не вложены в кнопку оператора. */
 .bp-statement{max-width:560px;min-width:0}
 .bp-statement>.bp-node{width:100%}
-.bp-expressions{list-style:none;margin:4px 0 7px;padding:0 4px;font:12px/18px var(--font-code);max-width:560px}
+.bp-expressions{list-style:none;margin:4px 0 7px;padding:6px 8px;font:12px/18px var(--font-code);max-width:560px;background:#fbfcfe;border:1px solid #d3deea;border-radius:5px}
+/* Под оператором дерево — продолжение его карточки: та же ширина, общая рамка, сетка холста не просвечивает. */
+.bp-statement>.bp-node:has(+ .bp-expressions){border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bp-statement>.bp-expressions{width:100%;margin-top:-1.4px;border:1.4px solid var(--bp-line);border-top:1px dashed #c8d5e3;border-radius:0 0 5px 5px}
+.bp-statement.is-selected>.bp-expressions{border-color:var(--blue);border-width:0 2px 2px;border-top:1px dashed #9db8e6;background:#f5f9ff}
 .bp-expressions ul{list-style:none;margin:0 0 0 10px;padding:0 0 0 8px;border-left:1px solid var(--bp-line)}
 .bp-expression{display:flex;align-items:baseline;gap:6px;width:100%;min-width:0;padding:2px 5px;border:1px solid transparent;border-radius:3px;background:transparent;color:var(--bp-ink);text-align:left}
 .bp-expression code{font:inherit;overflow-wrap:anywhere;min-width:0}
