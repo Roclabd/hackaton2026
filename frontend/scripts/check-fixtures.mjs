@@ -312,3 +312,24 @@ finishHeat.reject(new Error('Уже устаревшая ошибка'))
 await pendingHeat
 assert.equal(heatErrors.length, 1, 'Устаревшая ошибка не тревожит новый экран')
 console.log('OK: heat action — реальный запрос только открытого метода, защита двойного клика, поздние ответы/ошибки, серверный текст ошибки')
+
+// Проблемы в коде: вид, подвид javac, порядок и строки находок — то, что окрашивает редактор и ведёт F8.
+const { collectProblems, compileTitle, countByKind } = load('src/components/editor/problems.ts')
+assert.equal(compileTitle('incompatible types: int cannot be converted to boolean'), 'Несовпадение типов')
+assert.equal(compileTitle('cannot find symbol'), 'Неизвестное имя')
+assert.equal(compileTitle('missing return statement'), 'Поток выполнения')
+assert.equal(compileTitle('что-то новое'), 'Ошибка компиляции')
+const problemSource = Array.from({ length: 80 }, (_, i) => `line ${i + 1}`).join('\n')
+const problems = collectProblems(problemSource,
+  [{ line: 90, column: 3, message: 'Parse error' }],
+  [{ line: 67, column: 21, text: 'incompatible types: int cannot be converted to boolean' }],
+  [{ id: 'R2-1', rule: 'R2', methodId: 'm', lines: [29, 31], title: 'Граница массива', why: '…', category: 'DEFECT', growthBefore: null, growthAfter: null, conditions: [], patches: [] },
+   { id: 'R3-1', rule: 'R3', methodId: 'm', lines: [67, 70], title: 'Недостижимый метод', why: '…', category: 'DEAD_CODE', growthBefore: null, growthAfter: null, conditions: [], patches: [] },
+   { id: 'R1-1', rule: 'R1', methodId: 'm', lines: [14, 20], title: 'Вложенный цикл', why: '…', growthBefore: 'n²', growthAfter: 'n', conditions: [], patches: [] }])
+assert.deepEqual(problems.map((p) => `${p.kind}@${p.line}`), ['inefficiency@14', 'defect@29', 'compile@67', 'deadCode@67', 'syntax@80'],
+  'сверху вниз; на одной строке javac раньше находки; строка за концом файла прижата к последней')
+assert.equal(problems[0].endLine, 20, 'находка подсвечивает все свои строки')
+assert.equal(problems[2].title, 'Несовпадение типов')
+assert.deepEqual(countByKind(problems), { syntax: 1, compile: 1, defect: 1, inefficiency: 1, deadCode: 1 })
+assert.equal(collectProblems(problemSource, [], [], []).length, 0)
+console.log('OK: проблемы в коде — виды, подвид javac, порядок для F8, строки находок')

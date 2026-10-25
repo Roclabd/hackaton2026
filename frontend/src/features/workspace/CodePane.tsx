@@ -1,13 +1,16 @@
 import Editor, { type OnMount } from '@monaco-editor/react'
 import type * as Monaco from 'monaco-editor'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EDITOR_FONT, EDITOR_FONT_SIZE, EDITOR_LINE_HEIGHT, THEME } from '../../components/editor/monacoSetup'
-import { diagnosticMarkers, expressionEditorRange } from '../../components/editor/editorRanges'
+import { expressionEditorRange } from '../../components/editor/editorRanges'
+import { problemDecorations } from '../../components/editor/problemDecorations'
+import { collectProblems } from '../../components/editor/problems'
 import { Icon } from '../../components/Icon'
 import { editDraft, selectByLine } from '../../state/actions'
 import { selectedExpression, selectedNode } from '../../state/selectors'
 import { useAppState } from '../../state/store'
 import { BaselineNotice } from './BaselineNotice'
+import { ProblemsBar } from './ProblemsBar'
 
 type CodeEditor = Monaco.editor.IStandaloneCodeEditor
 
@@ -18,15 +21,22 @@ export function CodePane() {
   const errors = project?.errors
   const compileErrors = project?.compileErrors
   const projectId = useAppState((s) => s.project?.id)
+  const findings = useAppState((s) => s.findings)
   const node = useAppState(selectedNode)
   const expression = useAppState(selectedExpression)
   const [editor, setEditor] = useState<CodeEditor | null>(null)
   const decorations = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
+  const problemLayer = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
+  const step = useRef<(delta: number) => void>(() => {})
   const monaco = useRef<typeof Monaco | null>(null)
 
   const onMount: OnMount = (instance, api) => {
     monaco.current = api
     decorations.current = instance.createDecorationsCollection()
+    problemLayer.current = instance.createDecorationsCollection()
+    // F8 / Shift+F8 — как «следующая ошибка» в IDE, но по нашему списку: javac и находки вместе.
+    instance.addCommand(api.KeyCode.F8, () => step.current(1))
+    instance.addCommand(api.KeyMod.Shift | api.KeyCode.F8, () => step.current(-1))
     instance.onMouseDown((event) => {
       const line = event.target.position?.lineNumber
       if (line && event.event.leftButton) selectByLine(line)
@@ -52,13 +62,32 @@ export function CodePane() {
     } else editor.revealLinesInCenterIfOutsideViewport(first, last)
   }, [editor, first, last, draft, expression])
 
+  // Строки находок и ошибок относятся к тексту проекта: пока черновик не сохранён, подсветки нет.
+  const problems = useMemo(() => project && project.source === draft
+    ? collectProblems(draft, errors ?? [], compileErrors ?? [], findings) : [], [project, draft, errors, compileErrors, findings])
+  const [current, setCurrent] = useState(-1)
+  useEffect(() => setCurrent(-1), [problems])
+
   useEffect(() => {
     const model = editor?.getModel()
-    if (!model || !monaco.current) return
-    const markers = project?.source === draft ? diagnosticMarkers(draft, errors ?? [], compileErrors ?? []) : []
-    monaco.current.editor.setModelMarkers(model, 'blueprints', markers)
-    return () => { monaco.current?.editor.setModelMarkers(model, 'blueprints', []) }
-  }, [editor, projectId, project?.source, draft, errors, compileErrors])
+    if (!model || !monaco.current || !problemLayer.current) return
+    problemLayer.current.set(problemDecorations(monaco.current, model, problems))
+  }, [editor, problems])
+
+  const goTo = useCallback((index: number) => {
+    const problem = problems[index]
+    if (!editor || !problem) return
+    setCurrent(index)
+    selectByLine(problem.line)
+    const column = problem.column ?? editor.getModel()?.getLineFirstNonWhitespaceColumn(problem.line) ?? 1
+    editor.revealLineInCenter(problem.line)
+    editor.setPosition({ lineNumber: problem.line, column: Math.max(1, column) })
+    editor.focus()
+  }, [editor, problems])
+  step.current = (delta) => {
+    if (problems.length === 0) return
+    goTo(current < 0 ? (delta > 0 ? 0 : problems.length - 1) : (current + delta + problems.length) % problems.length)
+  }
 
   const firstError = errors?.[0]
   const firstCompileError = compileErrors?.[0]
@@ -78,6 +107,7 @@ export function CodePane() {
         <Icon name="alert" /><span><strong>Код не компилируется: строка {firstCompileError.line || 1}.</strong> {firstCompileError.text}</span>
       </div>}
       <BaselineNotice />
+      <ProblemsBar problems={problems} current={current} onGo={goTo} onStep={(delta) => step.current(delta)} />
       <div className="code-editor">
         <Editor
           path={projectId ? `${projectId}.java` : 'empty.java'}

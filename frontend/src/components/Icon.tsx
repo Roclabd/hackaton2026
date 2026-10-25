@@ -9,6 +9,7 @@ const SYMBOLS: Record<string, string> = {
   pencil: '<path d="m16 3 5 5L8 21H3v-5Zm-3 3 5 5"/>',
   chevron: '<path d="m9 5 7 7-7 7"/>',
   down: '<path d="m6 9 6 6 6-6"/>',
+  up: '<path d="m6 15 6-6 6 6"/>',
   close: '<path d="m6 6 12 12M6 18 18 6"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 4h.01"/>',

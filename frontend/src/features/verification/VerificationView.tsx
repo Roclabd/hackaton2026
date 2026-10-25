@@ -5,6 +5,7 @@ import type { JobState } from '../../state/reducer'
 import { useAppState } from '../../state/store'
 import { ExportDialog } from './ExportDialog'
 import { canExport, exportHint } from './exportText'
+import { NoRunsCard } from './NoRunsCard'
 import { RunComparison, ScenarioTable } from './RunComparison'
 import { ProgressPanel, ResultPanel } from './VerdictPanels'
 
@@ -13,6 +14,8 @@ export function VerificationView() {
   const job = useAppState((s) => s.job)
   const verdict = job?.verdict ?? null
   const running = job !== null && (verdict === null || verdict.status === 'RUNNING')
+  // Ни одного запуска (эталон или кандидат не собрались) — пустые таблицы выглядели бы как поломка.
+  const noRuns = verdict !== null && !running && verdict.inputs === 0
 
   return (
     <main id="main-content" className="verification-view" tabIndex={-1}>
@@ -32,8 +35,9 @@ export function VerificationView() {
         <div className="verification-layout">
           <section className="verification-main">
             {running || !verdict ? <ProgressPanel verdict={verdict} /> : <ResultPanel verdict={verdict} />}
-            {verdict && !running && <RunComparison verdict={verdict} job={job} />}
-            {verdict && !running && <ScenarioTable groups={verdict.groups} inputs={verdict.inputs} />}
+            {verdict && noRuns && <NoRunsCard verdict={verdict} />}
+            {verdict && !running && !noRuns && <RunComparison verdict={verdict} job={job} />}
+            {verdict && !running && !noRuns && <ScenarioTable groups={verdict.groups} inputs={verdict.inputs} />}
           </section>
           <RunConditions job={job} />
         </div>
@@ -57,7 +61,7 @@ function RunConditions({ job }: { job: JobState }) {
           <div><dt>Входов</dt><dd>{verdict ? `${verdict.checked} из ${verdict.inputs}` : '—'}</dd></div>
           <div><dt>Время</dt><dd>{done ? `${verdict.durationMs} мс` : '—'}</dd></div>
         </dl>
-        <div className="scope-note"><Icon name="info" />Результат относится только к выполненным входам.</div>
+        <div className="scope-note"><Icon name="info" />{done && verdict.inputs === 0 ? 'Запусков не было — результата по входам нет.' : 'Результат относится только к выполненным входам.'}</div>
       </section>
       <ExportButton job={job} />
     </aside>
