@@ -35,7 +35,7 @@ final class StringConcatLoopRule {
             int declaredAt = statements.indexOf(variable.findAncestor(ExpressionStmt.class).orElseThrow());
             for (Statement statement : statements.subList(declaredAt + 1, statements.size())) {
                 Statement loop = statement instanceof LabeledStmt labeled ? labeled.getStatement() : statement;
-                if (!isLoop(loop) || smallConstantLoop(loop)) continue;
+                if (!isLoop(loop) || constantLoop(loop)) continue;
                 appends(loop, variable.getNameAsString(), context).ifPresent(appends -> {
                     String id = RULE + "-" + (found.size() + 1);
                     found.add(finding(id, variable.getNameAsString(), statement, appends, context));
@@ -65,12 +65,51 @@ final class StringConcatLoopRule {
         return string ? Optional.of(block) : Optional.empty();
     }
 
-    /** for (int i = 0; i < 3; i++): число итераций — маленькая константа, роста нет — это не неэффективность. */
-    private static boolean smallConstantLoop(Statement loop) {
+    /**
+     * for (int i = 0; i < 40; i++): граница — число в коде, итераций всегда столько же, от входа не растёт —
+     * это не неэффективность (строка-разделитель из 40 «=»).
+     */
+    private static boolean constantLoop(Statement loop) {
+        if (loop instanceof ForEachStmt each) return fixedLocalCollection(each);
         if (!(loop instanceof ForStmt f) || f.getCompare().isEmpty()
                 || !(DiagnosticContext.unwrapped(f.getCompare().get()) instanceof BinaryExpr compare)) return false;
-        return compare.getRight() instanceof IntegerLiteralExpr bound && bound.asNumber().intValue() <= 16
+        return compare.getRight() instanceof IntegerLiteralExpr
                 && (compare.getOperator() == BinaryExpr.Operator.LESS || compare.getOperator() == BinaryExpr.Operator.LESS_EQUALS);
+    }
+
+    /**
+     * for (var e : ordered.entrySet()), где ordered — локальная пустая коллекция, которую метод пополняет
+     * только отдельными вызовами put/add вне циклов (ordered.put("zeta", 3); …): размер задан текстом, роста нет.
+     */
+    private static boolean fixedLocalCollection(ForEachStmt loop) {
+        Expression iterable = DiagnosticContext.unwrapped(loop.getIterable());
+        if (iterable instanceof MethodCallExpr view && view.getArguments().isEmpty()
+                && view.getNameAsString().matches("entrySet|keySet|values") && view.getScope().isPresent()) {
+            iterable = DiagnosticContext.unwrapped(view.getScope().get());
+        }
+        if (!(iterable instanceof NameExpr collection)) return false;
+        var method = loop.findAncestor(CallableDeclaration.class);
+        if (method.isEmpty()) return false;
+        String name = collection.getNameAsString();
+        boolean emptyLocal = method.get().findAll(VariableDeclarator.class).stream()
+                .anyMatch(v -> v.getNameAsString().equals(name) && v.getInitializer().map(DiagnosticContext::unwrapped)
+                        .filter(init -> init instanceof ObjectCreationExpr create && create.getArguments().isEmpty()).isPresent());
+        if (!emptyLocal) return false;
+        for (NameExpr use : method.get().findAll(NameExpr.class)) {
+            if (!use.getNameAsString().equals(name) || loop.getIterable().isAncestorOf(use) || loop.getIterable() == use) continue;
+            boolean fixedFill = use.getParentNode().orElse(null) instanceof MethodCallExpr call
+                    && call.getScope().orElse(null) == use && call.getNameAsString().matches("put|add")
+                    && !insideLoopOrLambda(call);
+            if (!fixedFill) return false;
+        }
+        return true;
+    }
+
+    private static boolean insideLoopOrLambda(Node node) {
+        for (Node up = node.getParentNode().orElse(null); up != null && !(up instanceof CallableDeclaration); up = up.getParentNode().orElse(null)) {
+            if (up instanceof LambdaExpr || up instanceof Statement s && isLoop(s)) return true;
+        }
+        return false;
     }
 
     private static boolean isLoop(Statement statement) {

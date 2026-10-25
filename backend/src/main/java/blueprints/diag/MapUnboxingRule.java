@@ -3,9 +3,12 @@ package blueprints.diag;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.ThrowStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import java.util.ArrayList;
@@ -149,6 +152,87 @@ final class MapUnboxingRule {
     }
 
     /**
+     * Ключ взят из этой же карты: {@code for (String id : m.keySet()) … m.get(id)}
+     * или {@code for (var e : m.entrySet()) … m.get(e.getKey())} — такой ключ в карте есть.
+     */
+    private static boolean keyFromSameMap(MethodCallExpr get, Expression key, String owner) {
+        String variable = null;
+        String view = null;
+        if (key instanceof NameExpr name) {
+            variable = name.getNameAsString();
+            view = "keySet";
+        } else if (key instanceof MethodCallExpr call && call.getNameAsString().equals("getKey") && call.getArguments().isEmpty()
+                && call.getScope().orElse(null) instanceof NameExpr entry) {
+            variable = entry.getNameAsString();
+            view = "entrySet";
+        }
+        if (variable == null) return false;
+        for (Node up = get.getParentNode().orElse(null); up != null; up = up.getParentNode().orElse(null)) {
+            if (up instanceof ForEachStmt loop && loop.getVariableDeclarator().getNameAsString().equals(variable)
+                    && DiagnosticContext.unwrapped(loop.getIterable()) instanceof MethodCallExpr source
+                    && source.getNameAsString().equals(view)
+                    && source.getScope().map(DiagnosticContext::unwrapped).filter(s -> sameMap(s, owner)).isPresent()) return true;
+        }
+        return false;
+    }
+
+    /** Тот же ключ уже проверен {@code containsKey} у какой-то карты метода — обычно с выходом или исключением, если ключа нет. */
+    private static boolean keyCheckedInAnyMap(CallableDeclaration<?> method, Expression key) {
+        String text = key.toString();
+        return method.findAll(MethodCallExpr.class).stream()
+                .anyMatch(call -> call.getNameAsString().equals("containsKey") && call.getArguments().size() == 1
+                        && DiagnosticContext.unwrapped(call.getArgument(0)).toString().equals(text));
+    }
+
+    /**
+     * Карта — поле «реестра»: в каком-то методе класса она и другая карта пополняются {@code put} по одному
+     * и тому же ключу (bookTitles.put(id, …); bookCopies.put(id, …)), а удаления из неё нет. Такие карты ходят
+     * парой: ключ, известный реестру, есть в каждой из них. Сам по себе это не защита — см. guarded.
+     */
+    private static boolean pairedRegistry(MethodCallExpr get, String owner) {
+        var type = get.findAncestor(TypeDeclaration.class);
+        if (type.isEmpty()) return false;
+        List<MethodCallExpr> calls = type.get().findAll(MethodCallExpr.class);
+        // Удаление ключа ломает пару. clear() не ломает, если в том же методе очищается и другая карта (сброс всего реестра).
+        boolean shrinks = calls.stream().filter(call -> call.getScope().map(DiagnosticContext::unwrapped).filter(s -> sameMap(s, owner)).isPresent())
+                .anyMatch(call -> call.getNameAsString().equals("remove")
+                        || call.getNameAsString().equals("clear") && !clearedWithOthers(call));
+        if (shrinks) return false;
+        for (MethodCallExpr put : calls) {
+            if (!isPut(put) || put.getScope().map(DiagnosticContext::unwrapped).filter(s -> sameMap(s, owner)).isEmpty()) continue;
+            var body = put.findAncestor(CallableDeclaration.class);
+            if (body.isEmpty()) continue;
+            String key = put.getArgument(0).toString();
+            boolean partner = body.get().findAll(MethodCallExpr.class).stream()
+                    .anyMatch(other -> other != put && isPut(other) && other.getArgument(0).toString().equals(key)
+                            && other.getScope().map(DiagnosticContext::unwrapped)
+                            .filter(s -> s instanceof NameExpr && !sameMap(s, owner)).isPresent());
+            if (partner) return true;
+        }
+        return false;
+    }
+
+    private static boolean clearedWithOthers(MethodCallExpr clear) {
+        return clear.findAncestor(CallableDeclaration.class).map(method -> method.findAll(MethodCallExpr.class).stream()
+                .anyMatch(other -> other != clear && other.getNameAsString().equals("clear") && other.getArguments().isEmpty()))
+                .orElse(false);
+    }
+
+    private static boolean isPut(MethodCallExpr call) {
+        return call.getNameAsString().equals("put") && call.getArguments().size() == 2;
+    }
+
+    /** До get в методе уже есть {@code throw}: метод проверяет входные данные и сам отсекает неизвестные ключи. */
+    private static boolean thrownBefore(CallableDeclaration<?> method, MethodCallExpr get) {
+        return method.findAll(ThrowStmt.class).stream()
+                .anyMatch(t -> t.getBegin().isPresent() && t.getBegin().get().isBefore(get.getBegin().get()));
+    }
+
+    private static boolean sameMap(Expression scope, String owner) {
+        return scope.toString().equals(owner) || scope.toString().equals("this." + owner);
+    }
+
+    /**
      * Защита в том же методе: {@code map.containsKey(…)}, {@code map.get(…) == / != null}, или карта заполнена
      * заранее — {@code map.put(…)} / {@code putIfAbsent} / {@code computeIfAbsent} выше по тексту метода.
      */
@@ -157,6 +241,10 @@ final class MapUnboxingRule {
         if (method.isEmpty() || get.getBegin().isEmpty()) return true;
         String owner = map.getNameAsString();
         if (filledOnConstruction(get, owner)) return true;
+        Expression key = DiagnosticContext.unwrapped(get.getArgument(0));
+        if (keyFromSameMap(get, key, owner) || keyCheckedInAnyMap(method.get(), key)) return true;
+        // Карта из «реестра» и ключ уже отсеян исключением выше или взят из внутренних данных, а не из параметра.
+        if (pairedRegistry(get, owner) && (thrownBefore(method.get(), get) || !(key instanceof NameExpr))) return true;
         for (MethodCallExpr call : method.get().findAll(MethodCallExpr.class)) {
             if (!(call.getScope().map(DiagnosticContext::unwrapped).orElse(null) instanceof NameExpr scope)
                     || !scope.getNameAsString().equals(owner)) continue;

@@ -119,7 +119,11 @@ class DataRulesTest {
             "import java.util.*; class S { Map<String,Integer> c=new HashMap<>(); void f(String w){ c.put(w, c.get(w) + 1); } }",
             "import java.util.*; class S { static int f(Map<String,Integer> m, String k){ int v = m.get(k); return v; } }",
             "import java.util.*; class S { Map<String,Double> vars=new HashMap<>(); double f(String k){ Double v = vars.get(k); return v; } }",
-            "import java.util.*; class S { static double f(Map<String,Double> m, String k){ return m.get(k); } }"
+            "import java.util.*; class S { static double f(Map<String,Double> m, String k){ return m.get(k); } }",
+            // ключ из keySet другой карты — в этой его может не быть
+            "import java.util.*; class S { static int f(Map<String,Integer> a, Map<String,Integer> b){ int t=0; for(String k: a.keySet()) t = t + b.get(k); return t; } }",
+            // карты реестра ходят парой, но ключ — параметр без проверки и без исключения выше
+            "import java.util.*; class S { Map<String,String> t=new HashMap<>(); Map<String,Integer> n=new HashMap<>(); void add(String id){ t.put(id, \"x\"); n.put(id, 1); } int f(String id){ return n.get(id) + 1; } }"
     })
     void r13FindsUnboxingOfMissingKey(String source) {
         Finding f = one("R13", source);
