@@ -14,17 +14,19 @@
 | PUT | `/api/projects/{id}/source` | Правка кода в редакторе | ✅ готово |
 | GET | `/api/projects/{id}/methods/{methodId}` | Чертёж метода (уровень 1) | ✅ готово |
 | POST | `/api/projects/{id}/commands` | Правка узла (`editStatement`) | ✅ готово |
-| GET | `/api/projects/{id}/findings` | Находки | ✅ R1–R8, с ограничениями правил |
-| POST | `/api/projects/{id}/profile` | Рост для находки | ⏳ B7 |
+| GET | `/api/projects/{id}/findings` | Находки | ✅ R1–R9, с ограничениями правил |
+| POST | `/api/projects/{id}/profile` | Замер роста для находки (счётчики циклов) | ✅ готово |
 | POST | `/api/projects/{id}/run` | Прогнать на входе | ✅ готово |
 | POST | `/api/projects/{id}/gate` | Проверить заплатку | ✅ готово |
 | GET | `/api/jobs/{jobId}` | Ход и итог проверки | ✅ готово |
-| POST | `/api/projects/{id}/apply` | Применить заплатку | ⏳ B8 |
-| GET | `/api/projects/{id}/export/junit` | Скачать тесты | ⏳ B10 |
+| GET | `/api/projects/{id}/export/junit?jobId=…` | Скачать мини-проект Maven с тестами JUnit (ZIP) | ✅ готово |
+| GET | `/api/projects/{id}/export/junit/preview?jobId=…` | Что будет в экспорте | ✅ готово |
 
-Также готово: `GET /api/examples`, `GET /api/examples/{fileName}` (примеры из корпуса). Формы прототипа — [ПРОТОТИП_КОНТРАКТ.md](ПРОТОТИП_КОНТРАКТ.md).
+Также готово: `GET /api/examples`, `GET /api/examples/{fileName}` (примеры из корпуса).
 
-Пока метод в статусе ⏳ — Фронт работает на фикстурах из `frontend/src/fixtures/`.
+Отдельного маршрута «применить заплатку» нет: кнопка «Применить изменение» отправляет код заплатки через `PUT /source`, и он становится текущей версией и новым эталоном.
+
+Все маршруты в таблице реализованы; фикстуры `frontend/src/fixtures/` нужны для проверок фронта без сервера.
 
 ---
 
@@ -163,17 +165,48 @@ id операторов: id родителя + хэш нормализованн
 Не компилируется: `{ "ok": false, "compileErrors": [{ "line": 12, "column": 5, "text": "…по-русски…" }] }` — версия не меняется.
 
 ## ✅ GET `/api/projects/{id}/findings` — находки
+Настоящий ответ на `MatchDemo.java` (вс 25.10; `source` заплатки сокращён):
 ```json
-[{ "id": "f1", "rule": "R1", "nodeId": "M:Analyzer#dedup(List)",
-   "lines": [214, 220], "title": "Вложенный цикл по той же коллекции",
-   "why": "Каждый элемент сравнивается с каждым: рост n².",
-   "conditions": ["merge не меняет id", "merge не меняет список"],
-   "patches": [{ "id": "p1", "intent": "REFACTOR", "title": "Индекс по id, тот же порядок вызовов" },
-               { "id": "p2", "intent": "BUGFIX", "title": "Без самослияния и повторов" }] }]
+[{ "id": "R1-1", "rule": "R1", "category": "INEFFICIENCY",
+   "methodId": "M:MatchDemo#countMatches(List<Integer>,List<Integer>)", "lines": [14, 20],
+   "title": "Вложенный цикл",
+   "why": "Для каждого элемента a просматривается весь список b: число сравнений растёт как n². …",
+   "growthBefore": "n²", "growthAfter": "n",
+   "conditions": ["Списки a и b не меняются внутри цикла", "У элементов согласованы equals и hashCode", "…"],
+   "patches": [{ "id": "R1-1-index", "intent": "REFACTOR", "title": "Индекс частот вместо перебора",
+                 "description": "Один проход по b строит таблицу «значение → сколько раз встретилось»…",
+                 "source": "…полный текст файла с заплаткой…", "changedLines": [14, 23] }] }]
 ```
+| Поле | Значение |
+|---|---|
+| `id` | правило + номер: `R1-1`; id заплатки — id находки + суффикс (`-index`, `-builder`, `-fix`, `-remove`) |
+| `methodId` | id метода с карты, к которому относится находка |
+| `growthBefore`, `growthAfter` | оценка роста по структуре; `null` у правил, которые сложность не оценивают |
+| `patches[].source` | полный текст файла с заплаткой — его фронт отправляет в `POST /gate` |
+| `patches[].changedLines` | `[первая, последняя]` строка новой версии, занятые заменой |
 
-## ⏳ POST `/api/projects/{id}/profile` — рост
-Запрос: `{ "findingId": "f1" }` → `{ "sizes": [100,200,400,800,1600], "loops": [{ "nodeId": "…", "counts": [10000,40000,…], "model": "n²" }], "timesMs": [3,9,…] }`
+## ✅ POST `/api/projects/{id}/profile` — замер роста
+Считает выполнения тел циклов (операции, а не время) в копии кода со счётчиками на входах n = 100, 200, 400, 800, 1600.
+Запрос: `{ "findingId": "R1-1", "patchId": "R1-1-index" }`; `patchId` необязателен — тогда меряется только оригинал.
+Настоящий ответ на MatchDemo (вс 25.10, `note` сокращён):
+```json
+{ "supported": true, "sizes": [100, 200, 400, 800, 1600],
+  "before": { "counts": [10100, 40200, 160400, 640800, 2561600], "model": "n²", "slope": 2, "lines": [14, 20], "loops": 2 },
+  "after":  { "counts": [200, 400, 800, 1600, 3200], "model": "n", "slope": 1, "lines": [14, 23], "loops": 2 },
+  "factor": 800.5,
+  "note": "Считали выполнения тел циклов (операции, а не время): до — в строках находки 14–20, после — в строках замены 14–23; …",
+  "durationMs": 2279 }
+```
+| Поле | Значение |
+|---|---|
+| `before`, `after` | ряд одной версии: `counts` по размерам, `model` — 1, log n, n, n log n, n², n³; `slope` — наклон на лог-лог шкале; `lines` и `loops` — какие циклы считались |
+| `after` | `null`, если заплатку не передали или её не измерить |
+| `factor` | во сколько раз меньше выполнений у заплатки на наибольшем n; `null` — сравнивать нечего |
+| `note` | по-русски: что и как измерено, что пропущено |
+
+Если измерить нельзя — `{ "supported": false, "note": "…почему…" }` без чисел: программа не читает `System.in`, ввод не построчный или не из целых чисел, программа отвергла вход, читает или печатает стек, в строках находки нет циклов.
+Ошибки: `404` — нет проекта, находки или заплатки; `400` — неверный JSON, нет `findingId` или код не разбирается.
+Входы поддержаны такие: строки целых чисел, которые программа читает через `Scanner.nextLine` и `Integer`/`Long` `parse*`/`valueOf`.
 
 ## ✅ POST `/api/projects/{id}/run` — прогон
 Запрос: `{ "input": "текст stdin" }` → `{ "stdout": "…", "stderr": "…", "exitCode": 0, "exception": null, "timedOut": false, "durationMs": 21, "outputUnknown": false, "outputTruncated": false }`.
@@ -182,19 +215,22 @@ id операторов: id родителя + хэш нормализованн
 ## ✅ POST `/api/projects/{id}/gate` → GET `/api/jobs/{jobId}` — проверка заплатки
 Запрос: `{ "source": "…кандидат…", "intent": "REFACTOR", "originalSource": "…эталон…" }` → `{ "jobId": "j1" }`.
 `originalSource` необязателен: без него эталон — текущая версия проекта. Для правок редактора фронт передаёт сохранённый эталон явно, чтобы не сравнивать новую версию с ней самой. Для проверки заплатки передаётся её полный `source` из находки; запрос только с `patchId` не реализован.
-Опрашивать `GET /api/jobs/{jobId}` раз в 300 мс, пока `progress < 1`:
+Опрашивать `GET /api/jobs/{jobId}` раз в 300 мс, пока `progress < 1`. Настоящий итог проверки заплатки R1 на MatchDemo (вс 25.10; `example`, `statements` и часть групп сокращены):
 ```json
-{ "status": "MATCHED | MISMATCH | INCOMPLETE | BUILD_ERROR | BEHAVIOR_CHANGE",
-  "inputs": 48, "mismatches": 0, "nondeterministic": 2,
-  "changedCovered": { "lines": 6, "covered": 6, "minHits": 11 },
-  "incompleteReason": null,
-  "smallestMismatch": { "input": "…", "original": { "stdout": "…" }, "candidate": { "stdout": "…" } },
-  "speedup": { "n": 1600, "before": "n²", "after": "n", "factor": 37.5 },
-  "durationMs": 1400, "progress": 1.0 }
+{ "status": "MATCHED", "phase": "done", "progress": 1,
+  "inputs": 41, "checked": 41, "matched": 41, "mismatches": 0, "nondeterministic": 0,
+  "incompleteReason": null, "buildErrors": [],
+  "smallestMismatch": null, "example": { … },
+  "groups": [{ "name": "Значения null", "total": 6, "checked": 6, "matched": 6, "status": "MATCHED" }, …],
+  "changedCovered": { "lines": 7, "covered": 7, "minHits": 30, "inputsReached": 40, "inputs": 41, "onOriginal": false, "statements": […] },
+  "speedup": null, "durationMs": 7652 }
 ```
+`durationMs` сильно зависит от загрузки машины: этот прогон шёл параллельно с полной сборкой проекта.
+`status` во время проверки — `RUNNING`, `phase` — `compile`, `run`, `compare`, `done`. `smallestMismatch` и `example` — пары прогонов `{ input, group, original, candidate, differences }` в форме ответа `/run`. `speedup` всегда `null`: рост измеряет отдельный `POST /profile`.
+
 | Статус | Цвет | Что показать |
 |---|---|---|
-| `MATCHED` | 🟢 | «Совпало на N входах», покрытие изменённых строк, ускорение |
+| `MATCHED` | 🟢 | «Совпало на N входах», покрытие изменённых строк |
 | `MISMATCH` | 🔴 | Самый маленький вход и два результата рядом, разница подсвечена |
 | `INCOMPLETE` | 🟡 | `incompleteReason`: что не проверено (таймаут, строки не выполнялись) |
 | `BUILD_ERROR` | 🔴 | Ошибки компилятора |
@@ -223,11 +259,16 @@ id операторов: id родителя + хэш нормализованн
 R2/R4/R5/R7/R8 содержат условия и предупреждают о потенциальном дефекте: совпадение шаблона не доказывает ошибочность замысла автора. Исправления дефектов помечены `BUGFIX`, а не `REFACTOR`.
 R3 ограничен простым классом без наследования, вложенных типов, аннотаций и обнаруженной рефлексии; перегрузки, ссылки на методы и неизвестные вызовы сохраняются. Удаление недостижимой группы сохраняет переводы строк. Статическое основание R3 не отменяет динамическую проверку покрытия и не обещает зелёный результат.
 
-## ⏳ POST `/api/projects/{id}/apply`
-Запрос: `{ "patchId": "p1" }` → та же форма, что у `PUT /source`.
+## ✅ GET `/api/projects/{id}/export/junit?jobId=…` — экспорт тестов
+Экспорт делается по завершённой проверке: эталон — выводы оригинала на её входах.
+Ответ — ZIP (`Content-Disposition: attachment`), например `MatchDemo-tests.zip`: мини-проект Maven с исходником и тестом `src/test/java/MatchDemoCharacterizationTest.java`, по одному тесту «вход → ожидаемые stdout, stderr и код выхода» на каждый сравнённый вход. Входы со случайным, неизвестным или слишком большим выводом эталона пропускаются (`skipped`). Экспорт возможен только после итога «совпало» или «расхождение». Проект собирается и проходит `mvn test` без этого инструмента.
 
-## ⏳ GET `/api/projects/{id}/export/junit`
-Ответ: файл `.java` (`Content-Disposition: attachment`).
+`GET …/export/junit/preview?jobId=…` — то же без файла, для окна экспорта. Настоящий ответ (вс 25.10):
+```json
+{ "zipName": "MatchDemo-tests.zip", "testFile": "src/test/java/MatchDemoCharacterizationTest.java",
+  "framework": "JUnit Jupiter 6.1.3", "tests": 41, "skipped": 0, "firstTest": "…текст первого теста…" }
+```
+Ошибки: `404` — нет проекта; `400` — нет `jobId`; `409` — проверка не найдена, ещё идёт или её нельзя экспортировать.
 
 ---
 
@@ -235,4 +276,4 @@ R3 ограничен простым классом без наследован�
 | Файл | Что | Как обновить |
 |---|---|---|
 | `minilang.project.json` | Настоящий ответ `POST /api/projects` на MiniLang: 36 классов, 69 полей, 109 методов, 224 вызова | `cd backend && ./mvnw -q -DskipTests package && java -Dstdout.encoding=UTF-8 -cp target/blueprints.jar blueprints.tools.DumpProject ../corpus/ours/MiniLang/MiniLang.java ../frontend/src/fixtures/minilang.project.json` |
-Для методов ⏳ Фронт может сделать свои фикстуры по формам выше. Когда Бэк закроет задачу — заменит их настоящими.
+Остальные фикстуры — тоже настоящие ответы сервера (MatchDemo, крупнейший чертёж MiniLang) и сценарии фронта; их проверяет `npm run check:fixtures`.
