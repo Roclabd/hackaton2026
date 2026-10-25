@@ -4,6 +4,7 @@ import blueprints.parse.SourceText;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.*;
@@ -37,6 +38,7 @@ public final class MethodBlueprintBuilder {
         return switch (declaration) {
             case MethodDeclaration m -> m.getBody();
             case ConstructorDeclaration c -> Optional.of(c.getBody());
+            case CompactConstructorDeclaration c -> Optional.of(c.getBody());
             case InitializerDeclaration i -> Optional.of(i.getBody());
             default -> Optional.empty();
         };
@@ -49,12 +51,14 @@ public final class MethodBlueprintBuilder {
         final Map<String, Node> astById = new LinkedHashMap<>();
         private final SourceText source;
         private final ExprTreeBuilder exprs;
+        private final EmbeddedStatementBlocks embedded;
         /** Оценка сложности циклов (фрагментов); null — если у объявления нет файла. */
         private final ComplexityEstimator complexity;
 
         Builder(SourceText source, ComplexityEstimator complexity) {
             this.source = source;
             this.exprs = new ExprTreeBuilder(source);
+            this.embedded = new EmbeddedStatementBlocks(source);
             this.complexity = complexity;
         }
 
@@ -106,6 +110,7 @@ public final class MethodBlueprintBuilder {
                 case LabeledStmt s -> add(s.getStatement(), parentId, branch, seen);
                 case ReturnStmt s -> leaf(s, NodeKind.RETURN, true, parentId, branch, seen);
                 case ThrowStmt s -> leaf(s, NodeKind.THROW, true, parentId, branch, seen);
+                case YieldStmt s -> leaf(s, NodeKind.STMT, true, parentId, branch, seen);
                 case BreakStmt s -> leaf(s, NodeKind.BREAK, false, parentId, branch, seen);
                 case ContinueStmt s -> leaf(s, NodeKind.CONTINUE, false, parentId, branch, seen);
                 case ExpressionStmt s -> leaf(s, NodeKind.STMT, true, parentId, branch, seen);
@@ -122,6 +127,7 @@ public final class MethodBlueprintBuilder {
                                  String parentId, String branch, Map<String, Integer> seen, List<Child> children) {
             String id = nextId(parentId, branch, kind, header, seen);
             String code = editable ? text(editTarget) : null;
+            children = withEmbedded(statement, children);
             List<GraphBranch> branchList = children.stream().map(c -> new GraphBranch(c.key(), c.label())).toList();
             nodes.add(new GraphNode(id, kind, shorten(header), code, ProjectMapBuilder.lines(statement),
                     parentId, branch, List.of(), editable, branchList, exprs.forStatement(statement, id),
@@ -137,10 +143,22 @@ public final class MethodBlueprintBuilder {
                             String parentId, String branch, Map<String, Integer> seen) {
             String code = text(statement);
             String id = nextId(parentId, branch, kind, code, seen);
+            List<Child> children = withEmbedded(statement, List.of());
+            List<GraphBranch> branches = children.isEmpty() ? null
+                    : children.stream().map(c -> new GraphBranch(c.key(), c.label())).toList();
             nodes.add(new GraphNode(id, kind, shorten(code), code, ProjectMapBuilder.lines(statement),
-                    parentId, branch, List.of(), editable, null, exprs.forStatement(statement, id)));
+                    parentId, branch, List.of(), editable, branches, exprs.forStatement(statement, id)));
             astById.put(id, statement);
+            for (Child child : children) {
+                addAll(child.statements(), id, child.key());
+            }
             return id;
+        }
+
+        private List<Child> withEmbedded(Statement statement, List<Child> ordinary) {
+            List<Child> children = new ArrayList<>(ordinary);
+            embedded.of(statement).forEach(b -> children.add(new Child(b.key(), b.label(), b.statements())));
+            return children;
         }
 
         private String nextId(String parentId, String branch, NodeKind kind, String text, Map<String, Integer> seen) {

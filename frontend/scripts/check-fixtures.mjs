@@ -21,12 +21,81 @@ function load(relative) {
   return result.exports
 }
 const { buildMap, buildBlueprint } = load('src/api/mock/mockGraph.ts')
+const { buildTree, CONTAINER_KINDS } = load('src/features/blueprint/blueprintTree.ts')
+const { buildClassCards } = load('src/features/map/mapModel.ts')
 const { reducer, initialState } = load('src/state/reducer.ts')
 const { selectedNode, selectedExpression } = load('src/state/selectors.ts')
 const { diagnosticMarkers, expressionEditorRange } = load('src/components/editor/editorRanges.ts')
 const { findingCategory, growthEstimate, findingGrowth } = load('src/features/evidence/findingPresentation.ts')
 const { describeVerdict } = load('src/features/verification/verdictText.ts')
 const fixture = JSON.parse(readFileSync(path.join(root, 'src/fixtures/frontend-behavior.json'), 'utf8'))
+
+// Проверяем отображение enum-констант по полному настоящему графу из API.
+const scope5Graph = JSON.parse(readFileSync(path.join(root, 'src/fixtures/scope5.map.json'), 'utf8'))
+const scope5Cards = buildClassCards(scope5Graph)
+for (const name of ['ADD', 'MUL']) {
+  const original = scope5Graph.nodes.find((node) => node.kind === 'class' && node.id.endsWith(`<constant:${name}>`))
+  assert.ok(original, `Scope5 API fixture содержит enum-константу ${name}`)
+  const card = scope5Cards.find((item) => item.id === original.id)
+  assert.ok(card, `Есть карточка enum-константы ${name}`)
+  assert.equal(card.name, name, `${name}: имя карточки без технического owner segment`)
+  assert.equal(card.fullName, original.id.slice(2).replace(/<constant:([^>]+)>/g, '$1'),
+    `${name}: полное отображаемое имя очищено, raw id сохранён отдельно`)
+  assert.equal(card.kind, 'константа', `${name}: подпись типа взята из API label`)
+  assert.equal(card.id, original.id, `${name}: внутренний id не нормализован`)
+  assert.ok(card.methods.some((method) => method.label.includes('apply(')), `${name}: метод apply доступен в карточке`)
+}
+assert.ok(scope5Cards.flatMap((card) => card.calls).every((call) => !call.target.includes('<constant:')),
+  'Подписи целей вызовов не показывают технический owner segment')
+
+// Эти настоящие backend fixtures обязательны: CI не должен молча пропускать проверку.
+const bonusBlueprintPath = path.join(root, 'src/fixtures/bonusblocks.run.blueprint.json')
+const bonusSourcePath = path.join(root, 'src/fixtures/BonusBlocks.java')
+{
+  const bonusBlueprint = JSON.parse(readFileSync(bonusBlueprintPath, 'utf8'))
+  const bonusSource = readFileSync(bonusSourcePath, 'utf8')
+  const tree = buildTree(bonusBlueprint)
+  const treeById = new Map()
+  const visit = (items) => items.forEach((item) => {
+    assert.ok(!treeById.has(item.node.id), `Узел ${item.node.id} не дублируется в дереве`)
+    treeById.set(item.node.id, item)
+    item.branches.forEach((branch) => visit(branch.children))
+  })
+  visit(tree)
+  assert.equal(treeById.size, bonusBlueprint.nodes.length, 'Все узлы BonusBlocks fixture достижимы в дереве ровно один раз')
+  const bonusBranchKeys = bonusBlueprint.nodes.flatMap((node) => node.branches ?? []).map((branch) => branch.key)
+  assert.ok(bonusBranchKeys.some((key) => key.startsWith('lambda:')), 'Fixture содержит ветку block lambda')
+  assert.ok(bonusBranchKeys.some((key) => key.startsWith('switch:')), 'Fixture содержит ветку switch expression')
+  let nestedSelectionChecked = false
+  let nestedEditableSelectionChecked = false
+  for (const node of bonusBlueprint.nodes) {
+    assert.ok(treeById.has(node.id), `Узел fixture ${node.id} доступен в дереве`)
+    if ((node.branches?.length ?? 0) > 0) {
+      assert.ok(CONTAINER_KINDS.includes(node.kind) || treeById.get(node.id).branches.length > 0,
+        `Ветвящийся оператор ${node.id} отображается контейнером`)
+      for (const branch of node.branches) {
+        const children = treeById.get(node.id).branches.find((entry) => entry.key === branch.key)?.children ?? []
+        const actualChildren = bonusBlueprint.nodes
+          .filter((child) => child.parent === node.id && (child.branch ?? 'body') === branch.key)
+          .sort((left, right) => left.lines[0] - right.lines[0] || left.lines[1] - right.lines[1])
+          .map((child) => child.id)
+        assert.deepEqual(children.map((child) => child.node.id), actualChildren,
+          `Ветка ${branch.key} узла ${node.id} содержит дочерние операторы из fixture в порядке строк`)
+        for (const child of children) {
+          let state = reducer(initialState, { type: 'methodOpened', blueprint: bonusBlueprint, selectedNodeId: null })
+          state = reducer(state, { type: 'select', nodeId: child.node.id })
+          assert.equal(selectedNode(state)?.id, child.node.id, `${bonusSourcePath}: вложенный оператор ${child.node.id} выбирается`)
+          nestedSelectionChecked = true
+          if (child.node.editable) nestedEditableSelectionChecked = true
+        }
+      }
+    }
+  }
+  assert.ok(nestedSelectionChecked, 'В BonusBlocks fixture есть реальный вложенный оператор для проверки выбора')
+  assert.ok(nestedEditableSelectionChecked, 'В BonusBlocks fixture выбирается вложенный editable оператор')
+  assert.ok(bonusSource.length > 0, 'Java fixture BonusBlocks.java не пустой')
+  console.log(`OK: bonus blocks — ${treeById.size} реальных узлов, ветвящиеся операторы и выбор вложенных узлов`)
+}
 let expressionCount = 0
 const kinds = new Set()
 
@@ -153,3 +222,93 @@ assert.ok(coveredText.includes('3 разных входах'))
 assert.doesNotMatch(coveredText, /строк|итерац|\d+ раз\b/)
 assert.ok(describeVerdict({ ...verdict, changedCovered: null }).detail.includes('покрытие изменений не измерено'))
 console.log(`OK: ${expressionCount} мок-выражений + ${realExpressionCount} настоящих + ${syntheticCount} синтетических; inclusive range, выбор оператора, краткий режим, диагностика, категории, смена эталона и текст покрытия обеих сторон`)
+
+// Частота исполнения: ноль приходит с сервера, отсутствие счётчика не означает ноль.
+const { executionCount, heatColor } = load('src/features/blueprint/heatModel.ts')
+const heatResult = { methodId: 'M:Heat#run()', runs: 1, counts: { zero: 0, loop: 1, body: 9 }, maxCount: 9, note: 'fixture только для переходов состояния' }
+assert.equal(executionCount(heatResult, 'zero'), 0)
+assert.equal(executionCount(heatResult, 'missing'), null)
+assert.equal(executionCount(null, 'zero'), null)
+assert.equal(executionCount({ ...heatResult, counts: { invalid: -1 } }, 'invalid'), null)
+assert.equal(heatColor(0, 9), 'rgb(255, 249, 240)')
+assert.equal(heatColor(9, 9), 'rgb(243, 153, 80)')
+assert.equal(heatColor(0, 0), 'rgb(255, 249, 240)')
+const heatProject = { ...fixed, id: 'heat-project', map: { nodes: [], edges: [] } }
+const heatBlueprint = { methodId: heatResult.methodId, label: 'run()', nodes: [], edges: [] }
+const heatRequest = { requestId: 1, projectId: heatProject.id, version: heatProject.version, methodId: heatResult.methodId, loading: true, result: null }
+let heatState = reducer(reducer(initialState, { type: 'projectLoaded', project: heatProject }), { type: 'methodOpened', blueprint: heatBlueprint, selectedNodeId: null })
+assert.equal(reducer({ ...heatState, level: 'map' }, { type: 'heatStarted', heat: heatRequest }).heat, null, 'С карты запрос не запускается')
+heatState = reducer(heatState, { type: 'heatStarted', heat: heatRequest })
+assert.equal(heatState.heat.loading, true)
+assert.equal(reducer(heatState, { type: 'heatLoaded', requestId: 0, result: heatResult }).heat.result, null, 'Старый запрос не заменяет новый')
+assert.equal(reducer(heatState, { type: 'heatLoaded', requestId: 1, result: { ...heatResult, methodId: 'another' } }).heat.result, null, 'Другой метод не получает чужие счётчики')
+const heatLoaded = reducer(heatState, { type: 'heatLoaded', requestId: 1, result: heatResult })
+assert.deepEqual(heatLoaded.heat.result, heatResult)
+assert.equal(heatLoaded.heat.loading, false)
+for (const action of [
+  { type: 'draftChanged', text: `${heatProject.source}\n` },
+  { type: 'projectSaved', project: { ...heatProject, version: heatProject.version + 1 } },
+  { type: 'patchApplied', project: heatProject },
+  { type: 'commandApplied', response: { ok: true, compileErrors: [], source: heatProject.source, version: heatProject.version + 1 } },
+  { type: 'methodOpened', blueprint: { ...heatBlueprint, methodId: 'another' }, selectedNodeId: null },
+  { type: 'blueprintRefreshed', blueprint: heatBlueprint },
+  { type: 'showMap' },
+  { type: 'projectLoaded', project: { ...heatProject, id: 'another-project' } },
+]) {
+  const changed = reducer(heatLoaded, action)
+  assert.equal(changed.heat, null, `${action.type}: измерение сброшено`)
+  assert.equal(reducer(changed, { type: 'heatLoaded', requestId: 1, result: heatResult }).heat, null, `${action.type}: поздний ответ игнорируется`)
+}
+assert.equal(reducer(heatLoaded, { type: 'heatCleared', requestId: 0 }).heat, heatLoaded.heat, 'Старая ошибка не убирает актуальное измерение')
+assert.equal(reducer(heatLoaded, { type: 'heatCleared' }).heat, null)
+console.log('OK: heat — реальные счётчики, отсутствие ≠ 0, шкала, загрузка, смена метода/проекта/версии и устаревшие ответы')
+
+// Асинхронный action проверяем на управляемом ответе API: запросы и ошибки не выдумывают результатов.
+let asyncState = heatState
+let heatCalls = 0
+let finishHeat
+const heatErrors = []
+const actionModule = { exports: {} }
+const actionSource = ts.transpileModule(readFileSync(path.join(root, 'src/state/heatActions.ts'), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText
+new Function('require', 'exports', 'module', actionSource)((name) => ({
+  '../api/heatApi': { measureHeat: () => { heatCalls++; return new Promise((resolve, reject) => { finishHeat = { resolve, reject } }) } },
+  './actions': { flushDraft: async () => {}, reportError: (error) => heatErrors.push(error.message) },
+  './store': { store: { getState: () => asyncState }, dispatch: (action) => { asyncState = reducer(asyncState, action) } },
+})[name], actionModule.exports, actionModule)
+const { toggleHeat } = actionModule.exports
+asyncState = { ...heatState, heat: null, level: 'map' }
+await toggleHeat()
+assert.equal(heatCalls, 0, 'Невыбранный метод не запрашивается')
+asyncState = { ...heatState, heat: null }
+let pendingHeat = toggleHeat()
+await Promise.resolve()
+await toggleHeat()
+assert.equal(heatCalls, 1, 'Повторный клик не запускает параллельное измерение')
+finishHeat.resolve(heatResult)
+await pendingHeat
+assert.deepEqual(asyncState.heat.result, heatResult)
+await toggleHeat()
+assert.equal(asyncState.heat, null, 'Готовое измерение выключается без запроса')
+pendingHeat = toggleHeat()
+await Promise.resolve()
+asyncState = reducer(asyncState, { type: 'draftChanged', text: 'changed' })
+finishHeat.resolve(heatResult)
+await pendingHeat
+assert.equal(asyncState.heat, null, 'Поздний ответ после правки игнорируется')
+asyncState = { ...heatState, heat: null }
+pendingHeat = toggleHeat()
+await Promise.resolve()
+finishHeat.reject(new Error('Точный текст ошибки сервера'))
+await pendingHeat
+assert.deepEqual(heatErrors, ['Точный текст ошибки сервера'])
+assert.equal(asyncState.heat, null)
+asyncState = { ...heatState, heat: null }
+pendingHeat = toggleHeat()
+await Promise.resolve()
+asyncState = reducer(asyncState, { type: 'showMap' })
+finishHeat.reject(new Error('Уже устаревшая ошибка'))
+await pendingHeat
+assert.equal(heatErrors.length, 1, 'Устаревшая ошибка не тревожит новый экран')
+console.log('OK: heat action — реальный запрос только открытого метода, защита двойного клика, поздние ответы/ошибки, серверный текст ошибки')

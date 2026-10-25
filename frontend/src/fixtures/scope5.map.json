@@ -1,0 +1,1587 @@
+{
+  "nodes": [
+    {
+      "id": "C:Scope5Bonus",
+      "kind": "class",
+      "label": "class Scope5Bonus",
+      "code": null,
+      "lines": [
+        26,
+        465
+      ],
+      "parent": null,
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Shape",
+      "kind": "class",
+      "label": "interface Shape",
+      "code": null,
+      "lines": [
+        29,
+        41
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#area()",
+      "kind": "method",
+      "label": "double area()",
+      "code": null,
+      "lines": [
+        30,
+        30
+      ],
+      "parent": "C:Scope5Bonus.Shape",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#name()",
+      "kind": "method",
+      "label": "String name()",
+      "code": null,
+      "lines": [
+        32,
+        32
+      ],
+      "parent": "C:Scope5Bonus.Shape",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#describe()",
+      "kind": "method",
+      "label": "String describe()",
+      "code": null,
+      "lines": [
+        34,
+        36
+      ],
+      "parent": "C:Scope5Bonus.Shape",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#unit()",
+      "kind": "method",
+      "label": "static Shape unit()",
+      "code": null,
+      "lines": [
+        38,
+        40
+      ],
+      "parent": "C:Scope5Bonus.Shape",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Base",
+      "kind": "class",
+      "label": "abstract class Base",
+      "code": null,
+      "lines": [
+        44,
+        55
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Base.name",
+      "kind": "field",
+      "label": "String name",
+      "code": "private final String name;",
+      "lines": [
+        45,
+        45
+      ],
+      "parent": "C:Scope5Bonus.Base",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Base#<init>(String)",
+      "kind": "method",
+      "label": "new Base(String)",
+      "code": null,
+      "lines": [
+        47,
+        49
+      ],
+      "parent": "C:Scope5Bonus.Base",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Base#name()",
+      "kind": "method",
+      "label": "String name()",
+      "code": null,
+      "lines": [
+        51,
+        54
+      ],
+      "parent": "C:Scope5Bonus.Base",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Square",
+      "kind": "class",
+      "label": "class Square",
+      "code": null,
+      "lines": [
+        58,
+        70
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Square.side",
+      "kind": "field",
+      "label": "double side",
+      "code": "private final double side;",
+      "lines": [
+        59,
+        59
+      ],
+      "parent": "C:Scope5Bonus.Square",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Square#<init>(double)",
+      "kind": "method",
+      "label": "new Square(double)",
+      "code": null,
+      "lines": [
+        61,
+        64
+      ],
+      "parent": "C:Scope5Bonus.Square",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Square#area()",
+      "kind": "method",
+      "label": "double area()",
+      "code": null,
+      "lines": [
+        66,
+        69
+      ],
+      "parent": "C:Scope5Bonus.Square",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Circle",
+      "kind": "class",
+      "label": "class Circle",
+      "code": null,
+      "lines": [
+        72,
+        89
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Circle.radius",
+      "kind": "field",
+      "label": "double radius",
+      "code": "private final double radius;",
+      "lines": [
+        73,
+        73
+      ],
+      "parent": "C:Scope5Bonus.Circle",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Circle#<init>(double)",
+      "kind": "method",
+      "label": "new Circle(double)",
+      "code": null,
+      "lines": [
+        75,
+        78
+      ],
+      "parent": "C:Scope5Bonus.Circle",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Circle#area()",
+      "kind": "method",
+      "label": "double area()",
+      "code": null,
+      "lines": [
+        80,
+        83
+      ],
+      "parent": "C:Scope5Bonus.Circle",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Circle#describe()",
+      "kind": "method",
+      "label": "String describe()",
+      "code": null,
+      "lines": [
+        85,
+        88
+      ],
+      "parent": "C:Scope5Bonus.Circle",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Counter",
+      "kind": "class",
+      "label": "class Counter",
+      "code": null,
+      "lines": [
+        92,
+        98
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Counter.value",
+      "kind": "field",
+      "label": "int value",
+      "code": "int value;",
+      "lines": [
+        93,
+        93
+      ],
+      "parent": "C:Scope5Bonus.Counter",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Counter#bump()",
+      "kind": "method",
+      "label": "void bump()",
+      "code": null,
+      "lines": [
+        95,
+        97
+      ],
+      "parent": "C:Scope5Bonus.Counter",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "F:Scope5Bonus.step",
+      "kind": "field",
+      "label": "int step",
+      "code": "int step = 2;",
+      "lines": [
+        100,
+        100
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Pair",
+      "kind": "class",
+      "label": "record Pair",
+      "code": null,
+      "lines": [
+        103,
+        117
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Pair.key",
+      "kind": "field",
+      "label": "String key",
+      "code": "String key",
+      "lines": [
+        103,
+        103
+      ],
+      "parent": "C:Scope5Bonus.Pair",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Pair.value",
+      "kind": "field",
+      "label": "int value",
+      "code": "int value",
+      "lines": [
+        103,
+        103
+      ],
+      "parent": "C:Scope5Bonus.Pair",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Pair#<init>(String,int)",
+      "kind": "method",
+      "label": "new Pair(String, int)",
+      "code": null,
+      "lines": [
+        104,
+        108
+      ],
+      "parent": "C:Scope5Bonus.Pair",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Pair#of(String,int)",
+      "kind": "method",
+      "label": "static Pair of(String, int)",
+      "code": null,
+      "lines": [
+        110,
+        112
+      ],
+      "parent": "C:Scope5Bonus.Pair",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Pair#withValue(int)",
+      "kind": "method",
+      "label": "Pair withValue(int)",
+      "code": null,
+      "lines": [
+        114,
+        116
+      ],
+      "parent": "C:Scope5Bonus.Pair",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Rect",
+      "kind": "class",
+      "label": "record Rect",
+      "code": null,
+      "lines": [
+        120,
+        130
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Rect.w",
+      "kind": "field",
+      "label": "double w",
+      "code": "double w",
+      "lines": [
+        120,
+        120
+      ],
+      "parent": "C:Scope5Bonus.Rect",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Rect.h",
+      "kind": "field",
+      "label": "double h",
+      "code": "double h",
+      "lines": [
+        120,
+        120
+      ],
+      "parent": "C:Scope5Bonus.Rect",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Rect#area()",
+      "kind": "method",
+      "label": "double area()",
+      "code": null,
+      "lines": [
+        121,
+        124
+      ],
+      "parent": "C:Scope5Bonus.Rect",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Rect#name()",
+      "kind": "method",
+      "label": "String name()",
+      "code": null,
+      "lines": [
+        126,
+        129
+      ],
+      "parent": "C:Scope5Bonus.Rect",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Op",
+      "kind": "class",
+      "label": "enum Op",
+      "code": null,
+      "lines": [
+        133,
+        158
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Op.<constant:ADD>",
+      "kind": "class",
+      "label": "константа ADD",
+      "code": null,
+      "lines": [
+        134,
+        139
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Op.<constant:ADD>#apply(int,int)",
+      "kind": "method",
+      "label": "int apply(int, int)",
+      "code": null,
+      "lines": [
+        135,
+        138
+      ],
+      "parent": "C:Scope5Bonus.Op.<constant:ADD>",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Op.<constant:MUL>",
+      "kind": "class",
+      "label": "константа MUL",
+      "code": null,
+      "lines": [
+        140,
+        145
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Op.<constant:MUL>#apply(int,int)",
+      "kind": "method",
+      "label": "int apply(int, int)",
+      "code": null,
+      "lines": [
+        141,
+        144
+      ],
+      "parent": "C:Scope5Bonus.Op.<constant:MUL>",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "F:Scope5Bonus.Op.symbol",
+      "kind": "field",
+      "label": "String symbol",
+      "code": "private final String symbol;",
+      "lines": [
+        147,
+        147
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Op#<init>(String)",
+      "kind": "method",
+      "label": "new Op(String)",
+      "code": null,
+      "lines": [
+        149,
+        151
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Op#apply(int,int)",
+      "kind": "method",
+      "label": "int apply(int, int)",
+      "code": null,
+      "lines": [
+        153,
+        153
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Op#symbol()",
+      "kind": "method",
+      "label": "String symbol()",
+      "code": null,
+      "lines": [
+        155,
+        157
+      ],
+      "parent": "C:Scope5Bonus.Op",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Box",
+      "kind": "class",
+      "label": "class Box",
+      "code": null,
+      "lines": [
+        161,
+        175
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Box.value",
+      "kind": "field",
+      "label": "T value",
+      "code": "private T value;",
+      "lines": [
+        162,
+        162
+      ],
+      "parent": "C:Scope5Bonus.Box",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Box#<init>(T)",
+      "kind": "method",
+      "label": "new Box(T)",
+      "code": null,
+      "lines": [
+        164,
+        166
+      ],
+      "parent": "C:Scope5Bonus.Box",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Box#get()",
+      "kind": "method",
+      "label": "T get()",
+      "code": null,
+      "lines": [
+        168,
+        170
+      ],
+      "parent": "C:Scope5Bonus.Box",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Box#map(Function<T,R>)",
+      "kind": "method",
+      "label": "Box<R> map(Function<T,R>)",
+      "code": null,
+      "lines": [
+        172,
+        174
+      ],
+      "parent": "C:Scope5Bonus.Box",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Stack2",
+      "kind": "class",
+      "label": "interface Stack2",
+      "code": null,
+      "lines": [
+        178,
+        184
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.Stack2#push(T)",
+      "kind": "method",
+      "label": "void push(T)",
+      "code": null,
+      "lines": [
+        179,
+        179
+      ],
+      "parent": "C:Scope5Bonus.Stack2",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Stack2#pop()",
+      "kind": "method",
+      "label": "T pop()",
+      "code": null,
+      "lines": [
+        181,
+        181
+      ],
+      "parent": "C:Scope5Bonus.Stack2",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.Stack2#isEmpty()",
+      "kind": "method",
+      "label": "boolean isEmpty()",
+      "code": null,
+      "lines": [
+        183,
+        183
+      ],
+      "parent": "C:Scope5Bonus.Stack2",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.ListStack",
+      "kind": "class",
+      "label": "class ListStack",
+      "code": null,
+      "lines": [
+        187,
+        204
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.ListStack.items",
+      "kind": "field",
+      "label": "List<T> items",
+      "code": "private final List<T> items = new ArrayList<>();",
+      "lines": [
+        188,
+        188
+      ],
+      "parent": "C:Scope5Bonus.ListStack",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus.ListStack#push(T)",
+      "kind": "method",
+      "label": "void push(T)",
+      "code": null,
+      "lines": [
+        190,
+        193
+      ],
+      "parent": "C:Scope5Bonus.ListStack",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.ListStack#pop()",
+      "kind": "method",
+      "label": "T pop()",
+      "code": null,
+      "lines": [
+        195,
+        198
+      ],
+      "parent": "C:Scope5Bonus.ListStack",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): remove() у списка — просмотр всех элементов (стр. 197). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus.ListStack#isEmpty()",
+      "kind": "method",
+      "label": "boolean isEmpty()",
+      "code": null,
+      "lines": [
+        200,
+        203
+      ],
+      "parent": "C:Scope5Bonus.ListStack",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#maxOf(List<T>)",
+      "kind": "method",
+      "label": "static T maxOf(List<T>)",
+      "code": null,
+      "lines": [
+        207,
+        215
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): цикл (стр. 209). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#sumOf(List<?extendsNumber>)",
+      "kind": "method",
+      "label": "static double sumOf(List<?extendsNumber>)",
+      "code": null,
+      "lines": [
+        218,
+        224
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): цикл (стр. 220). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "C:Scope5Bonus.Expr",
+      "kind": "class",
+      "label": "interface Expr",
+      "code": null,
+      "lines": [
+        227,
+        227
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Num",
+      "kind": "class",
+      "label": "record Num",
+      "code": null,
+      "lines": [
+        229,
+        229
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Num.value",
+      "kind": "field",
+      "label": "int value",
+      "code": "int value",
+      "lines": [
+        229,
+        229
+      ],
+      "parent": "C:Scope5Bonus.Num",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Add",
+      "kind": "class",
+      "label": "record Add",
+      "code": null,
+      "lines": [
+        231,
+        231
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Add.left",
+      "kind": "field",
+      "label": "Expr left",
+      "code": "Expr left",
+      "lines": [
+        231,
+        231
+      ],
+      "parent": "C:Scope5Bonus.Add",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Add.right",
+      "kind": "field",
+      "label": "Expr right",
+      "code": "Expr right",
+      "lines": [
+        231,
+        231
+      ],
+      "parent": "C:Scope5Bonus.Add",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "C:Scope5Bonus.Neg",
+      "kind": "class",
+      "label": "record Neg",
+      "code": null,
+      "lines": [
+        233,
+        233
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "F:Scope5Bonus.Neg.inner",
+      "kind": "field",
+      "label": "Expr inner",
+      "code": "Expr inner",
+      "lines": [
+        233,
+        233
+      ],
+      "parent": "C:Scope5Bonus.Neg",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null
+    },
+    {
+      "id": "M:Scope5Bonus#eval(Expr)",
+      "kind": "method",
+      "label": "static int eval(Expr)",
+      "code": null,
+      "lines": [
+        236,
+        242
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "рекурсия",
+        "level": "unknown",
+        "why": "Метод eval() рекурсивный (сам или через другие методы): сложность зависит от глубины вызовов — по структуре кода её не оценить."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])",
+      "kind": "method",
+      "label": "static void main(String[])",
+      "code": null,
+      "lines": [
+        244,
+        264
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n log n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): вызов lambdas() (стр. 261): сортировка (стр. 382) — n log n. n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше. Вызывает рекурсивный метод eval() — его вклад здесь не учтён."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()",
+      "kind": "method",
+      "label": "static void classesAndInterfaces()",
+      "code": null,
+      "lines": [
+        266,
+        298
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): цикл (стр. 269). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#records()",
+      "kind": "method",
+      "label": "static void records()",
+      "code": null,
+      "lines": [
+        300,
+        314
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#enums()",
+      "kind": "method",
+      "label": "static void enums()",
+      "code": null,
+      "lines": [
+        316,
+        330
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(1)",
+        "level": "low",
+        "why": "Нет циклов по данным и вызовов, зависящих от размера входа."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)",
+      "kind": "method",
+      "label": "static void generics(List<Integer>)",
+      "code": null,
+      "lines": [
+        332,
+        351
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): вызов maxOf() (стр. 343): цикл (стр. 209). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#lambdas(List<Integer>)",
+      "kind": "method",
+      "label": "static void lambdas(List<Integer>)",
+      "code": null,
+      "lines": [
+        353,
+        395
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n log n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): сортировка (стр. 382) — n log n. n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#streams(List<Integer>)",
+      "kind": "method",
+      "label": "static void streams(List<Integer>)",
+      "code": null,
+      "lines": [
+        397,
+        429
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n log n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): сортировка (стр. 400) — n log n. n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше."
+      }
+    },
+    {
+      "id": "M:Scope5Bonus#patterns()",
+      "kind": "method",
+      "label": "static void patterns()",
+      "code": null,
+      "lines": [
+        431,
+        464
+      ],
+      "parent": "C:Scope5Bonus",
+      "branch": null,
+      "badges": [],
+      "editable": false,
+      "branches": null,
+      "complexity": {
+        "big": "O(n)",
+        "level": "linear",
+        "why": "Оценка сверху по структуре кода (вложенность циклов и вызовов): цикл (стр. 437). n — размер входных данных; если внутренний цикл продолжает счётчик внешнего, настоящий рост меньше. Вызывает рекурсивный метод eval() — его вклад здесь не учтён."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "M:Scope5Bonus.Shape#describe()->M:Scope5Bonus.Shape#name()",
+      "from": "M:Scope5Bonus.Shape#describe()",
+      "to": "M:Scope5Bonus.Shape#name()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#describe()->M:Scope5Bonus.Shape#area()",
+      "from": "M:Scope5Bonus.Shape#describe()",
+      "to": "M:Scope5Bonus.Shape#area()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Shape#unit()->M:Scope5Bonus.Square#<init>(double)",
+      "from": "M:Scope5Bonus.Shape#unit()",
+      "to": "M:Scope5Bonus.Square#<init>(double)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Circle#describe()->M:Scope5Bonus.Shape#describe()",
+      "from": "M:Scope5Bonus.Circle#describe()",
+      "to": "M:Scope5Bonus.Shape#describe()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Pair#of(String,int)->M:Scope5Bonus.Pair#<init>(String,int)",
+      "from": "M:Scope5Bonus.Pair#of(String,int)",
+      "to": "M:Scope5Bonus.Pair#<init>(String,int)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Pair#withValue(int)->M:Scope5Bonus.Pair#<init>(String,int)",
+      "from": "M:Scope5Bonus.Pair#withValue(int)",
+      "to": "M:Scope5Bonus.Pair#<init>(String,int)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus.Box#map(Function<T,R>)->M:Scope5Bonus.Box#<init>(T)",
+      "from": "M:Scope5Bonus.Box#map(Function<T,R>)",
+      "to": "M:Scope5Bonus.Box#<init>(T)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#eval(Expr)->M:Scope5Bonus#eval(Expr)",
+      "from": "M:Scope5Bonus#eval(Expr)",
+      "to": "M:Scope5Bonus#eval(Expr)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#classesAndInterfaces()",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#classesAndInterfaces()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#records()",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#records()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#enums()",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#enums()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#generics(List<Integer>)",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#generics(List<Integer>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#lambdas(List<Integer>)",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#lambdas(List<Integer>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#streams(List<Integer>)",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#streams(List<Integer>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#main(String[])->M:Scope5Bonus#patterns()",
+      "from": "M:Scope5Bonus#main(String[])",
+      "to": "M:Scope5Bonus#patterns()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()->M:Scope5Bonus.Shape#unit()",
+      "from": "M:Scope5Bonus#classesAndInterfaces()",
+      "to": "M:Scope5Bonus.Shape#unit()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()->M:Scope5Bonus.Shape#describe()",
+      "from": "M:Scope5Bonus#classesAndInterfaces()",
+      "to": "M:Scope5Bonus.Shape#describe()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()->M:Scope5Bonus.Counter#bump()",
+      "from": "M:Scope5Bonus#classesAndInterfaces()",
+      "to": "M:Scope5Bonus.Counter#bump()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()->M:Scope5Bonus.Square#<init>(double)",
+      "from": "M:Scope5Bonus#classesAndInterfaces()",
+      "to": "M:Scope5Bonus.Square#<init>(double)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#classesAndInterfaces()->M:Scope5Bonus.Circle#<init>(double)",
+      "from": "M:Scope5Bonus#classesAndInterfaces()",
+      "to": "M:Scope5Bonus.Circle#<init>(double)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#records()->M:Scope5Bonus.Pair#of(String,int)",
+      "from": "M:Scope5Bonus#records()",
+      "to": "M:Scope5Bonus.Pair#of(String,int)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#records()->M:Scope5Bonus.Pair#withValue(int)",
+      "from": "M:Scope5Bonus#records()",
+      "to": "M:Scope5Bonus.Pair#withValue(int)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#enums()->M:Scope5Bonus.Op#symbol()",
+      "from": "M:Scope5Bonus#enums()",
+      "to": "M:Scope5Bonus.Op#symbol()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#enums()->M:Scope5Bonus.Op#apply(int,int)",
+      "from": "M:Scope5Bonus#enums()",
+      "to": "M:Scope5Bonus.Op#apply(int,int)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Box#map(Function<T,R>)",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Box#map(Function<T,R>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Box#get()",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Box#get()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Stack2#push(T)",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Stack2#push(T)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Stack2#pop()",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Stack2#pop()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Stack2#isEmpty()",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Stack2#isEmpty()",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus#maxOf(List<T>)",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus#maxOf(List<T>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus#sumOf(List<?extendsNumber>)",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus#sumOf(List<?extendsNumber>)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#generics(List<Integer>)->M:Scope5Bonus.Box#<init>(T)",
+      "from": "M:Scope5Bonus#generics(List<Integer>)",
+      "to": "M:Scope5Bonus.Box#<init>(T)",
+      "kind": "call",
+      "label": "вызов"
+    },
+    {
+      "id": "M:Scope5Bonus#patterns()->M:Scope5Bonus#eval(Expr)",
+      "from": "M:Scope5Bonus#patterns()",
+      "to": "M:Scope5Bonus#eval(Expr)",
+      "kind": "call",
+      "label": "вызов"
+    }
+  ]
+}

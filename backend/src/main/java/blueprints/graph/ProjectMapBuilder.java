@@ -58,16 +58,54 @@ public final class ProjectMapBuilder {
             if (type instanceof RecordDeclaration record) {
                 record.getParameters().forEach(p -> addRecordComponent(p, id, typeName));
             }
+            if (type instanceof EnumDeclaration enumeration) {
+                enumeration.getEntries().stream().filter(entry -> !entry.getClassBody().isEmpty())
+                        .forEach(entry -> addEnumConstant(entry, id, typeName));
+            }
             for (BodyDeclaration<?> member : type.getMembers()) {
                 switch (member) {
                     case TypeDeclaration<?> nested -> addType(nested, id, typeName + "." + nested.getNameAsString());
                     case FieldDeclaration field -> addFields(field, id, typeName);
                     case MethodDeclaration method -> addMethod(method, id, typeName);
                     case ConstructorDeclaration constructor -> addConstructor(constructor, id, typeName);
+                    case CompactConstructorDeclaration constructor -> addCompactConstructor(constructor, id, typeName,
+                            ((RecordDeclaration) type).getParameters());
                     case InitializerDeclaration initializer -> addInitializer(initializer, id, typeName);
-                    default -> { /* константы enum и прочее на карту не выносим */ }
+                    default -> { }
                 }
             }
+        }
+
+        private void addEnumConstant(EnumConstantDeclaration constant, String parentId, String enumName) {
+            // Зарезервированный сегмент не сталкивается с одноимённым вложенным классом enum.
+            String owner = enumName + ".<constant:" + constant.getNameAsString() + ">";
+            String id = unique(NodeIds.type(owner));
+            Map<String, String> fieldTypes = new HashMap<>();
+            constant.getClassBody().stream().filter(BodyDeclaration::isFieldDeclaration)
+                    .map(BodyDeclaration::asFieldDeclaration).flatMap(field -> field.getVariables().stream())
+                    .forEach(variable -> fieldTypes.put(variable.getNameAsString(), CallResolver.typeNameOf(variable.getType())));
+            types.put(owner, new CallResolver.TypeInfo(owner, enumName, List.of(), false, fieldTypes));
+            nodes.add(node(id, NodeKind.CLASS, "константа " + constant.getNameAsString(), null, constant, parentId));
+            for (BodyDeclaration<?> member : constant.getClassBody()) {
+                switch (member) {
+                    case MethodDeclaration method -> addMethod(method, id, owner);
+                    case FieldDeclaration field -> addFields(field, id, owner);
+                    case InitializerDeclaration initializer -> addInitializer(initializer, id, owner);
+                    case TypeDeclaration<?> nested -> addType(nested, id, owner + "." + nested.getNameAsString());
+                    default -> { }
+                }
+            }
+        }
+
+        private void addCompactConstructor(CompactConstructorDeclaration constructor, String parentId, String typeName,
+                                           List<Parameter> components) {
+            List<String> parameterTypes = parameterTypes(components);
+            String id = unique(NodeIds.method(typeName, "<init>", parameterTypes));
+            String label = "new " + constructor.getNameAsString() + "(" + String.join(", ", parameterTypes) + ")";
+            nodes.add(methodNode(id, label, constructor, parentId));
+            declarations.put(id, constructor);
+            methods.add(new CallResolver.MethodInfo(id, typeName, "<init>", String.join(",", parameterTypes),
+                    components.size(), hasVarargs(components), constructor));
         }
 
         private void addFields(FieldDeclaration field, String parentId, String typeName) {

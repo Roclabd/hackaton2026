@@ -27,6 +27,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
 
@@ -83,6 +84,29 @@ public final class CoverageInstrumenter {
         }
         String instrumented = Insertion.apply(source, insertions) + countersClass(statementLines.size());
         return Optional.of(new InstrumentedSource(instrumented, statementLines));
+    }
+
+    /**
+     * Счётчики выбранных узлов чертежа. Связь с оператором берётся из AST, а не из номера строки:
+     * условие if/while/do поднимается до своего оператора. Цикл считается при входе в оператор,
+     * поэтому счётчик стоит перед всем циклом, а не внутри его тела.
+     */
+    public static NodeInstrumentedSource instrumentNodes(String source, Map<String, Node> astById) {
+        SourceText text = new SourceText(source);
+        List<Insertion> insertions = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for (Map.Entry<String, Node> entry : astById.entrySet()) {
+            Node target = entry.getValue();
+            Statement statement = target instanceof Statement s ? s
+                    : target.findAncestor(Statement.class).orElse(null);
+            // Вызов this/super нельзя честно измерить до входа существующим механизмом конструктора.
+            if (statement == null || statement instanceof ExplicitConstructorInvocationStmt || !measurable(statement)) continue;
+            List<Insertion> placed = place(statement, counter(ids.size()), text);
+            if (placed.isEmpty()) continue;
+            insertions.addAll(placed);
+            ids.add(entry.getKey());
+        }
+        return new NodeInstrumentedSource(Insertion.apply(source, insertions) + countersClass(ids.size()), ids);
     }
 
     /** Операторы, перед которыми можно поставить счётчик, — в порядке появления в файле. */

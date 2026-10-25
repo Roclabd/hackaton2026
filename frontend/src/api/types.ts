@@ -107,6 +107,16 @@ export interface Blueprint {
   edges: GraphEdge[]
 }
 
+/** Реальное число входов в операторы на выполненных сервером прогонах. */
+export interface HeatResult {
+  methodId: string
+  runs: number
+  /** Неизмеримые узлы отсутствуют; измеренный, но не выполненный оператор имеет 0. */
+  counts: Record<string, number>
+  maxCount: number
+  note: string
+}
+
 /** Ошибка компиляции или разбора, текст по-русски. */
 export interface CompileError {
   line: number

@@ -16,5 +16,6 @@ final class ExtraRoutes {
         blueprints.diag.FindingRoutes.register(config, store);
         blueprints.export.ExportRoutes.register(config, store);
         blueprints.profile.ProfileRoutes.register(config, store);
+        blueprints.heat.HeatRoutes.register(config, store);
     }
 }

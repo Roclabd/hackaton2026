@@ -1,0 +1,540 @@
+{
+  "methodId": "M:BonusBlocks#run(int)",
+  "label": "static int run(int)",
+  "nodes": [
+    {
+      "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9",
+      "kind": "stmt",
+      "label": "IntUnaryOperator twice = x -> { int doubled = x * 2; return doubled; };",
+      "code": "IntUnaryOperator twice = x -> {\n            int doubled = x * 2;\n            return doubled;\n        };",
+      "lines": [
+        6,
+        9
+      ],
+      "parent": "M:BonusBlocks#run(int)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "lambda:78",
+          "label": "лямбда (x) → · тело"
+        }
+      ],
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/e",
+        "kind": "declare",
+        "label": "IntUnaryOperator",
+        "code": "IntUnaryOperator twice = x -> {\n            int doubled = x * 2;\n            return doubled;\n        }",
+        "range": [
+          6,
+          9,
+          9,
+          9
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/e/0",
+            "kind": "name",
+            "label": "twice",
+            "code": "twice = x -> {\n            int doubled = x * 2;\n            return doubled;\n        }",
+            "range": [
+              6,
+              26,
+              9,
+              9
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/e/0/0",
+                "kind": "lambda",
+                "label": "(x) ->",
+                "code": "x -> {\n            int doubled = x * 2;\n            return doubled;\n        }",
+                "range": [
+                  6,
+                  34,
+                  9,
+                  9
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/e/0/0/0",
+                    "kind": "block",
+                    "label": "{ 2 оператора }",
+                    "code": "{\n            int doubled = x * 2;\n            return doubled;\n        }",
+                    "range": [
+                      6,
+                      39,
+                      9,
+                      9
+                    ],
+                    "role": "тело",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8",
+      "kind": "stmt",
+      "label": "int doubled = x * 2;",
+      "code": "int doubled = x * 2;",
+      "lines": [
+        7,
+        7
+      ],
+      "parent": "M:BonusBlocks#run(int)/body.stmt:1589e8c9",
+      "branch": "lambda:78",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8/e",
+        "kind": "declare",
+        "label": "int",
+        "code": "int doubled = x * 2",
+        "range": [
+          7,
+          13,
+          7,
+          31
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8/e/0",
+            "kind": "name",
+            "label": "doubled",
+            "code": "doubled = x * 2",
+            "range": [
+              7,
+              17,
+              7,
+              31
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8/e/0/0",
+                "kind": "binary",
+                "label": "*",
+                "code": "x * 2",
+                "range": [
+                  7,
+                  27,
+                  7,
+                  31
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8/e/0/0/0",
+                    "kind": "name",
+                    "label": "x",
+                    "code": "x",
+                    "range": [
+                      7,
+                      27,
+                      7,
+                      27
+                    ],
+                    "role": "слева",
+                    "children": []
+                  },
+                  {
+                    "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8/e/0/0/1",
+                    "kind": "literal",
+                    "label": "2",
+                    "code": "2",
+                    "range": [
+                      7,
+                      31,
+                      7,
+                      31
+                    ],
+                    "role": "справа",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.return:d6c150d8",
+      "kind": "return",
+      "label": "return doubled;",
+      "code": "return doubled;",
+      "lines": [
+        8,
+        8
+      ],
+      "parent": "M:BonusBlocks#run(int)/body.stmt:1589e8c9",
+      "branch": "lambda:78",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.return:d6c150d8/e",
+        "kind": "name",
+        "label": "doubled",
+        "code": "doubled",
+        "range": [
+          8,
+          20,
+          8,
+          26
+        ],
+        "role": null,
+        "children": []
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.return:814b37b3",
+      "kind": "return",
+      "label": "return switch (value) { case 0 -> { int base = twice.applyAsInt(3); yield base + 1; } def…",
+      "code": "return switch (value) {\n            case 0 -> {\n                int base = twice.applyAsInt(3);\n                yield base + 1;\n            }\n            default -> {\n                yield twice.applyAsInt(value);\n            }\n        };",
+      "lines": [
+        10,
+        18
+      ],
+      "parent": "M:BonusBlocks#run(int)",
+      "branch": "body",
+      "badges": [],
+      "editable": true,
+      "branches": [
+        {
+          "key": "switch:6ac9171:case:0",
+          "label": "switch (value) · case 0 ->"
+        },
+        {
+          "key": "switch:6ac9171:case:1",
+          "label": "switch (value) · default ->"
+        }
+      ],
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e",
+        "kind": "switchExpr",
+        "label": "switch",
+        "code": "switch (value) {\n            case 0 -> {\n                int base = twice.applyAsInt(3);\n                yield base + 1;\n            }\n            default -> {\n                yield twice.applyAsInt(…",
+        "range": [
+          10,
+          16,
+          18,
+          9
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e/0",
+            "kind": "name",
+            "label": "value",
+            "code": "value",
+            "range": [
+              10,
+              24,
+              10,
+              28
+            ],
+            "role": "селектор",
+            "children": []
+          },
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e/1",
+            "kind": "other",
+            "label": "case 0 ->",
+            "code": "case 0 -> {\n                int base = twice.applyAsInt(3);\n                yield base + 1;\n            }",
+            "range": [
+              11,
+              13,
+              14,
+              13
+            ],
+            "role": "case 1",
+            "children": [
+              {
+                "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e/1/0",
+                "kind": "block",
+                "label": "{ 2 оператора }",
+                "code": "{\n                int base = twice.applyAsInt(3);\n                yield base + 1;\n            }",
+                "range": [
+                  11,
+                  23,
+                  14,
+                  13
+                ],
+                "role": "тело",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e/2",
+            "kind": "other",
+            "label": "default ->",
+            "code": "default -> {\n                yield twice.applyAsInt(value);\n            }",
+            "range": [
+              15,
+              13,
+              17,
+              13
+            ],
+            "role": "case 2",
+            "children": [
+              {
+                "id": "M:BonusBlocks#run(int)/body.return:814b37b3/e/2/0",
+                "kind": "block",
+                "label": "{ 1 оператор }",
+                "code": "{\n                yield twice.applyAsInt(value);\n            }",
+                "range": [
+                  15,
+                  24,
+                  17,
+                  13
+                ],
+                "role": "тело",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693",
+      "kind": "stmt",
+      "label": "int base = twice.applyAsInt(3);",
+      "code": "int base = twice.applyAsInt(3);",
+      "lines": [
+        12,
+        12
+      ],
+      "parent": "M:BonusBlocks#run(int)/body.return:814b37b3",
+      "branch": "switch:6ac9171:case:0",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693/e",
+        "kind": "declare",
+        "label": "int",
+        "code": "int base = twice.applyAsInt(3)",
+        "range": [
+          12,
+          17,
+          12,
+          46
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693/e/0",
+            "kind": "name",
+            "label": "base",
+            "code": "base = twice.applyAsInt(3)",
+            "range": [
+              12,
+              21,
+              12,
+              46
+            ],
+            "role": "переменная",
+            "children": [
+              {
+                "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693/e/0/0",
+                "kind": "call",
+                "label": "applyAsInt",
+                "code": "twice.applyAsInt(3)",
+                "range": [
+                  12,
+                  28,
+                  12,
+                  46
+                ],
+                "role": "инициализация",
+                "children": [
+                  {
+                    "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693/e/0/0/0",
+                    "kind": "name",
+                    "label": "twice",
+                    "code": "twice",
+                    "range": [
+                      12,
+                      28,
+                      12,
+                      32
+                    ],
+                    "role": "объект",
+                    "children": []
+                  },
+                  {
+                    "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693/e/0/0/1",
+                    "kind": "literal",
+                    "label": "3",
+                    "code": "3",
+                    "range": [
+                      12,
+                      45,
+                      12,
+                      45
+                    ],
+                    "role": "арг 1",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b",
+      "kind": "stmt",
+      "label": "yield base + 1;",
+      "code": "yield base + 1;",
+      "lines": [
+        13,
+        13
+      ],
+      "parent": "M:BonusBlocks#run(int)/body.return:814b37b3",
+      "branch": "switch:6ac9171:case:0",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b/e",
+        "kind": "binary",
+        "label": "+",
+        "code": "base + 1",
+        "range": [
+          13,
+          23,
+          13,
+          30
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b/e/0",
+            "kind": "name",
+            "label": "base",
+            "code": "base",
+            "range": [
+              13,
+              23,
+              13,
+              26
+            ],
+            "role": "слева",
+            "children": []
+          },
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b/e/1",
+            "kind": "literal",
+            "label": "1",
+            "code": "1",
+            "range": [
+              13,
+              30,
+              13,
+              30
+            ],
+            "role": "справа",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:1.stmt:ccda5583",
+      "kind": "stmt",
+      "label": "yield twice.applyAsInt(value);",
+      "code": "yield twice.applyAsInt(value);",
+      "lines": [
+        16,
+        16
+      ],
+      "parent": "M:BonusBlocks#run(int)/body.return:814b37b3",
+      "branch": "switch:6ac9171:case:1",
+      "badges": [],
+      "editable": true,
+      "branches": null,
+      "expr": {
+        "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:1.stmt:ccda5583/e",
+        "kind": "call",
+        "label": "applyAsInt",
+        "code": "twice.applyAsInt(value)",
+        "range": [
+          16,
+          23,
+          16,
+          45
+        ],
+        "role": null,
+        "children": [
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:1.stmt:ccda5583/e/0",
+            "kind": "name",
+            "label": "twice",
+            "code": "twice",
+            "range": [
+              16,
+              23,
+              16,
+              27
+            ],
+            "role": "объект",
+            "children": []
+          },
+          {
+            "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:1.stmt:ccda5583/e/1",
+            "kind": "name",
+            "label": "value",
+            "code": "value",
+            "range": [
+              16,
+              40,
+              16,
+              44
+            ],
+            "role": "арг 1",
+            "children": []
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8->M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.return:d6c150d8",
+      "from": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.stmt:420608c8",
+      "to": "M:BonusBlocks#run(int)/body.stmt:1589e8c9/lambda:78.return:d6c150d8",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693->M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b",
+      "from": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:4988b693",
+      "to": "M:BonusBlocks#run(int)/body.return:814b37b3/switch:6ac9171:case:0.stmt:b7f5c55b",
+      "kind": "exec",
+      "label": null
+    },
+    {
+      "id": "M:BonusBlocks#run(int)/body.stmt:1589e8c9->M:BonusBlocks#run(int)/body.return:814b37b3",
+      "from": "M:BonusBlocks#run(int)/body.stmt:1589e8c9",
+      "to": "M:BonusBlocks#run(int)/body.return:814b37b3",
+      "kind": "exec",
+      "label": null
+    }
+  ]
+}

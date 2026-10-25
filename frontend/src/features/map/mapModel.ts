@@ -29,7 +29,7 @@ export function buildClassCards(graph: Graph): ClassCard[] {
     .sort((a, b) => a.lines[0] - b.lines[0])
     .map((node) => {
       const children = byParent.get(node.id) ?? []
-      const fullName = className(node.id)
+      const fullName = displayClassName(className(node.id))
       return {
         id: node.id,
         name: fullName.slice(fullName.lastIndexOf('.') + 1),
@@ -57,9 +57,14 @@ function aggregateCalls(graph: Graph): Map<string, { target: string; count: numb
   }
   const result = new Map<string, { target: string; count: number }[]>()
   for (const [from, row] of counts) {
-    result.set(from, [...row].map(([target, count]) => ({ target, count })).sort((a, b) => b.count - a.count))
+    result.set(from, [...row].map(([target, count]) => ({ target: displayClassName(target), count })).sort((a, b) => b.count - a.count))
   }
   return result
+}
+
+/** Убираем техническое имя владельца enum-константы только из отображаемого текста. */
+function displayClassName(name: string): string {
+  return name.replace(/<constant:([^>]+)>/g, '$1')
 }
 
 /** Подпись метода без модификаторов: «static long countMatches(List<Integer>)» → «countMatches(List<Integer>)». */
