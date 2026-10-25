@@ -108,7 +108,6 @@ final class GateJob implements Runnable {
             return Verdict.buildError(candidate.errors(), elapsedMs());
         }
 
-        System.err.println("[DBG] built t=" + elapsedMs());
         List<LabeledInput> generated = inputs.generate(request.fileName(), request.originalSource());
         synchronized (this) {
             checks = new ArrayList<>(generated.stream().map(in -> new InputCheck(in, null, null, null)).toList());
@@ -220,7 +219,6 @@ final class GateJob implements Runnable {
                 }
             }
         }
-        System.err.println("[DBG] phase2 t=" + elapsedMs() + " unfinished=" + unfinished);
         boolean scenariosFinish = unfinished.isEmpty() || runWatched(runner.forCheck(), programs, generated, unfinished);
         synchronized (this) {
             List<InputCheck> scenarioChecks = scenarios.stream().map(checks::get).toList();
@@ -233,7 +231,6 @@ final class GateJob implements Runnable {
         if (watch.tripped()) {
             return; // серия остановлена: это итоги убитых и отменённых прогонов
         }
-        System.err.println("[DBG] t=" + elapsedMs() + " job=" + job.id() + " timedOut=" + result.timedOut() + " unknown=" + result.outputUnknown());
         int index = job.id() / RUNS_PER_INPUT;
         int slot = job.id() % RUNS_PER_INPUT;
         checks.set(index, checks.get(index).with(slot, result));

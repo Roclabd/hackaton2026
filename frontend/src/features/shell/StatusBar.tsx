@@ -26,7 +26,9 @@ export function StatusBar() {
     tone = view.tone
     icon = view.icon as typeof icon
     title = view.label
-    message = job && draft !== job.candidateSource ? 'Код изменён после проверки — нужна новая' : view.detail
+    // Устарела, только если код правили после запуска; применённая заплатка совпадает с кандидатом.
+    const stale = job !== null && draft !== job.draftAtStart && draft !== job.candidateSource
+    message = stale ? 'Код изменён после проверки — нужна новая' : view.detail
   }
 
   return (

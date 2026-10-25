@@ -98,3 +98,4 @@
 .no-runs-body{padding:14px 18px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;font-size:14px;line-height:21px}
 .no-runs-body p{margin:0}
 .no-runs-body ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.diff-editor>.diff-loading{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:8px;background:white;color:var(--muted);font-size:13px}

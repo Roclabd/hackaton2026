@@ -1,4 +1,5 @@
-import { DiffEditor } from '@monaco-editor/react'
+import { DiffEditor, type DiffOnMount } from '@monaco-editor/react'
+import { useEffect, useState } from 'react'
 import { EDITOR_FONT, EDITOR_FONT_SIZE, EDITOR_LINE_HEIGHT, THEME } from '../../components/editor/monacoSetup'
 import { Icon } from '../../components/Icon'
 import { applyPatch, runPatchCheck } from '../../state/gateActions'
@@ -14,6 +15,19 @@ export function DiffView() {
   const draft = useAppState((s) => s.draft)
   const project = useAppState((s) => s.project)
   const running = useAppState((s) => s.job !== null && (s.job.verdict === null || s.job.verdict.status === 'RUNNING'))
+  // Monaco считает разницу в воркере (до ~3 с при первом открытии) и до этого рисует по строке с каждой стороны.
+  // Пока разницы нет — заглушка, а не полупустой редактор.
+  const [diffReady, setDiffReady] = useState(false)
+  useEffect(() => {
+    setDiffReady(false)
+    // Страховка: если событие не пришло, через 6 с всё равно показываем редактор.
+    const timer = setTimeout(() => setDiffReady(true), 6000)
+    return () => clearTimeout(timer)
+  }, [patch?.source, draft])
+  const onDiffMount: DiffOnMount = (editor) => {
+    if (editor.getLineChanges() !== null) setDiffReady(true)
+    editor.onDidUpdateDiff(() => setDiffReady(true))
+  }
 
   if (!patch || !project) {
     return (
@@ -52,8 +66,10 @@ export function DiffView() {
             <div><strong>До</strong><span className="muted">{project.fileName} · текущий код, версия {project.version}</span></div>
             <div><strong>После</strong><span className="muted">заплатка · строки {patch.changedLines[0]}–{patch.changedLines[1]}</span></div>
           </div>
-          <div className="code-editor">
+          <div className={`code-editor diff-editor ${diffReady ? 'is-ready' : ''}`}>
+            {!diffReady && <div className="diff-loading" role="status"><i className="heat-spinner" aria-hidden="true" />Сравниваем версии…</div>}
             <DiffEditor
+              onMount={onDiffMount}
               original={draft}
               modified={patch.source}
               language="java"

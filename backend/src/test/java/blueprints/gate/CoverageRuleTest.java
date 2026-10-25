@@ -54,6 +54,20 @@ class CoverageRuleTest {
     }
 
     @Test
+    void programWithoutInputDoesNotClaimTheChangeWasMissed() {
+        // Slide5Trap: ввода нет, один запуск, изменение выполнено — «не затронула» было бы неправдой.
+        String reason = CoverageRule.incompleteReason(coverage(1, false, at(20, 1), at(21, 1)));
+        assertTrue(reason.startsWith("Изменённый код выполнился на 1 из 1 входов, но для «совпало» нужно хотя бы 3"), reason);
+        assertFalse(reason.contains("не затронула"), reason);
+    }
+
+    @Test
+    void reachedButTooFewInputsSaysSo() {
+        String reason = CoverageRule.incompleteReason(coverage(27, false, at(9, 2)));
+        assertEquals("Изменённый код выполнился только на 2 из 27 входов — меньше 3 разных. Добавьте вход, который доходит до строки 9", reason);
+    }
+
+    @Test
     void consecutiveLinesBecomeRanges() {
         assertEquals("3, 5–7, 9", CoverageRule.ranges(List.of(3, 5, 6, 7, 9)));
     }

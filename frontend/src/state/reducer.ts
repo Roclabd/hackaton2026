@@ -17,6 +17,8 @@ export interface JobState {
   /** что проверяем: «код редактора» или название заплатки */
   candidateLabel: string
   candidateSource: string
+  /** текст редактора при запуске: у проверки заплатки он равен оригиналу, а не кандидату */
+  draftAtStart: string
   intent: Intent
   baselineVersion: number
   /** текущая версия проекта на момент запуска */

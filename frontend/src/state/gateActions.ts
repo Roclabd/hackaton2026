@@ -32,7 +32,7 @@ export async function runPatchCheck(): Promise<void> {
 }
 
 async function startCheck(candidate: Candidate): Promise<void> {
-  const { project, baseline, blueprint, job } = store.getState()
+  const { project, baseline, blueprint, job, draft } = store.getState()
   if (!project || !baseline) return
   if (job && job.verdict?.status === 'RUNNING') return
   try {
@@ -40,7 +40,7 @@ async function startCheck(candidate: Candidate): Promise<void> {
       source: candidate.source, intent: candidate.intent, originalSource: baseline.source,
     })
     const started: JobState = {
-      id: jobId, verdict: null, candidateLabel: candidate.label, candidateSource: candidate.source,
+      id: jobId, verdict: null, candidateLabel: candidate.label, candidateSource: candidate.source, draftAtStart: draft,
       intent: candidate.intent, baselineVersion: baseline.version, projectVersion: project.version,
       fileName: project.fileName, methodLabel: blueprint?.label ?? null,
     }

@@ -31,9 +31,19 @@ final class CoverageRule {
                 .map(ChangedCoverage.Statement::line).distinct().sorted().toList();
         String what = original ? "Удалённый или заменённый код эталона" : "Изменённый код";
         String target = "Добавьте вход, который доходит до " + toLines(weak) + (original ? " эталона" : "");
+        if (coverage.inputsReached() == 0) {
+            return what + " выполнился только на 0 из " + coverage.inputs()
+                    + " входов: проверка не затронула изменение. " + target;
+        }
+        if (coverage.inputs() < MIN_INPUTS) {
+            // Изменение выполнилось, но разных входов всего меньше трёх — обычно программа не читает ввод.
+            return what + " выполнился на " + coverage.inputsReached() + " из " + coverage.inputs()
+                    + " входов, но для «совпало» нужно хотя бы " + MIN_INPUTS + " разных входа: программа, похоже, "
+                    + "не читает ввод, и генератор не может сделать разные запуски. Вывод сравнён, но одного запуска мало";
+        }
         if (coverage.inputsReached() < MIN_INPUTS) {
             return what + " выполнился только на " + coverage.inputsReached() + " из " + coverage.inputs()
-                    + " входов: проверка не затронула изменение. " + target;
+                    + " входов — меньше " + MIN_INPUTS + " разных. " + target;
         }
         return what + " на " + atLines(weak) + " выполнился меньше чем на " + MIN_INPUTS + " из " + coverage.inputs()
                 + " входов (самое меньшее — на " + coverage.minHits() + "). " + target;
