@@ -75,7 +75,7 @@ export type Action =
   | { type: 'projectLoaded'; project: ProjectResponse }
   | { type: 'projectSaved'; project: ProjectResponse }
   | { type: 'patchApplied'; project: ProjectResponse }
-  | { type: 'commandApplied'; response: CommandResponse }
+  | { type: 'commandApplied'; response: CommandResponse; editedNodeId?: string }
   | { type: 'draftChanged'; text: string }
   | { type: 'methodOpened'; blueprint: Blueprint; selectedNodeId: string | null }
   | { type: 'blueprintRefreshed'; blueprint: Blueprint | null }
@@ -119,7 +119,7 @@ export function reducer(state: State, action: Action): State {
         findingId: null, patchId: null, heat: null,
       }
     case 'commandApplied':
-      return applyCommand(state, action.response)
+      return applyCommand(state, action.response, action.editedNodeId)
     case 'draftChanged':
       return { ...state, draft: action.text, selectedExprId: null, heat: null }
     case 'methodOpened':
@@ -176,7 +176,7 @@ export function reducer(state: State, action: Action): State {
 }
 
 /** Правка узла: новый код, карта и чертёж; выделение переносим по idMap. */
-function applyCommand(state: State, response: CommandResponse): State {
+function applyCommand(state: State, response: CommandResponse, editedNodeId?: string): State {
   if (!state.project || !response.ok || response.source === undefined) return state
   const project: ProjectResponse = {
     ...state.project,
@@ -191,8 +191,19 @@ function applyCommand(state: State, response: CommandResponse): State {
     ...state, project, draft: response.source, selectedExprId: null, heat: null,
     blueprint: response.blueprint ?? state.blueprint,
     methodId: response.methodId ?? state.methodId,
-    selectedNodeId: selected ? response.idMap?.[selected] ?? selected : null,
+    selectedNodeId: keptAfterEdit(selected, response, editedNodeId),
   }
+}
+
+/**
+ * Выделение после правки. Если у изменённого узла нет переноса в idMap, его прежний ID мог достаться
+ * соседнему одинаковому оператору (`ping(); ping();`) — выделение сбрасываем, чтобы следующая правка не ушла не туда.
+ */
+function keptAfterEdit(selected: string | null, response: CommandResponse, editedNodeId?: string): string | null {
+  if (!selected) return null
+  const moved = response.idMap?.[selected]
+  if (moved) return moved
+  return selected === editedNodeId ? null : selected
 }
 
 function heatIsCurrent(state: State, heat: HeatState): boolean {

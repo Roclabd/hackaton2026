@@ -348,3 +348,11 @@ const lateJob = { id: 'job_A', projectId: 'A', verdict: null, candidateLabel: 'A
 assert.equal(reducer(switched, { type: 'jobStarted', job: lateJob }).job, null, 'поздний запуск проверки A не попадает в B')
 assert.equal(reducer(switched, { type: 'jobStarted', job: { ...lateJob, id: 'job_B', projectId: 'B' } }).job.id, 'job_B')
 console.log('OK: смена проекта — поздние сохранение, заплатка и запуск проверки старого проекта отбрасываются')
+
+// Правка узла: если ID изменённого узла не перенесён, выделение сбрасывается, а не переезжает на соседний одинаковый оператор.
+const editBase = { ...reducer(initialState, { type: 'projectLoaded', project: projectOf('E', 'ping(); ping();') }), selectedNodeId: 'stmt:ping#1' }
+const ambiguous = reducer(editBase, { type: 'commandApplied', editedNodeId: 'stmt:ping#1', response: { ok: true, compileErrors: [], source: 'pong(); ping();', version: 2, idMap: {} } })
+assert.equal(ambiguous.selectedNodeId, null, 'без переноса ID выделение изменённого узла сбрасывается')
+const mapped = reducer(editBase, { type: 'commandApplied', editedNodeId: 'stmt:ping#1', response: { ok: true, compileErrors: [], source: 'pong(); ping();', version: 2, idMap: { 'stmt:ping#1': 'stmt:pong' } } })
+assert.equal(mapped.selectedNodeId, 'stmt:pong', 'с переносом выделение идёт за узлом')
+console.log('OK: правка узла — выделение не переезжает на соседний одинаковый оператор')

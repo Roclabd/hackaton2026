@@ -1,6 +1,6 @@
 import { api } from '../api/client'
 import type { Intent } from '../api/types'
-import { flushDraft, isCurrentProject, refreshBlueprint, refreshFindings, reportError, showToast } from './actions'
+import { draftSaved, flushDraft, isCurrentProject, refreshBlueprint, refreshFindings, reportError, showToast } from './actions'
 import type { JobState } from './reducer'
 import { navigate } from './route'
 import { currentPatch } from './selectors'
@@ -20,6 +20,7 @@ interface Candidate {
 /** «Запустить и сравнить»: текущий код редактора против эталона (версия до правок). */
 export async function runEditorCheck(): Promise<void> {
   await flushDraft()
+  if (!draftSaved()) { showToast('Код редактора не сохранён — проверка не запущена', 'error'); return }
   const { draft, project } = store.getState()
   await startCheck({ source: draft, intent: 'REFACTOR', label: `код редактора · версия ${project?.version ?? '—'}` })
 }
@@ -71,6 +72,7 @@ async function pollJob(jobId: string): Promise<void> {
 /** «Применить изменение»: заплатка становится текущим кодом и новым эталоном. */
 export async function applyPatch(): Promise<void> {
   await flushDraft()
+  if (!draftSaved()) { showToast('Код редактора не сохранён — изменение не применено', 'error'); return }
   const state = store.getState()
   const patch = currentPatch(state)
   if (!state.project || !patch) return

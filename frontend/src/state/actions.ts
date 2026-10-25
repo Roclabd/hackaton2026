@@ -129,6 +129,12 @@ export async function acceptCurrentBaseline(): Promise<void> {
   showToast(`Версия ${project.version} выбрана эталоном для следующих проверок`)
 }
 
+/** Текст редактора сохранён на сервере? Если сохранение не удалось, команды над старой версией не запускаем — иначе ответ затрёт правку. */
+export function draftSaved(): boolean {
+  const { project, draft } = store.getState()
+  return !!project && project.source === draft
+}
+
 async function saveDraftNow(): Promise<void> {
   const { project, draft } = store.getState()
   if (!project || draft === project.source) return
@@ -152,11 +158,12 @@ export async function editNode(nodeId: string, text: string): Promise<CompileErr
   await flushDraft()
   const project = store.getState().project
   if (!project) return []
+  if (!draftSaved()) return [{ line: 0, column: 0, text: 'Код редактора не сохранён — правка узла не применена. Сохраните код и повторите' }]
   try {
     const response = await api.editStatement(project.id, { type: 'editStatement', nodeId, text, baseVersion: project.version })
     if (!isCurrentProject(project.id)) return []
     if (!response.ok) return response.compileErrors.length ? response.compileErrors : [{ line: 0, column: 0, text: 'Правка не применена' }]
-    dispatch({ type: 'commandApplied', response })
+    dispatch({ type: 'commandApplied', response, editedNodeId: nodeId })
     showToast(`Узел изменён · версия ${response.version}`)
     void refreshFindings()
     return []
