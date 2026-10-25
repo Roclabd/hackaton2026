@@ -3,8 +3,11 @@ package blueprints.graph;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.CompactConstructorDeclaration;
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
@@ -269,6 +272,15 @@ public final class ComplexityEstimator {
     /** Тип имени: параметр или локальная переменная метода, иначе поле класса. Для оценки этого достаточно. */
     private static Optional<String> declaredTypeName(NameExpr name) {
         String id = name.getNameAsString();
+        Optional<CompactConstructorDeclaration> compact = name.findAncestor(CompactConstructorDeclaration.class);
+        if (compact.isPresent()) {
+            for (VariableDeclarator v : compact.get().findAll(VariableDeclarator.class)) {
+                if (v.getNameAsString().equals(id)) return Optional.of(v.getTypeAsString());
+            }
+            for (Parameter p : compact.get().findAncestor(RecordDeclaration.class).orElseThrow().getParameters()) {
+                if (p.getNameAsString().equals(id)) return Optional.of(p.getTypeAsString());
+            }
+        }
         Optional<CallableDeclaration<?>> callable = name.findAncestor(CallableDeclaration.class).map(c -> (CallableDeclaration<?>) c);
         if (callable.isPresent()) {
             for (Parameter p : callable.get().getParameters()) {
@@ -295,6 +307,8 @@ public final class ComplexityEstimator {
         List<MethodDeclaration> candidates = unit.findAll(MethodDeclaration.class).stream()
                 .filter(m -> m.getNameAsString().equals(call.getNameAsString())
                         && m.getParameters().size() == call.getArguments().size() && m.getBody().isPresent())
+                // Тело другой константы enum не является методом нашего типа.
+                .filter(m -> !(ownerOf(m) instanceof EnumConstantDeclaration) || ownerOf(m) == ownerOf(call))
                 .toList();
         Optional<Expression> scope = call.getScope();
         if (scope.isPresent() && !(scope.get() instanceof ThisExpr)) {
@@ -302,16 +316,22 @@ public final class ComplexityEstimator {
             Optional<String> type = declaredTypeName(variable).map(t -> t.replaceAll("<.*", ""));
             if (type.isEmpty()) return Optional.empty();
             List<MethodDeclaration> inType = candidates.stream()
-                    .filter(m -> m.findAncestor(TypeDeclaration.class)
-                            .map(t -> ((TypeDeclaration<?>) t).getNameAsString().equals(type.get())).orElse(false))
+                    .filter(m -> ownerOf(m) instanceof TypeDeclaration<?> t && t.getNameAsString().equals(type.get()))
                     .toList();
             return inType.size() == 1 ? Optional.of(inType.getFirst()) : Optional.empty();
         }
-        Optional<TypeDeclaration> own = call.findAncestor(TypeDeclaration.class);
+        Node own = ownerOf(call);
         List<MethodDeclaration> inOwnClass = candidates.stream()
-                .filter(m -> own.isPresent() && m.findAncestor(TypeDeclaration.class).orElse(null) == own.get()).toList();
+                .filter(m -> own != null && ownerOf(m) == own).toList();
         if (inOwnClass.size() == 1) return Optional.of(inOwnClass.getFirst());
         return inOwnClass.isEmpty() && candidates.size() == 1 ? Optional.of(candidates.getFirst()) : Optional.empty();
+    }
+
+    private static Node ownerOf(Node node) {
+        for (Node parent = node.getParentNode().orElse(null); parent != null; parent = parent.getParentNode().orElse(null)) {
+            if (parent instanceof EnumConstantDeclaration || parent instanceof TypeDeclaration<?>) return parent;
+        }
+        return null;
     }
 
     // ——— запись для схемы ———

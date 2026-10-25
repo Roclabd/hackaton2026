@@ -18,6 +18,7 @@ export const TERMINAL_KINDS: NodeKind[] = ['return', 'throw', 'break', 'continue
 
 const CONTAINER_TITLES: Partial<Record<NodeKind, string>> = {
   if: 'Условие', loop: 'Цикл', switch: 'Выбор', try: 'Попытка',
+  stmt: 'Оператор', return: 'Возврат', throw: 'Исключение',
 }
 
 export function containerTitle(kind: NodeKind): string {
@@ -46,8 +47,8 @@ export function buildTree(blueprint: Blueprint): TreeNode[] {
 }
 
 function branchesOf(node: GraphNode, children: GraphNode[], toTree: (n: GraphNode) => TreeNode): TreeBranch[] {
-  if (!CONTAINER_KINDS.includes(node.kind)) return []
   const declared = node.branches ?? []
+  if (!CONTAINER_KINDS.includes(node.kind) && declared.length === 0) return []
   const keys = [...declared.map((b) => b.key)]
   children.forEach((child) => {
     const key = child.branch ?? 'body'

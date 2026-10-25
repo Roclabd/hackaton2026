@@ -39,7 +39,7 @@ export function Sequence({ items, selectedId }: { items: TreeNode[]; selectedId:
 }
 
 function Block({ item, selectedId }: BlockProps) {
-  return CONTAINER_KINDS.includes(item.node.kind)
+  return (CONTAINER_KINDS.includes(item.node.kind) || (item.node.branches?.length ?? 0) > 0)
     ? <ContainerBlock item={item} selectedId={selectedId} />
     : <StatementBlock item={item} selectedId={selectedId} />
 }
@@ -69,6 +69,9 @@ function ContainerBlock({ item, selectedId }: BlockProps) {
   const { node, branches } = item
   const picked = node.id === selectedId
   const sideBySide = node.kind === 'if'
+  const editTitle = node.kind === 'if' || (node.kind === 'loop' && /^(?:while|do)\b/i.test(node.label))
+    ? 'Двойной клик — изменить условие'
+    : 'Двойной клик — изменить оператор'
   const heat = useNodeHeat(node.id)
   return (
     <div className={`bp-frame kind-${node.kind} ${picked ? 'is-selected' : ''}`}>
@@ -78,7 +81,7 @@ function ContainerBlock({ item, selectedId }: BlockProps) {
         style={heat.style}
         onClick={() => select(node.id)}
         onDoubleClick={() => openEditor(node.id, node.editable)}
-        title={node.editable ? 'Двойной клик — изменить условие' : undefined}
+        title={node.editable ? editTitle : undefined}
         aria-pressed={picked}
       >
         <span className="bp-frame-title">{containerTitle(node.kind)}</span>

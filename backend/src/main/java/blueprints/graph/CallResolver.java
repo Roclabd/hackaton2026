@@ -276,6 +276,11 @@ final class CallResolver {
                 }
             }
         }
+        if (declaration instanceof CompactConstructorDeclaration compact) {
+            for (Parameter p : compact.findAncestor(RecordDeclaration.class).orElseThrow().getParameters()) {
+                if (p.getNameAsString().equals(scopeName)) return Optional.of(typeNameOf(p.getType()));
+            }
+        }
         for (VariableDeclarator v : declaration.findAll(VariableDeclarator.class)) {
             if (v.getNameAsString().equals(scopeName) && belongsTo(v, declaration)) {
                 if (v.getType().isVarType()) {
@@ -324,7 +329,8 @@ final class CallResolver {
      */
     private static boolean belongsTo(Node expression, Node callerDeclaration) {
         for (Node node = expression.getParentNode().orElse(null); node != null; node = node.getParentNode().orElse(null)) {
-            if (node instanceof CallableDeclaration<?> || node instanceof InitializerDeclaration
+            if (node instanceof CallableDeclaration<?> || node instanceof CompactConstructorDeclaration
+                    || node instanceof InitializerDeclaration
                     || node instanceof TypeDeclaration<?> || node instanceof FieldDeclaration
                     || node instanceof EnumConstantDeclaration) {
                 return node == callerDeclaration;

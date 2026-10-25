@@ -110,8 +110,11 @@ class ScopeCorpusTest {
         assertTrue(project.errors().isEmpty(), "разбор без ошибок: " + project.errors());
         CompilationUnit unit = project.lastGood().orElseThrow();
 
-        List<String> expectedTypes = unit.findAll(TypeDeclaration.class).stream()
-                .filter(t -> !insideBody(t)).map(t -> t.getNameAsString()).sorted().toList();
+        List<String> expectedTypes = java.util.stream.Stream.concat(
+                unit.findAll(TypeDeclaration.class).stream().filter(t -> !insideBody(t)).map(t -> t.getNameAsString()),
+                unit.findAll(EnumConstantDeclaration.class).stream().filter(c -> !insideBody(c))
+                        .filter(c -> !c.getClassBody().isEmpty()).map(EnumConstantDeclaration::getNameAsString))
+                .sorted().toList();
         List<String> mapTypes = project.map().nodes().stream().filter(n -> n.kind() == NodeKind.CLASS)
                 .map(n -> n.label().substring(n.label().lastIndexOf(' ') + 1)).sorted().toList();
         assertEquals(expectedTypes, mapTypes, "все объявленные типы есть на карте");
@@ -119,22 +122,23 @@ class ScopeCorpusTest {
         long expectedCallables = unit.findAll(CallableDeclaration.class).stream()
                 .filter(c -> c instanceof MethodDeclaration || c instanceof ConstructorDeclaration)
                 .filter(c -> !insideBody(c)).count()
-                + unit.findAll(InitializerDeclaration.class).stream().filter(i -> !insideBody(i)).count();
+                + unit.findAll(InitializerDeclaration.class).stream().filter(i -> !insideBody(i)).count()
+                + unit.findAll(CompactConstructorDeclaration.class).stream().filter(c -> !insideBody(c)).count();
         long mapMethods = project.map().nodes().stream().filter(n -> n.kind() == NodeKind.METHOD).count();
         assertEquals(expectedCallables, mapMethods, "все методы, конструкторы и блоки инициализации есть на карте");
 
         long hiddenCallables = unit.findAll(MethodDeclaration.class).stream().filter(ScopeCorpusTest::insideBody).count();
-        long compact = unit.findAll(CompactConstructorDeclaration.class).size();
+        long compact = unit.findAll(CompactConstructorDeclaration.class).stream().filter(c -> !insideBody(c)).count();
         long enumConstants = unit.findAll(EnumConstantDeclaration.class).size();
         long enumConstantBodies = unit.findAll(EnumConstantDeclaration.class).stream()
-                .filter(c -> !c.getClassBody().isEmpty()).count();
+                .filter(c -> !insideBody(c) && !c.getClassBody().isEmpty()).count();
         long edges = project.map().edges().size();
         REPORT.add(String.format("[scope] карта %s: типов=%d, методов=%d, полей=%d, рёбер вызовов=%d; "
-                        + "не на карте: методов внутри анонимных/локальных классов и констант enum=%d, "
-                        + "компактных конструкторов record=%d, констант enum=%d (из них с телом %d)",
+                        + "не на карте: методов внутри анонимных/локальных классов=%d; "
+                        + "на карте компактных конструкторов record=%d, тел констант enum=%d; всего констант enum в AST=%d",
                 name, mapTypes.size(), mapMethods,
                 project.map().nodes().stream().filter(n -> n.kind() == NodeKind.FIELD).count(), edges,
-                hiddenCallables, compact, enumConstants, enumConstantBodies));
+                hiddenCallables, compact, enumConstantBodies, enumConstants));
     }
 
     // ---------- 2. чертёж каждого метода ----------
@@ -179,8 +183,8 @@ class ScopeCorpusTest {
         String kindText = kinds.entrySet().stream().map(e -> e.getKey().wire() + "=" + e.getValue())
                 .collect(Collectors.joining(", "));
         REPORT.add(String.format("[scope] чертёж %s: методов=%d; узлов по видам: %s; серых raw=%d; "
-                + "операторов потеряно=%d %s; скрыто в лямбдах/анонимных/локальных классах=%d; "
-                + "скрыто в ветках switch-выражений=%d", name, methods, kindText, kinds.getOrDefault(NodeKind.RAW, 0),
+                + "операторов потеряно=%d %s; без отдельных узлов в лямбдах/анонимных/локальных классах=%d; "
+                + "без отдельных узлов в ветках switch-выражений=%d", name, methods, kindText, kinds.getOrDefault(NodeKind.RAW, 0),
                 notDrawn[0], notDrawnSamples.stream().limit(5).toList(), notDrawn[1], notDrawn[2]));
         raws.forEach(r -> REPORT.add("[scope] raw " + name + " | " + r));
     }
@@ -327,14 +331,14 @@ class ScopeCorpusTest {
 
     // ---------- помощники: дерево разбора ----------
 
-    /** Находится ли узел внутри тела метода, лямбды, анонимного класса или константы enum (на карту такие не выносятся). */
+    /** Объявления внутри исполняемого кода и анонимных классов на карту не выносятся; тело константы enum выносится. */
     private static boolean insideBody(Node node) {
         Optional<Node> parent = node.getParentNode();
         while (parent.isPresent()) {
             Node p = parent.get();
             if (p instanceof MethodDeclaration || p instanceof ConstructorDeclaration || p instanceof InitializerDeclaration
                     || p instanceof CompactConstructorDeclaration || p instanceof ObjectCreationExpr
-                    || p instanceof LambdaExpr || p instanceof EnumConstantDeclaration) {
+                    || p instanceof LambdaExpr) {
                 return true;
             }
             parent = p.getParentNode();
@@ -358,16 +362,16 @@ class ScopeCorpusTest {
             if (s instanceof BlockStmt || s instanceof EmptyStmt || s instanceof LabeledStmt) {
                 continue;
             }
-            int hidden = hiddenCategory(s, declaration);
-            if (hidden > 0) {
-                counts[hidden]++;
-                continue;
-            }
             boolean drawn = targets.contains(s)
                     || (s instanceof IfStmt i && targets.contains(i.getCondition()))
                     || (s instanceof WhileStmt w && targets.contains(w.getCondition()))
                     || (s instanceof DoStmt d && targets.contains(d.getCondition()));
             if (!drawn) {
+                int hidden = hiddenCategory(s, declaration);
+                if (hidden > 0) {
+                    counts[hidden]++;
+                    continue;
+                }
                 counts[0]++;
                 samples.add(shorten(s.toString().replaceAll("\s+", " ")));
             }

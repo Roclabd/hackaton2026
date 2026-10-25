@@ -21,12 +21,81 @@ function load(relative) {
   return result.exports
 }
 const { buildMap, buildBlueprint } = load('src/api/mock/mockGraph.ts')
+const { buildTree, CONTAINER_KINDS } = load('src/features/blueprint/blueprintTree.ts')
+const { buildClassCards } = load('src/features/map/mapModel.ts')
 const { reducer, initialState } = load('src/state/reducer.ts')
 const { selectedNode, selectedExpression } = load('src/state/selectors.ts')
 const { diagnosticMarkers, expressionEditorRange } = load('src/components/editor/editorRanges.ts')
 const { findingCategory, growthEstimate, findingGrowth } = load('src/features/evidence/findingPresentation.ts')
 const { describeVerdict } = load('src/features/verification/verdictText.ts')
 const fixture = JSON.parse(readFileSync(path.join(root, 'src/fixtures/frontend-behavior.json'), 'utf8'))
+
+// Проверяем отображение enum-констант по полному настоящему графу из API.
+const scope5Graph = JSON.parse(readFileSync(path.join(root, 'src/fixtures/scope5.map.json'), 'utf8'))
+const scope5Cards = buildClassCards(scope5Graph)
+for (const name of ['ADD', 'MUL']) {
+  const original = scope5Graph.nodes.find((node) => node.kind === 'class' && node.id.endsWith(`<constant:${name}>`))
+  assert.ok(original, `Scope5 API fixture содержит enum-константу ${name}`)
+  const card = scope5Cards.find((item) => item.id === original.id)
+  assert.ok(card, `Есть карточка enum-константы ${name}`)
+  assert.equal(card.name, name, `${name}: имя карточки без технического owner segment`)
+  assert.equal(card.fullName, original.id.slice(2).replace(/<constant:([^>]+)>/g, '$1'),
+    `${name}: полное отображаемое имя очищено, raw id сохранён отдельно`)
+  assert.equal(card.kind, 'константа', `${name}: подпись типа взята из API label`)
+  assert.equal(card.id, original.id, `${name}: внутренний id не нормализован`)
+  assert.ok(card.methods.some((method) => method.label.includes('apply(')), `${name}: метод apply доступен в карточке`)
+}
+assert.ok(scope5Cards.flatMap((card) => card.calls).every((call) => !call.target.includes('<constant:')),
+  'Подписи целей вызовов не показывают технический owner segment')
+
+// Эти настоящие backend fixtures обязательны: CI не должен молча пропускать проверку.
+const bonusBlueprintPath = path.join(root, 'src/fixtures/bonusblocks.run.blueprint.json')
+const bonusSourcePath = path.join(root, 'src/fixtures/BonusBlocks.java')
+{
+  const bonusBlueprint = JSON.parse(readFileSync(bonusBlueprintPath, 'utf8'))
+  const bonusSource = readFileSync(bonusSourcePath, 'utf8')
+  const tree = buildTree(bonusBlueprint)
+  const treeById = new Map()
+  const visit = (items) => items.forEach((item) => {
+    assert.ok(!treeById.has(item.node.id), `Узел ${item.node.id} не дублируется в дереве`)
+    treeById.set(item.node.id, item)
+    item.branches.forEach((branch) => visit(branch.children))
+  })
+  visit(tree)
+  assert.equal(treeById.size, bonusBlueprint.nodes.length, 'Все узлы BonusBlocks fixture достижимы в дереве ровно один раз')
+  const bonusBranchKeys = bonusBlueprint.nodes.flatMap((node) => node.branches ?? []).map((branch) => branch.key)
+  assert.ok(bonusBranchKeys.some((key) => key.startsWith('lambda:')), 'Fixture содержит ветку block lambda')
+  assert.ok(bonusBranchKeys.some((key) => key.startsWith('switch:')), 'Fixture содержит ветку switch expression')
+  let nestedSelectionChecked = false
+  let nestedEditableSelectionChecked = false
+  for (const node of bonusBlueprint.nodes) {
+    assert.ok(treeById.has(node.id), `Узел fixture ${node.id} доступен в дереве`)
+    if ((node.branches?.length ?? 0) > 0) {
+      assert.ok(CONTAINER_KINDS.includes(node.kind) || treeById.get(node.id).branches.length > 0,
+        `Ветвящийся оператор ${node.id} отображается контейнером`)
+      for (const branch of node.branches) {
+        const children = treeById.get(node.id).branches.find((entry) => entry.key === branch.key)?.children ?? []
+        const actualChildren = bonusBlueprint.nodes
+          .filter((child) => child.parent === node.id && (child.branch ?? 'body') === branch.key)
+          .sort((left, right) => left.lines[0] - right.lines[0] || left.lines[1] - right.lines[1])
+          .map((child) => child.id)
+        assert.deepEqual(children.map((child) => child.node.id), actualChildren,
+          `Ветка ${branch.key} узла ${node.id} содержит дочерние операторы из fixture в порядке строк`)
+        for (const child of children) {
+          let state = reducer(initialState, { type: 'methodOpened', blueprint: bonusBlueprint, selectedNodeId: null })
+          state = reducer(state, { type: 'select', nodeId: child.node.id })
+          assert.equal(selectedNode(state)?.id, child.node.id, `${bonusSourcePath}: вложенный оператор ${child.node.id} выбирается`)
+          nestedSelectionChecked = true
+          if (child.node.editable) nestedEditableSelectionChecked = true
+        }
+      }
+    }
+  }
+  assert.ok(nestedSelectionChecked, 'В BonusBlocks fixture есть реальный вложенный оператор для проверки выбора')
+  assert.ok(nestedEditableSelectionChecked, 'В BonusBlocks fixture выбирается вложенный editable оператор')
+  assert.ok(bonusSource.length > 0, 'Java fixture BonusBlocks.java не пустой')
+  console.log(`OK: bonus blocks — ${treeById.size} реальных узлов, ветвящиеся операторы и выбор вложенных узлов`)
+}
 let expressionCount = 0
 const kinds = new Set()
 

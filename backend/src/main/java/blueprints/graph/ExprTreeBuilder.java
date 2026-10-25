@@ -52,6 +52,7 @@ public final class ExprTreeBuilder {
             case SwitchStmt s -> build(s.getSelector(), id, null);
             case ReturnStmt s -> s.getExpression().map(e -> build(e, id, null)).orElse(null);
             case ThrowStmt s -> build(s.getExpression(), id, null);
+            case YieldStmt s -> build(s.getExpression(), id, null);
             case TryStmt s -> resources(s, id);
             case AssertStmt s -> build(s.getCheck(), id, null);
             case ExplicitConstructorInvocationStmt s -> constructorCall(s, id);
