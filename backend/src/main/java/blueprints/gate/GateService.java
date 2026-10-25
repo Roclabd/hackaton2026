@@ -27,6 +27,11 @@ public final class GateService implements AutoCloseable {
 
     /** Лимит на один прогон. Дольше — таймаут, вердикт INCOMPLETE, а не MATCHED. */
     static final Duration RUN_TIMEOUT = Duration.ofSeconds(5);
+    /**
+     * Общий лимит на одну проверку. Быстрая программа (MatchDemo) проверяется за секунды и его не замечает;
+     * тяжёлая получает честное «неполно» с числом сравненных входов вместо проверки на несколько минут.
+     */
+    static final Duration CHECK_BUDGET = Duration.ofSeconds(75);
     /** Параллельные проверки. Больше двух одновременно на демо не бывает. */
     private static final int PARALLEL_CHECKS = 2;
 
@@ -43,6 +48,7 @@ public final class GateService implements AutoCloseable {
     private final InputGenerator inputs;
     /** Замер покрытия создаётся на исполнителе каждой проверки: тогда досрочная остановка проверки останавливает и его. */
     private final Function<ProgramRunner, ChangedCoverageMeter> coverage;
+    private final Duration budget;
     private final Map<String, GateJob> jobs = new ConcurrentHashMap<>();
     /**
      * Все проверки процесса по id. Маршруты gate создают свой экземпляр сервиса, а экспорт тестов ищет
@@ -63,6 +69,12 @@ public final class GateService implements AutoCloseable {
     }
 
     public GateService(ProgramRunner runner, InputGenerator inputs) {
+        this(runner, inputs, CHECK_BUDGET);
+    }
+
+    /** С другим общим лимитом — для теста остановки по лимиту. */
+    GateService(ProgramRunner runner, InputGenerator inputs, Duration budget) {
+        this.budget = budget;
         this.runner = runner;
         this.inputs = inputs;
         this.coverage = checkRunner -> new ChangedCoverageMeter(compiler, checkRunner, COVERAGE_WORKERS);
@@ -82,7 +94,7 @@ public final class GateService implements AutoCloseable {
         String original = originalSource != null ? originalSource : project.source();
         GateJob.Request request = new GateJob.Request(project.fileName(), original, candidateSource,
                 intent == null ? Intent.REFACTOR : intent);
-        GateJob job = new GateJob(request, builder, runner, inputs, coverage, RUN_TIMEOUT, workersPerCheck);
+        GateJob job = new GateJob(request, builder, runner, inputs, coverage, RUN_TIMEOUT, budget, workersPerCheck);
         String id = "j" + NEXT_ID.getAndIncrement();
         jobs.put(id, job);
         ALL_JOBS.put(id, job);
