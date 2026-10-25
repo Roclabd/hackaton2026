@@ -15,10 +15,19 @@ import java.util.regex.Pattern;
  */
 public final class Oracle {
 
-    /** «(MatchDemo.java:16)» → «(MatchDemo.java)». */
+    /** «(MatchDemo.java:16)» → «(MatchDemo.java)» — только внутри кадра стека. */
     private static final Pattern LINE_NUMBER = Pattern.compile("\\(([^():\\s]+\\.java):\\d+\\)");
-    /** Кадры JDK: «at java.base/java.util.Scanner.next(…)», «at jdk.internal…». */
-    private static final Pattern JDK_FRAME = Pattern.compile("(?m)^\\s*at (java\\.base/|jdk\\.internal\\.).*(\\R|$)");
+    /** Кадр стека: «\tat пакет.Класс.метод(Файл.java:16)». */
+    private static final Pattern FRAME = Pattern.compile("^\\s+at \\S+\\(.*\\)$");
+    /** Кадр внутри JDK: зависит от версии JDK, а не от программы. */
+    private static final Pattern JDK_FRAME = Pattern.compile("^\\s+at (java\\.base/|jdk\\.internal\\.).*");
+    /**
+     * Строка, после которой начинается стек: заголовок JVM («Exception in thread …»), «Caused by: …»,
+     * «Suppressed: …», «… N more» или имя исключения с сообщением («java.lang.IllegalStateException: …»).
+     */
+    private static final Pattern TRACE_HEAD = Pattern.compile(
+            "^(Exception in thread .*|\\s*Caused by: .*|\\s*Suppressed: .*|\\s+\\.\\.\\. \\d+ (more|common frames omitted)"
+                    + "|[\\w$.]+(Exception|Error|Throwable)(: .*)?)$");
 
     private Oracle() {}
 
@@ -39,9 +48,18 @@ public final class Oracle {
         if (stderr == null) {
             return "";
         }
-        String unified = stderr.replace("\r\n", "\n");
-        String withoutJdk = JDK_FRAME.matcher(unified).replaceAll("");
-        return LINE_NUMBER.matcher(withoutJdk).replaceAll("($1)");
+        // Номер строки убираем только в кадрах стека: строка «at …(Файл.java:N)» сразу после заголовка
+        // исключения или другого кадра. Тот же текст, напечатанный программой как обычная строка, сравнивается точно.
+        StringBuilder out = new StringBuilder();
+        boolean inTrace = false;
+        for (String line : stderr.replace("\r\n", "\n").split("\n", -1)) {
+            boolean frame = inTrace && FRAME.matcher(line).matches();
+            if (frame && JDK_FRAME.matcher(line).matches()) continue;
+            String normalized = frame ? LINE_NUMBER.matcher(line).replaceAll("($1)") : line;
+            out.append(normalized).append('\n');
+            inTrace = frame || TRACE_HEAD.matcher(line).matches();
+        }
+        return out.substring(0, out.length() - 1);
     }
 
     private static String describe(RunResult.ExceptionInfo exception) {
