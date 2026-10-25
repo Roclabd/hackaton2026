@@ -191,7 +191,9 @@ class ConservativeRulesTest {
             "double d=a/b; return d;",
             "double d; d=a/b; return d;",
             "return a/b;",
-            "double d=(double)(a/b); return d;"
+            "double d=(double)(a/b); return d;",
+            "return b == 0 ? 0 : a/b;",
+            "double d = b > 0 ? a/b : -1; return d;"
     })
     void r8FindsIntegralDivisionBeforeWidening(String body) {
         Finding finding = one("R8", "class Sample { double run(int a,int b){ " + body + " } }");
@@ -209,6 +211,26 @@ class ConservativeRulesTest {
             "class Sample { double run(int a,int b){ return unknown()/b; } }"
     })
     void r8SkipsFloatingOperandsIntegralDestinationAndUnknownTypes(String source) { assertNone("R8", source); }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "class Sample { double run(int sum, java.util.List<Integer> xs){ return sum / xs.size(); } }",
+            "import java.util.*; class Sample { double run(int sum, List<Integer> xs){ return xs.isEmpty() ? 0 : sum / xs.size(); } }",
+            "class Sample { double run(int n, String s){ double r = n / s.length(); return r; } }"
+    })
+    void r8SeesSizeAndLengthOfStandardTypes(String source) {
+        assertBugfixParses(one("R8", source));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            // свой класс List с size(): тип результата неизвестен — правило молчит
+            "class Sample { static class List { double size(){ return 2.5; } } double run(int sum, List xs){ return sum / xs.size(); } }",
+            // деление в условии тернарного оператора результатом не становится
+            "class Sample { double run(int a,int b){ return a/b > 1 ? 1.0 : 2.0; } }",
+            "class Sample { double run(int sum, java.util.List<Integer> xs){ return sum / (double) xs.size(); } }"
+    })
+    void r8StaysSilentOnOwnTypesAndConditions(String source) { assertNone("R8", source); }
 
     @Test
     void r8PatchProducesFractionalResult() throws Exception {

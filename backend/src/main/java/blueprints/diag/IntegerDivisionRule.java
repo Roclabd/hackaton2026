@@ -36,6 +36,8 @@ final class IntegerDivisionRule {
             Node parent = value.getParentNode().orElse(null);
             if (parent instanceof EnclosedExpr) { value = parent; continue; }
             if (parent instanceof CastExpr cast && cast.getTypeAsString().equals("double")) { value = parent; continue; }
+            // Ветка тернарного оператора уходит туда же, куда весь оператор; условие — нет.
+            if (parent instanceof ConditionalExpr ternary && ternary.getCondition() != value) { value = parent; continue; }
             if (parent instanceof VariableDeclarator variable) return variable.getTypeAsString().equals("double");
             if (parent instanceof AssignExpr assign && assign.getOperator() == AssignExpr.Operator.ASSIGN && assign.getValue() == value) {
                 return context.type(assign.getTarget()).equals("double");

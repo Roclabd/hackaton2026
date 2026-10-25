@@ -12,7 +12,7 @@
 |---|---|
 | Заплатка вложенного цикла: **совпало на 41 из 41 входа**; рост n² → n, при n = 1600 тело цикла выполнилось **2 561 600 → 3 200** раз | [SCOPE.md](docs/SCOPE.md#сквозная-проверка-jar), тесты [`ChangedCoverageGateTest`](backend/src/test/java/blueprints/gate/ChangedCoverageGateTest.java), [`GrowthProfilerTest`](backend/src/test/java/blueprints/profile/GrowthProfilerTest.java) |
 | Правка `Objects.equals(x, y)` → `x.equals(y)` поймана: **7 расхождений из 41 входа**, кратчайший — `null` / `1` | [SCOPE.md](docs/SCOPE.md#сквозная-проверка-jar), тест [`GateServiceTest`](backend/src/test/java/blueprints/gate/GateServiceTest.java) |
-| Тесты бэкенда: **523, 0 падений** (чистая копия, вс 25.10) | [SCOPE.md](docs/SCOPE.md), [CI](https://github.com/Roclabd/hackaton2026/actions/workflows/ci.yml) |
+| Тесты бэкенда: **533, 0 падений** (`mvnw clean package`, вс 25.10) | [SCOPE.md](docs/SCOPE.md), [CI](https://github.com/Roclabd/hackaton2026/actions/workflows/ci.yml) |
 
 Это результат на конечном наборе входов, а не доказательство для любых данных.
 

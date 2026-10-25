@@ -169,6 +169,12 @@ final class DiagnosticContext {
         if (value instanceof FieldAccessExpr field && field.getNameAsString().equals("length")
                 && field.getScope() instanceof NameExpr name && declaredType(name).filter(Type::isArrayType).isPresent()) return "int";
         if (value instanceof FieldAccessExpr field) return fieldAccessType(field).map(Type::asString).orElse("");
+        if (value instanceof MethodCallExpr call && call.getArguments().isEmpty()
+                && call.getScope().map(DiagnosticContext::unwrapped).orElse(null) instanceof NameExpr scope) {
+            // list.size() и s.length() — int, если переменная объявлена стандартной коллекцией или строкой.
+            if (call.getNameAsString().equals("size") && collection(scope)) return "int";
+            if (call.getNameAsString().equals("length") && string(scope)) return "int";
+        }
         if (value instanceof BinaryExpr binary && integral(binary.getLeft()) && integral(binary.getRight())) {
             return switch (binary.getOperator()) {
                 case PLUS, MINUS, MULTIPLY, DIVIDE, REMAINDER, BINARY_AND, BINARY_OR, XOR, LEFT_SHIFT,
@@ -178,6 +184,18 @@ final class DiagnosticContext {
             };
         }
         return "";
+    }
+
+    private static final List<String> COLLECTIONS = List.of("Collection", "List", "ArrayList", "LinkedList", "Set",
+            "HashSet", "LinkedHashSet", "TreeSet", "Map", "HashMap", "LinkedHashMap", "TreeMap", "Queue", "Deque",
+            "ArrayDeque", "PriorityQueue");
+
+    /** Объявлена стандартной коллекцией java.util, и в файле нет своего типа с тем же именем. */
+    private boolean collection(NameExpr name) {
+        Optional<String> simple = declaredType(name).filter(Type::isClassOrInterfaceType)
+                .map(type -> type.asClassOrInterfaceType().getNameAsString()).filter(COLLECTIONS::contains);
+        return simple.isPresent() && unit.findAll(TypeDeclaration.class).stream()
+                .noneMatch(type -> type.getNameAsString().equals(simple.get()));
     }
 
     boolean integral(Expression expression) {

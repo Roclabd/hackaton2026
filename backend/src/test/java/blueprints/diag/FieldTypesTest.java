@@ -75,7 +75,8 @@ class FieldTypesTest {
     @Test
     void robustnessGradesHasBothPlantedDefects() throws Exception {
         String source = Files.readString(Path.of("../corpus/robustness/Grades/Grades.java"), StandardCharsets.UTF_8);
-        assertEquals(1, rule("R8", source).size(), "return sum / marks.length в average()");
+        // sum / marks.length в average() и total / count в ветке тернарного оператора (средняя по группе)
+        assertEquals(List.of(35, 92), rule("R8", source).stream().map(f -> f.lines()[0]).toList());
         assertEquals(1, rule("R7", source).size(), "s.name == name в findByName()");
     }
 
