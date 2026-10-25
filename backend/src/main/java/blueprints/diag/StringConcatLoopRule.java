@@ -35,7 +35,7 @@ final class StringConcatLoopRule {
             int declaredAt = statements.indexOf(variable.findAncestor(ExpressionStmt.class).orElseThrow());
             for (Statement statement : statements.subList(declaredAt + 1, statements.size())) {
                 Statement loop = statement instanceof LabeledStmt labeled ? labeled.getStatement() : statement;
-                if (!isLoop(loop)) continue;
+                if (!isLoop(loop) || smallConstantLoop(loop)) continue;
                 appends(loop, variable.getNameAsString(), context).ifPresent(appends -> {
                     String id = RULE + "-" + (found.size() + 1);
                     found.add(finding(id, variable.getNameAsString(), statement, appends, context));
@@ -63,6 +63,14 @@ final class StringConcatLoopRule {
                 .anyMatch(t -> t.getNameAsString().equals("String"));
         boolean string = type.equals("java.lang.String") || type.equals("String") && !shadowed;
         return string ? Optional.of(block) : Optional.empty();
+    }
+
+    /** for (int i = 0; i < 3; i++): число итераций — маленькая константа, роста нет — это не неэффективность. */
+    private static boolean smallConstantLoop(Statement loop) {
+        if (!(loop instanceof ForStmt f) || f.getCompare().isEmpty()
+                || !(DiagnosticContext.unwrapped(f.getCompare().get()) instanceof BinaryExpr compare)) return false;
+        return compare.getRight() instanceof IntegerLiteralExpr bound && bound.asNumber().intValue() <= 16
+                && (compare.getOperator() == BinaryExpr.Operator.LESS || compare.getOperator() == BinaryExpr.Operator.LESS_EQUALS);
     }
 
     private static boolean isLoop(Statement statement) {

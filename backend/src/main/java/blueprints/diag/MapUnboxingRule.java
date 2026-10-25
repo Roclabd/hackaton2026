@@ -54,6 +54,21 @@ final class MapUnboxingRule {
         return found;
     }
 
+    /**
+     * Карта заполняется в конструкторе или блоке инициализации (for (Day d : Day.values()) load.put(…)) — ключи
+     * заданы до первого get. Заполнение по командам пользователя в обычных методах защитой не считается.
+     */
+    private static boolean filledOnConstruction(MethodCallExpr get, String owner) {
+        var type = get.findAncestor(com.github.javaparser.ast.body.TypeDeclaration.class);
+        if (type.isEmpty()) return false;
+        return type.get().findAll(MethodCallExpr.class).stream()
+                .filter(call -> call.getNameAsString().matches("put|putAll|putIfAbsent")
+                        && call.getScope().map(DiagnosticContext::unwrapped)
+                        .filter(s -> s.toString().equals(owner) || s.toString().equals("this." + owner)).isPresent())
+                .anyMatch(call -> call.findAncestor(com.github.javaparser.ast.body.ConstructorDeclaration.class).isPresent()
+                        || call.findAncestor(com.github.javaparser.ast.body.InitializerDeclaration.class).isPresent());
+    }
+
     /** Тип значений стандартной карты: Integer, Long, Double, Float — то, что распаковывается в число. */
     private static Optional<String> valueType(DiagnosticContext context, NameExpr map) {
         return context.standardType(map, MAPS).flatMap(ClassOrInterfaceType::getTypeArguments)
@@ -101,8 +116,21 @@ final class MapUnboxingRule {
         if (binary.getOperator() != BinaryExpr.Operator.PLUS) return false;
         BinaryExpr top = binary;
         while (top.getParentNode().orElse(null) instanceof BinaryExpr up && up.getOperator() == BinaryExpr.Operator.PLUS) top = up;
-        return top.findAll(Expression.class).stream().anyMatch(e -> e instanceof StringLiteralExpr || e instanceof TextBlockLiteralExpr
+        // Смотрим только на сами слагаемые цепочки «+», не на аргументы вызовов внутри них (c.get(w) + 1 — арифметика).
+        List<Expression> operands = new ArrayList<>();
+        collectOperands(top, operands);
+        return operands.stream().map(DiagnosticContext::unwrapped).anyMatch(e -> e instanceof StringLiteralExpr || e instanceof TextBlockLiteralExpr
                 || e instanceof NameExpr n && context != null && context.string(n));
+    }
+
+    private static void collectOperands(Expression e, List<Expression> out) {
+        Expression value = DiagnosticContext.unwrapped(e);
+        if (value instanceof BinaryExpr b && b.getOperator() == BinaryExpr.Operator.PLUS) {
+            collectOperands(b.getLeft(), out);
+            collectOperands(b.getRight(), out);
+        } else {
+            out.add(value);
+        }
     }
 
     private static boolean returnsPrimitive(Node node) {
@@ -128,6 +156,7 @@ final class MapUnboxingRule {
         var method = get.findAncestor(CallableDeclaration.class);
         if (method.isEmpty() || get.getBegin().isEmpty()) return true;
         String owner = map.getNameAsString();
+        if (filledOnConstruction(get, owner)) return true;
         for (MethodCallExpr call : method.get().findAll(MethodCallExpr.class)) {
             if (!(call.getScope().map(DiagnosticContext::unwrapped).orElse(null) instanceof NameExpr scope)
                     || !scope.getNameAsString().equals(owner)) continue;

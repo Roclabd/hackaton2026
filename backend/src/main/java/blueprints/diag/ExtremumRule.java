@@ -32,7 +32,11 @@ final class ExtremumRule {
             boolean targetLeft = left.equals(target.toString()) && right.equals(candidate.toString());
             boolean targetRight = right.equals(target.toString()) && left.equals(candidate.toString());
             if (!targetLeft && !targetRight) continue;
-            int direction = intent(target.getNameAsString());
+            // Направление — по точному имени (max, min, highest…): maxBudget, maximumAllowed — это потолки, а не поиск максимума.
+            int direction = exactIntent(target.getNameAsString());
+            // maxDelay, minPrice… — да, если переменная начинается как поиск экстремума: с первого элемента данных
+            // или с крайней константы. Потолок (maxBudget из параметра) так не начинается — его не трогаем.
+            if (direction == 0 && runningExtremum(target, check)) direction = intent(target.getNameAsString());
             if (direction == 0 && neutral(target.getNameAsString())) {
                 direction = intent(check.findAncestor(MethodDeclaration.class).map(MethodDeclaration::getNameAsString).orElse(""));
             }
@@ -44,7 +48,7 @@ final class ExtremumRule {
             BinaryExpr.Operator corrected = wrong == BinaryExpr.Operator.LESS ? BinaryExpr.Operator.GREATER : BinaryExpr.Operator.LESS;
             String id = "R4-" + (found.size() + 1);
             found.add(context.finding("R4", compare, "Возможно, сравнение направлено обратно",
-                    "«" + target + "» по " + (intent(target.getNameAsString()) != 0 ? "имени" : "имени метода") + " ищет "
+                    "«" + target + "» по " + (exactIntent(target.getNameAsString()) != 0 ? "имени" : "имени метода") + " ищет "
                             + (direction > 0 ? "максимум" : "минимум") + ", но это условие сохраняет "
                             + (direction > 0 ? "меньшее" : "большее") + " значение. Имя — подсказка, а не доказательство ошибки.",
                     List.of("Переменная действительно должна хранить " + (direction > 0 ? "максимум" : "минимум"),
@@ -73,6 +77,26 @@ final class ExtremumRule {
                             + java.util.regex.Pattern.quote(index.getNameAsString())))).isPresent();
         }
         return false;
+    }
+
+    /** Локальная переменная объявлена со стартом a[0], list.get(0), 0 или Integer.MIN_VALUE / MAX_VALUE. */
+    private static boolean runningExtremum(NameExpr target, IfStmt check) {
+        return check.findAncestor(com.github.javaparser.ast.body.CallableDeclaration.class).map(method -> method
+                .findAll(com.github.javaparser.ast.body.VariableDeclarator.class).stream()
+                .filter(v -> v.getNameAsString().equals(target.getNameAsString()))
+                .anyMatch(v -> v.getInitializer().map(DiagnosticContext::unwrapped).filter(init ->
+                        init instanceof ArrayAccessExpr a && a.getIndex().toString().equals("0")
+                        || init instanceof MethodCallExpr m && m.getNameAsString().equals("get") && m.getArguments().size() == 1
+                                && m.getArgument(0).toString().equals("0")
+                        || init.toString().matches("0|0L|(Integer|Long)\\.(MIN|MAX)_VALUE")).isPresent()))
+                .orElse(false);
+    }
+
+    static int exactIntent(String name) {
+        String lower = name.toLowerCase(Locale.ROOT);
+        if (lower.matches("max(imum)?|highest|largest|maxvalue|maxval")) return 1;
+        if (lower.matches("min(imum)?|lowest|smallest|minvalue|minval")) return -1;
+        return 0;
     }
 
     static int intent(String name) {

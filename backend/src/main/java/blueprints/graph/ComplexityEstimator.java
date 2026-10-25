@@ -354,15 +354,21 @@ public final class ComplexityEstimator {
     }
 
     static String notation(int power, int logs) {
-        String n = switch (power) {
-            case 0 -> "";
-            case 1 -> "n";
-            case 2 -> "n²";
-            case 3 -> "n³";
-            default -> "n^" + power;
-        };
-        String log = logs == 0 ? "" : logs == 1 ? "log n" : "log^" + logs + " n";
+        String n = power == 0 ? "" : "n" + superscript(power);
+        String log = logs == 0 ? "" : "log" + superscript(logs) + " n";
         String body = (n + " " + log).strip();
         return "O(" + (body.isEmpty() ? "1" : body) + ")";
+    }
+
+    private static final String SUPERSCRIPT_DIGITS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+
+    /** Показатель степени верхним индексом: 1 → «» (n¹ пишется как n), 4 → «⁴», 12 → «¹²». */
+    static String superscript(int exponent) {
+        if (exponent == 1) return "";
+        StringBuilder out = new StringBuilder();
+        for (char digit : Integer.toString(exponent).toCharArray()) {
+            out.append(SUPERSCRIPT_DIGITS.charAt(digit - '0'));
+        }
+        return out.toString();
     }
 }

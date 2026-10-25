@@ -18,7 +18,7 @@ final class AverageDivisorRule {
             Expression divisor = DiagnosticContext.unwrapped(division.getRight());
             if (!(divisor instanceof BinaryExpr minus) || minus.getOperator() != BinaryExpr.Operator.MINUS
                     || !minus.getRight().isIntegerLiteralExpr() || !minus.getRight().asIntegerLiteralExpr().getValue().equals("1")
-                    || context.arrayLength(minus.getLeft()).isEmpty()) continue;
+                    || context.arrayLength(minus.getLeft()).isEmpty() || intervalOrSpread(division.getLeft(), method.get())) continue;
             String id = "R5-" + (found.size() + 1);
             found.add(context.finding("R5", minus, "Проверьте делитель среднего",
                     "Метод с именем среднего делит на length - 1. Для среднего всех элементов обычно нужен length; "
@@ -29,6 +29,23 @@ final class AverageDivisorRule {
                     Finding.DEFECT, found.size() + 1));
         }
         return found;
+    }
+
+    /**
+     * Числитель — интервал или разброс, а не сумма: разность ({@code span = last - first}) или имя вроде span, gap,
+     * delta, diff, sq, var, dev. Средний интервал между n отметками и выборочная дисперсия делят на n - 1 правильно.
+     */
+    private static boolean intervalOrSpread(Expression numerator, MethodDeclaration method) {
+        Expression value = DiagnosticContext.unwrapped(numerator);
+        if (value instanceof CastExpr cast) value = DiagnosticContext.unwrapped(cast.getExpression());
+        if (value instanceof BinaryExpr difference && difference.getOperator() == BinaryExpr.Operator.MINUS) return true;
+        if (!(value instanceof NameExpr name)) return false;
+        String n = name.getNameAsString();
+        if (n.toLowerCase(Locale.ROOT).matches(".*(span|gap|delta|diff|interval|range|sq|var|dev).*")) return true;
+        return method.findAll(com.github.javaparser.ast.body.VariableDeclarator.class).stream()
+                .filter(v -> v.getNameAsString().equals(n))
+                .anyMatch(v -> v.getInitializer().map(DiagnosticContext::unwrapped)
+                        .filter(init -> init instanceof BinaryExpr b && b.getOperator() == BinaryExpr.Operator.MINUS).isPresent());
     }
 
     private boolean averageName(String name) {

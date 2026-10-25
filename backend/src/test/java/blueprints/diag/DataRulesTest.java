@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** R4 в цикле с индексом, R10–R13: что находят и где молчат. Источники — типичные места ИИ-кода. */
+/** R4 в цикле с индексом, R10–R14: что находят и где молчат. Источники — типичные места ИИ-кода. */
 class DataRulesTest {
 
     // ---------- R4: цикл с индексом и нейтральное имя ----------
@@ -65,7 +65,6 @@ class DataRulesTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "import java.util.*; class S { static void f(List<String> src){ List<String> out=new ArrayList<>(); for(String s: src){ out.add(s); out.sort(Comparator.naturalOrder()); } } }",
-            "import java.util.*; class S { static void f(int[][] m){ for(int[] row: m){ Arrays.sort(row); } } }",
             "import java.util.*; class S { static void f(List<Integer> l, int n){ for(int i=0;i<n;i++){ l.add(i); Collections.sort(l); } } }"
     })
     void r11FindsSortInLoop(String source) {
@@ -78,7 +77,9 @@ class DataRulesTest {
     @ValueSource(strings = {
             "import java.util.*; class S { static void f(List<String> l){ l.sort(Comparator.naturalOrder()); } }",
             "import java.util.*; class S { static void f(List<String> l, Scanner in){ while(in.hasNextLine()){ l.add(in.nextLine()); l.sort(null); } } }",
-            "class S { static class Deck { void sort(){} } static void f(Deck d, int n){ for(int i=0;i<n;i++){ d.sort(); } } }"
+            "class S { static class Deck { void sort(){} } static void f(Deck d, int n){ for(int i=0;i<n;i++){ d.sort(); } } }",
+            // каждая строка сортируется один раз — n log n, а не n² log n
+            "import java.util.*; class S { static void f(int[][] m){ for(int[] row: m){ Arrays.sort(row); } } }"
     })
     void r11SilentOutsideLoopsInMenusAndOnOwnTypes(String source) { none("R11", source); }
 
@@ -143,6 +144,61 @@ class DataRulesTest {
             "import java.util.*; class S { static Integer f(Map<String,Integer> m, String k){ return m.get(k); } }"
     })
     void r13SilentWhenGuardedPrefilledOrNotUnboxed(String source) { none("R13", source); }
+
+    // ---------- R14: == между Integer ----------
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "class S { static boolean f(Integer a, Integer b){ return a == b; } }",
+            "import java.util.*; class S { static boolean f(List<Integer> xs, int i, int j){ return xs.get(i) == xs.get(j); } }",
+            "import java.util.*; class S { Map<String,Long> m=new HashMap<>(); boolean f(String a, String b){ return m.get(a) != m.get(b); } }"
+    })
+    void r14FindsReferenceComparisonOfBoxedNumbers(String source) {
+        Finding f = one("R14", source);
+        assertBugfix(f);
+        assertTrue(f.patches().getFirst().source().contains("java.util.Objects.equals("), f.patches().getFirst().source());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            // распаковка: int против Integer сравнивает числа
+            "class S { static boolean f(int a, Integer b){ return a == b; } }",
+            // сравнение с null — проверка ссылки, так и надо
+            "class S { static boolean f(Integer a){ return a == null; } }",
+            // уже equals
+            "class S { static boolean f(Integer a, Integer b){ return a.equals(b); } }",
+            // разные обёртки — не тот случай (ещё и не скомпилируется у javac)
+            "class S { static boolean f(int a, int b){ return a == b; } }",
+            // свой класс Integer
+            "class S { static class Integer { } static boolean f(Integer a, Integer b){ return a == b; } }",
+            // List<String> — это R7, не R14
+            "import java.util.*; class S { static boolean f(List<String> xs){ return xs.get(0) == xs.get(1); } }"
+    })
+    void r14SilentOnUnboxingNullEqualsAndOwnTypes(String source) { none("R14", source); }
+
+    // ---------- R6, R7: намеренные идиомы из JDK не обвиняем ----------
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "class S { static boolean f(int x){ boolean neg; if ((neg = (x < 0))) { return neg; } return false; } }",
+            "class S { static boolean f(int a, int b){ boolean eq; if (eq = (a == b)) { return eq; } return false; } }"
+    })
+    void r6SilentOnParenthesizedAssignmentAndStoredComparison(String source) { none("R6", source); }
+
+    @Test
+    void r6StillFindsNumericAssignment() {
+        assertEquals(1, rule("R6", "class S { static void f(int p){ if (p = 100) { } } }").size());
+    }
+
+    @Test
+    void r7SilentOnIdentityShortcutBeforeEquals() {
+        none("R7", "class S { static boolean f(String s, String t){ if (s == t) return true; return s != null && s.equals(t); } }");
+    }
+
+    @Test
+    void r7StillFindsPlainStringComparison() {
+        assertEquals(1, rule("R7", "class S { static boolean f(String s, String t){ return s == t; } }").size());
+    }
 
     private static List<Finding> rule(String rule, String source) {
         return new FindingsService().find(SourceParser.parseOrThrow(source), source).stream()

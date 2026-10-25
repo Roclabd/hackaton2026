@@ -63,6 +63,21 @@ class ComplexityEstimatorTest {
         assertEquals("O(n² log n)", of("void f(List<List<Integer>> all) { for (List<Integer> a : all) Collections.sort(a); }", "f").big());
     }
 
+    /** Любая степень — верхним индексом, без «^»: n⁴, n¹², log² n. */
+    @Test
+    void notationUsesSuperscriptsForAnyPower() {
+        assertEquals("O(1)", ComplexityEstimator.notation(0, 0));
+        assertEquals("O(n)", ComplexityEstimator.notation(1, 0));
+        assertEquals("O(n³)", ComplexityEstimator.notation(3, 0));
+        assertEquals("O(n⁴)", ComplexityEstimator.notation(4, 0));
+        assertEquals("O(n¹⁰)", ComplexityEstimator.notation(10, 0));
+        assertEquals("O(n⁴ log n)", ComplexityEstimator.notation(4, 1));
+        assertEquals("O(n log² n)", ComplexityEstimator.notation(1, 2));
+        assertEquals("O(log³ n)", ComplexityEstimator.notation(0, 3));
+        String fourLoops = "int f(List<Integer> a) { int t = 0; for (int w : a) for (int x : a) for (int y : a) for (int z : a) t++; return t; }";
+        assertEquals("O(n⁴)", of(fourLoops, "f").big());
+    }
+
     /** Свой sort — не библиотечный: стоимость берётся из его тела (пузырёк — n²). */
     @Test
     void ownSortMethodIsCountedByItsBody() {

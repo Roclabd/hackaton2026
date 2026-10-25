@@ -40,6 +40,7 @@ public final class FindingsService {
         findings.addAll(new SortInLoopRule().find(context));
         findings.addAll(new ZeroStartExtremumRule().find(context));
         findings.addAll(new MapUnboxingRule().find(context));
+        findings.addAll(new BoxedEqualityRule().find(context));
         return List.copyOf(findings);
     }
 }

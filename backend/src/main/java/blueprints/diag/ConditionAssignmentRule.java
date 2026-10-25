@@ -21,8 +21,12 @@ final class ConditionAssignmentRule {
                 default -> null;
             };
             if (condition == null || context.methodId(node).isEmpty()) continue;
+            // if ((x = …)) — лишние скобки вокруг присваивания: общепринятый знак «это намеренно».
+            if (condition instanceof EnclosedExpr) continue;
             if (!(DiagnosticContext.unwrapped(condition) instanceof AssignExpr assign)
                     || assign.getOperator() != AssignExpr.Operator.ASSIGN) continue;
+            // flag = (a == b) — сохраняют результат сравнения: значение уже boolean, ошибки «= вместо ==» нет.
+            if (DiagnosticContext.unwrapped(assign.getValue()) instanceof BinaryExpr value && comparison(value.getOperator())) continue;
             String type = context.type(assign.getTarget());
             boolean numeric = context.integral(assign.getTarget()) || type.equals("float") || type.equals("double");
             String id = "R6-" + (found.size() + 1);
@@ -35,6 +39,13 @@ final class ConditionAssignmentRule {
                     Finding.DEFECT, found.size() + 1));
         }
         return found;
+    }
+
+    private static boolean comparison(BinaryExpr.Operator op) {
+        return switch (op) {
+            case EQUALS, NOT_EQUALS, LESS, GREATER, LESS_EQUALS, GREATER_EQUALS, AND, OR -> true;
+            default -> false;
+        };
     }
 }
 

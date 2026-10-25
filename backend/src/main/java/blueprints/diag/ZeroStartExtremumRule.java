@@ -38,7 +38,7 @@ final class ZeroStartExtremumRule {
             String method = variable.findAncestor(MethodDeclaration.class).map(MethodDeclaration::getNameAsString).orElse("");
             int direction = ExtremumRule.intent(name);
             if (direction == 0 && ExtremumRule.neutral(name)) direction = ExtremumRule.intent(method);
-            if (direction == 0) continue;
+            if (direction == 0 || countLike(name) || countLike(method)) continue;
             if (!accumulates(variable, name, direction)) continue;
             String id = RULE + "-" + (found.size() + 1);
             String start = direction > 0 ? minValue(type) : maxValue(type);
@@ -55,6 +55,11 @@ final class ZeroStartExtremumRule {
                     Finding.DEFECT, found.size() + 1));
         }
         return found;
+    }
+
+    /** Счётчики, частоты, длины, количества не бывают отрицательными — для них старт с 0 правильный. */
+    private static boolean countLike(String name) {
+        return name.toLowerCase(java.util.Locale.ROOT).matches(".*(count|freq|len|size|qty|quantity|amount|num|times|votes|hits).*");
     }
 
     private static boolean zero(Expression e) {

@@ -17,6 +17,7 @@ final class StringEqualityRule {
                     || !context.string(compare.getLeft()) || !context.string(compare.getRight())) continue;
             if (compare.getLeft().equals(compare.getRight())
                     || (compare.getLeft().isStringLiteralExpr() && compare.getRight().isStringLiteralExpr())) continue;
+            if (identityShortcut(compare)) continue;
             String id = "R7-" + (found.size() + 1);
             String replacement = (equal ? "" : "!") + "java.util.Objects.equals(" + compare.getLeft() + ", " + compare.getRight() + ")";
             // Полностью квалифицированное имя пакета тоже может быть затенено переменной java.
@@ -31,5 +32,21 @@ final class StringEqualityRule {
                     Finding.DEFECT, found.size() + 1));
         }
         return found;
+    }
+
+    /**
+     * {@code if (s == t) return true;} перед {@code s.equals(t)} — быстрая проверка того же объекта, а не ошибка:
+     * в том же методе эти же две строки дальше сравниваются по содержимому.
+     */
+    private static boolean identityShortcut(BinaryExpr compare) {
+        String a = compare.getLeft().toString(), b = compare.getRight().toString();
+        return compare.findAncestor(com.github.javaparser.ast.body.CallableDeclaration.class).map(method -> method
+                .findAll(com.github.javaparser.ast.expr.MethodCallExpr.class).stream()
+                .filter(call -> call.getNameAsString().matches("equals|equalsIgnoreCase|compareTo|compareToIgnoreCase|contentEquals")
+                        && call.getScope().isPresent() && call.getArguments().size() == 1)
+                .anyMatch(call -> {
+                    String scope = call.getScope().get().toString(), arg = call.getArgument(0).toString();
+                    return scope.equals(a) && arg.equals(b) || scope.equals(b) && arg.equals(a);
+                })).orElse(false);
     }
 }

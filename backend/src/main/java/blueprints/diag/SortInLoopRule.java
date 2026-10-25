@@ -23,7 +23,7 @@ final class SortInLoopRule {
         for (MethodCallExpr call : context.unit.findAll(MethodCallExpr.class)) {
             if (!call.getNameAsString().equals("sort") || context.methodId(call).isEmpty() || !isSort(call, context)) continue;
             var loop = DiagnosticContext.enclosingLoop(call);
-            if (loop.isEmpty() || DiagnosticContext.inputLoop(loop.get())) continue;
+            if (loop.isEmpty() || DiagnosticContext.inputLoop(loop.get()) || !growsInLoop(call, loop.get())) continue;
             int ordinal = found.size() + 1;
             found.add(new Finding(RULE + "-" + ordinal, RULE, context.methodId(call).orElseThrow(),
                     DiagnosticContext.lines(call), "Сортировка внутри цикла",
@@ -35,6 +35,23 @@ final class SortInLoopRule {
                     List.of(), Finding.INEFFICIENCY));
         }
         return found;
+    }
+
+    /**
+     * Сортируется одна и та же коллекция, которую этот цикл пополняет (add, addAll, put…).
+     * Каждая группа, отсортированная по разу ({@code for (g : groups) g.sort(…)}), — это n log n, а не n² log n.
+     */
+    private static boolean growsInLoop(MethodCallExpr call, com.github.javaparser.ast.stmt.Statement loop) {
+        com.github.javaparser.ast.expr.Expression target = call.getScope().map(DiagnosticContext::unwrapped).orElse(null);
+        if (!(target instanceof NameExpr scope) || scope.getNameAsString().matches("Collections|Arrays")) {
+            target = call.getArguments().isEmpty() ? null : DiagnosticContext.unwrapped(call.getArgument(0));
+        }
+        if (!(target instanceof NameExpr list)) return false;
+        String name = list.getNameAsString();
+        boolean declaredOutside = loop.findAll(com.github.javaparser.ast.body.VariableDeclarator.class).stream()
+                .noneMatch(v -> v.getNameAsString().equals(name));
+        return declaredOutside && loop.findAll(MethodCallExpr.class).stream().anyMatch(m -> m.getNameAsString().matches("add|addAll|put|offer|push")
+                && m.getScope().map(DiagnosticContext::unwrapped).filter(s -> s instanceof NameExpr n && n.getNameAsString().equals(name)).isPresent());
     }
 
     /** list.sort(…) у стандартного списка или Collections.sort / Arrays.sort (в том числе java.util.Arrays.sort). */

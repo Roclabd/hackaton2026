@@ -248,7 +248,8 @@ final class DiagnosticContext {
         return unit.findAll(TypeDeclaration.class).stream().noneMatch(t -> t.getNameAsString().equals("String"))
                 && unit.getImports().stream().noneMatch(i -> !i.isAsterisk()
                 && i.getName().getIdentifier().equals("String") && !i.getNameAsString().equals("java.lang.String"))
-                && unit.getImports().stream().noneMatch(i -> i.isAsterisk() && !i.isStatic() && !i.getNameAsString().equals("java.lang"));
+                // import java.util.* и другие пакеты JDK своего String не приносят — опасен только чужой пакет со «*».
+                && unit.getImports().stream().noneMatch(i -> i.isAsterisk() && !i.isStatic() && !i.getNameAsString().matches("javax?\\..*"));
     }
 
     Optional<FieldAccessExpr> arrayLength(Expression expression) {
