@@ -47,6 +47,8 @@ final class GateJob implements Runnable {
     /** Замер покрытия на исполнителе этой проверки: при досрочной остановке он останавливается вместе с ней. */
     private final Function<ProgramRunner, ChangedCoverageMeter> coverage;
     private final Duration timeout;
+    /** Общий лимит на всю проверку: сверх него прогоны останавливаются, вердикт — INCOMPLETE с причиной. */
+    private final Duration budget;
     private final int workers;
     private final long startNanos = System.nanoTime();
 
@@ -54,15 +56,19 @@ final class GateJob implements Runnable {
     /** Сторож текущей серии прогонов; после срабатывания результаты этой серии больше не учитываются. */
     private HangWatch watch = new HangWatch(Integer.MAX_VALUE, () -> {});
     private volatile Verdict verdict = Verdict.starting();
+    /** Исполнитель текущей серии прогонов — его останавливает таймер общего лимита. */
+    private volatile ProgramRunner active;
+    private volatile boolean overBudget;
 
     GateJob(Request request, ProgramBuilder builder, ProgramRunner runner, InputGenerator inputs,
-            Function<ProgramRunner, ChangedCoverageMeter> coverage, Duration timeout, int workers) {
+            Function<ProgramRunner, ChangedCoverageMeter> coverage, Duration timeout, Duration budget, int workers) {
         this.request = request;
         this.builder = builder;
         this.runner = runner;
         this.inputs = inputs;
         this.coverage = coverage;
         this.timeout = timeout;
+        this.budget = budget;
         this.workers = workers;
     }
 
@@ -108,13 +114,51 @@ final class GateJob implements Runnable {
             return Verdict.buildError(candidate.errors(), elapsedMs());
         }
 
+        Thread budgetTimer = startBudgetTimer();
+        try {
+            return compare(original, candidate);
+        } finally {
+            budgetTimer.interrupt();
+        }
+    }
+
+    /**
+     * Таймер общего лимита. Зачем: тяжёлая программа (монолит организаторов LibraryManagerMess запускается
+     * отдельной JVM, ~1–4 с на прогон) на ~50 входах × 3 прогона шла минутами, и проверка каждой заплатки —
+     * столько же: на защите это выглядит зависанием. По истечении лимита прогоны этой проверки останавливаются.
+     */
+    private Thread startBudgetTimer() {
+        return Thread.ofVirtual().name("gate-budget").start(() -> {
+            try {
+                Thread.sleep(budget);
+            } catch (InterruptedException finishedInTime) {
+                return;
+            }
+            overBudget = true;
+            ProgramRunner current = active;
+            if (current != null) {
+                current.cancel();
+            }
+        });
+    }
+
+    /** Сделать исполнитель текущим; если лимит уже вышел — сразу остановить его. */
+    private ProgramRunner activate(ProgramRunner checkRunner) {
+        active = checkRunner;
+        if (overBudget) {
+            checkRunner.cancel();
+        }
+        return checkRunner;
+    }
+
+    private Verdict compare(ProgramBuilder.Built original, ProgramBuilder.Built candidate) {
         List<LabeledInput> generated = inputs.generate(request.fileName(), request.originalSource());
         synchronized (this) {
             checks = new ArrayList<>(generated.stream().map(in -> new InputCheck(in, null, null, null)).toList());
             publish(false);
         }
         // Свой исполнитель на проверку: его можно остановить досрочно, не задев другие проверки.
-        ProgramRunner checkRunner = runner.forCheck();
+        ProgramRunner checkRunner = activate(runner.forCheck());
         CompletableFuture<CoverageMeasurement> measuring = measureChangedCode(checkRunner, original.mainClass(), generated);
         boolean plainJvm = original.program().plainJvm() || candidate.program().plainJvm();
         List<WorkerProtocol.Program> programs =
@@ -125,6 +169,9 @@ final class GateJob implements Runnable {
             return checkExitScenarios(programs, generated, exit);
         }
         CoverageMeasurement measured = measuring.join();
+        if (overBudget) {
+            return overBudgetVerdict();
+        }
         synchronized (this) {
             return VerdictAssembler.assemble(List.copyOf(checks), request.intent(), true, timeout.toMillis(), elapsedMs(),
                     changedCoverage(measured), measured.incompleteReason(i -> compared(checks.get(i))));
@@ -191,6 +238,7 @@ final class GateJob implements Runnable {
      */
     private boolean runWatched(ProgramRunner checkRunner, List<WorkerProtocol.Program> programs,
                                List<LabeledInput> generated, List<Integer> order) {
+        activate(checkRunner);
         HangWatch current = new HangWatch(HANG_INPUTS_IN_A_ROW, checkRunner::cancel);
         synchronized (this) {
             watch = current;
@@ -220,11 +268,19 @@ final class GateJob implements Runnable {
             }
         }
         boolean scenariosFinish = unfinished.isEmpty() || runWatched(runner.forCheck(), programs, generated, unfinished);
+        if (overBudget) {
+            return overBudgetVerdict();
+        }
         synchronized (this) {
             List<InputCheck> scenarioChecks = scenarios.stream().map(checks::get).toList();
             return VerdictAssembler.assembleNonTerminating(scenarioChecks, request.intent(), timeout.toMillis(),
                     elapsedMs(), new NonTerminating(generated.size(), HANG_INPUTS_IN_A_ROW, exit, scenariosFinish));
         }
+    }
+
+    private synchronized Verdict overBudgetVerdict() {
+        return VerdictAssembler.assembleOverBudget(List.copyOf(checks), request.intent(), timeout.toMillis(), elapsedMs(),
+                budget.toMillis());
     }
 
     private synchronized void onResult(WorkerProtocol.Job job, RunResult result) {

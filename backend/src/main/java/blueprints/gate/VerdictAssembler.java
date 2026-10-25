@@ -2,11 +2,13 @@ package blueprints.gate;
 
 import blueprints.inputs.InputGenerator;
 import blueprints.instrument.ChangedCoverage;
+import blueprints.runner.RunResult;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -86,6 +88,34 @@ final class VerdictAssembler {
         return new Verdict(VerdictStatus.INCOMPLETE, Phase.DONE, 1.0, base.inputs(), base.checked(), base.matched(),
                 base.mismatches(), base.nondeterministic(), stopped.reason(compared, scenarioChecks.size(), timeoutMs),
                 List.of(), base.smallestMismatch(), base.example(), base.groups(), null, null, durationMs);
+    }
+
+    /**
+     * Итог проверки, остановленной по общему лимиту времени ({@link GateService#CHECK_BUDGET}).
+     * Расхождение на уже сравненных входах — настоящий результат; иначе INCOMPLETE: часть входов не сравнена.
+     */
+    static Verdict assembleOverBudget(List<InputCheck> checks, Intent intent, long timeoutMs, long durationMs,
+                                      long budgetMs) {
+        Verdict base = assemble(checks, intent, true, timeoutMs, durationMs);
+        if (base.status() == VerdictStatus.MISMATCH || base.status() == VerdictStatus.BEHAVIOR_CHANGE) {
+            return base;
+        }
+        String reason = "Проверка остановлена по общему лимиту времени " + budgetMs / 1000 + " с: сравнено "
+                + base.matched() + " из " + checks.size() + " входов"
+                + (base.matched() > 0 ? ", на всех сравненных вывод совпал" : "")
+                + ". Один запуск программы длится в среднем " + averageRunSeconds(checks)
+                + " с — остальные входы не прогонялись, чтобы проверка не длилась минутами";
+        return new Verdict(VerdictStatus.INCOMPLETE, Phase.DONE, 1.0, base.inputs(), base.checked(), base.matched(),
+                base.mismatches(), base.nondeterministic(), reason, List.of(), base.smallestMismatch(), base.example(),
+                base.groups(), null, null, durationMs);
+    }
+
+    /** Средняя длительность завершённых прогонов эталона в секундах, один знак после запятой. */
+    private static String averageRunSeconds(List<InputCheck> checks) {
+        double ms = checks.stream().map(InputCheck::original)
+                .filter(run -> run != null && !run.unknown())
+                .mapToLong(RunResult::durationMs).average().orElse(0);
+        return String.format(Locale.forLanguageTag("ru"), "%.1f", ms / 1000);
     }
 
     /** null — проверка полная. Иначе — что именно не проверено, по-русски. */
