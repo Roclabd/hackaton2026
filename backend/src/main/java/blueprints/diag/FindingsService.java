@@ -36,6 +36,10 @@ public final class FindingsService {
         findings.addAll(new StringEqualityRule().find(context));
         findings.addAll(new IntegerDivisionRule().find(context));
         findings.addAll(new StringConcatLoopRule().find(context));
+        findings.addAll(new ListSearchInLoopRule().find(context));
+        findings.addAll(new SortInLoopRule().find(context));
+        findings.addAll(new ZeroStartExtremumRule().find(context));
+        findings.addAll(new MapUnboxingRule().find(context));
         return List.copyOf(findings);
     }
 }

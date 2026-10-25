@@ -14,7 +14,7 @@
 | PUT | `/api/projects/{id}/source` | Правка кода в редакторе | ✅ готово |
 | GET | `/api/projects/{id}/methods/{methodId}` | Чертёж метода (уровень 1) | ✅ готово |
 | POST | `/api/projects/{id}/commands` | Правка узла (`editStatement`) | ✅ готово |
-| GET | `/api/projects/{id}/findings` | Находки | ✅ R1–R9, с ограничениями правил |
+| GET | `/api/projects/{id}/findings` | Находки | ✅ R1–R13, с ограничениями правил |
 | POST | `/api/projects/{id}/profile` | Замер роста для находки (счётчики циклов) | ✅ готово |
 | POST | `/api/projects/{id}/run` | Прогнать на входе | ✅ готово |
 | POST | `/api/projects/{id}/gate` | Проверить заплатку | ✅ готово |

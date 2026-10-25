@@ -192,10 +192,48 @@ final class DiagnosticContext {
 
     /** Объявлена стандартной коллекцией java.util, и в файле нет своего типа с тем же именем. */
     private boolean collection(NameExpr name) {
-        Optional<String> simple = declaredType(name).filter(Type::isClassOrInterfaceType)
-                .map(type -> type.asClassOrInterfaceType().getNameAsString()).filter(COLLECTIONS::contains);
-        return simple.isPresent() && unit.findAll(TypeDeclaration.class).stream()
-                .noneMatch(type -> type.getNameAsString().equals(simple.get()));
+        return standardType(name, COLLECTIONS).isPresent();
+    }
+
+    /**
+     * Объявленный тип переменной, если это один из стандартных типов {@code names} (List, Map…) и в файле нет
+     * своего типа с тем же простым именем — иначе пусто.
+     */
+    Optional<com.github.javaparser.ast.type.ClassOrInterfaceType> standardType(NameExpr name, java.util.Collection<String> names) {
+        Optional<com.github.javaparser.ast.type.ClassOrInterfaceType> type = declaredType(name)
+                .filter(Type::isClassOrInterfaceType).map(Type::asClassOrInterfaceType)
+                .filter(t -> names.contains(t.getNameAsString()));
+        return type.filter(t -> unit.findAll(TypeDeclaration.class).stream()
+                .noneMatch(own -> own.getNameAsString().equals(t.getNameAsString())));
+    }
+
+    /**
+     * Цикл ввода: {@code while (true)} или цикл, который на каждом шаге читает ввод. Его итерации — команды
+     * пользователя, а не элементы данных: одна сортировка на команду — не рост n².
+     */
+    static boolean inputLoop(com.github.javaparser.ast.stmt.Statement loop) {
+        Optional<Expression> condition = loop instanceof com.github.javaparser.ast.stmt.WhileStmt w ? Optional.of(w.getCondition())
+                : loop instanceof com.github.javaparser.ast.stmt.DoStmt d ? Optional.of(d.getCondition())
+                : loop instanceof ForStmt f ? f.getCompare() : Optional.empty();
+        if (!(loop instanceof ForEachStmt) && (condition.isEmpty() || condition.get() instanceof BooleanLiteralExpr b && b.getValue())) {
+            return true;
+        }
+        return loop.findAll(MethodCallExpr.class).stream().anyMatch(call -> call.getNameAsString().matches(
+                "next|nextLine|nextInt|nextLong|nextDouble|readLine|hasNext|hasNextLine|hasNextInt"));
+    }
+
+    /** Ближайший цикл, внутри которого стоит узел, — в пределах того же метода (лямбды и классы — граница). */
+    static Optional<com.github.javaparser.ast.stmt.Statement> enclosingLoop(Node node) {
+        for (Node parent = node.getParentNode().orElse(null); parent != null; parent = parent.getParentNode().orElse(null)) {
+            if (parent instanceof ForStmt || parent instanceof ForEachStmt
+                    || parent instanceof com.github.javaparser.ast.stmt.WhileStmt || parent instanceof com.github.javaparser.ast.stmt.DoStmt) {
+                return Optional.of((com.github.javaparser.ast.stmt.Statement) parent);
+            }
+            if (parent instanceof CallableDeclaration<?> || parent instanceof LambdaExpr || parent instanceof TypeDeclaration<?>) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 
     boolean integral(Expression expression) {
