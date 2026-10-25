@@ -22,11 +22,12 @@ jobs:
           java-version: 25
           cache: maven
 
-      - name: Фронт — проверка типов и сборка
+      - name: Фронт — проверка типов, фикстур и сборка
         working-directory: frontend
         run: |
           npm ci --no-audit --no-fund
           npm run typecheck
+          npm run check:fixtures
           npm run build
 
       - name: Бэк — тесты и сборка jar (фронт уже внутри)

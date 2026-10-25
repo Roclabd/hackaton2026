@@ -20,6 +20,13 @@ import java.util.concurrent.TimeUnit;
 /** Настоящий запуск java main: пользователь видит свой стек, stdout и stderr читаются как байты. */
 final class PlainJavaRunner implements AutoCloseable {
 
+    /**
+     * Запас на запуск самой JVM. Лимит времени — для программы: в рабочем процессе он отсчитывается уже после
+     * старта JVM, а здесь каждый прогон — новый процесс. Первый запуск из свежего каталога (антивирус проверяет
+     * только что записанные .class) на Windows доходит до нескольких секунд — без запаса это был бы ложный таймаут.
+     */
+    static final Duration JVM_STARTUP_ALLOWANCE = Duration.ofSeconds(5);
+
     private final Map<WorkerProtocol.Program, Path> directories = new HashMap<>();
     private final Path parent;
     private Path root;
@@ -45,7 +52,8 @@ final class PlainJavaRunner implements AutoCloseable {
             CompletableFuture<Boolean> stdout = drain(process.getInputStream(), out);
             CompletableFuture<Boolean> stderr = drain(process.getErrorStream(), err);
             writeInput(process.getOutputStream(), input);
-            boolean timedOut = !process.waitFor(Math.max(1, timeout.toMillis()), TimeUnit.MILLISECONDS);
+            long limitMs = Math.max(1, timeout.toMillis()) + JVM_STARTUP_ALLOWANCE.toMillis();
+            boolean timedOut = !process.waitFor(limitMs, TimeUnit.MILLISECONDS);
             if (timedOut) stop(process);
             boolean complete = collected(stdout) & collected(stderr);
             Integer exit = timedOut || process.isAlive() ? null : process.exitValue();

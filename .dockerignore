@@ -5,3 +5,4 @@ backend/target
 backend/src/main/resources/web
 .env
 прототипы
+backend/target-*

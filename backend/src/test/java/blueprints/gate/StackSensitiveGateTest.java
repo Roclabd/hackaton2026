@@ -36,6 +36,7 @@ class StackSensitiveGateTest {
             Verdict verdict = check(gate, original, candidate, Intent.REFACTOR);
             assertEquals(VerdictStatus.INCOMPLETE, verdict.status());
             assertEquals(0, verdict.mismatches(), "обе стороны должны видеть java Pair, а не только кандидат");
+            assertNotNull(verdict.example(), "ни один вход не сравнён: " + verdict.incompleteReason());
             assertEquals("Pair" + System.lineSeparator(), verdict.example().original().stdout());
             assertEquals(verdict.example().original().stdout(), verdict.example().candidate().stdout());
             assertTrue(verdict.incompleteReason().contains("без счётчиков"), verdict.incompleteReason());
