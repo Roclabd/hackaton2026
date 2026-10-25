@@ -4,6 +4,7 @@ import { dispatch, useAppState } from '../../state/store'
 import type { GraphNode } from '../../api/types'
 import { ExpressionTree } from './ExpressionTree'
 import { CONTAINER_KINDS, TERMINAL_KINDS, containerTitle, type TreeBranch, type TreeNode } from './blueprintTree'
+import { executionCount, heatColor } from './heatModel'
 
 // Блоки чертежа метода: контейнеры if/loop/switch/try — рамки с ветками, операторы — моноширинные блоки.
 
@@ -52,15 +53,29 @@ function Expressions({ node }: { node: GraphNode }) {
   return detailed && node.expr ? <ExpressionTree root={node.expr} operatorId={node.id} /> : null
 }
 
+function useNodeHeat(nodeId: string) {
+  const result = useAppState((s) => s.heat?.result)
+  const count = executionCount(result, nodeId)
+  return { count, style: count === null || !result ? undefined : { backgroundColor: heatColor(count, result.maxCount) } }
+}
+
+function HeatCount({ count }: { count: number | null }) {
+  return count === null ? null : <span className="bp-heat-count" title={`Выполнений оператора: ${count.toLocaleString('ru-RU')}`}>
+    × {count.toLocaleString('ru-RU')}
+  </span>
+}
+
 function ContainerBlock({ item, selectedId }: BlockProps) {
   const { node, branches } = item
   const picked = node.id === selectedId
   const sideBySide = node.kind === 'if'
+  const heat = useNodeHeat(node.id)
   return (
     <div className={`bp-frame kind-${node.kind} ${picked ? 'is-selected' : ''}`}>
       <button
         type="button"
         className="bp-frame-header"
+        style={heat.style}
         onClick={() => select(node.id)}
         onDoubleClick={() => openEditor(node.id, node.editable)}
         title={node.editable ? 'Двойной клик — изменить условие' : undefined}
@@ -70,6 +85,7 @@ function ContainerBlock({ item, selectedId }: BlockProps) {
         <code className="bp-frame-code">{node.label}</code>
         <ComplexityBadge complexity={node.complexity} />
         <Badges badges={node.badges} />
+        <HeatCount count={heat.count} />
       </button>
       <Expressions node={node} />
       <div className={`bp-branches ${sideBySide ? 'side-by-side' : ''}`}>
@@ -92,11 +108,13 @@ function StatementBlock({ item, selectedId }: BlockProps) {
   const { node } = item
   const picked = node.id === selectedId
   const style = TERMINAL_KINDS.includes(node.kind) ? 'terminal' : node.kind === 'raw' ? 'raw' : 'statement'
+  const heat = useNodeHeat(node.id)
   return (
     <div className={`bp-statement ${picked ? 'is-selected' : ''}`}>
     <button
       type="button"
       className={`bp-node ${style} kind-${node.kind} ${picked ? 'is-selected' : ''}`}
+      style={heat.style}
       onClick={() => select(node.id)}
       onDoubleClick={() => openEditor(node.id, node.editable)}
       title={node.editable ? 'Двойной клик — изменить' : node.kind === 'raw' ? 'Исходный код без разбора на блоки' : undefined}
@@ -105,6 +123,7 @@ function StatementBlock({ item, selectedId }: BlockProps) {
       {node.kind === 'raw' && <span className="bp-raw-caption">исходный код</span>}
       <code>{node.code ?? node.label}</code>
       <Badges badges={node.badges} />
+      <HeatCount count={heat.count} />
     </button>
     <Expressions node={node} />
     </div>

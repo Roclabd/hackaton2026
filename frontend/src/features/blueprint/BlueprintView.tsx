@@ -10,6 +10,7 @@ export function BlueprintView() {
   const blueprint = useAppState((s) => s.blueprint)
   const selectedId = useAppState((s) => s.selectedNodeId)
   const zoom = useAppState((s) => s.zoom)
+  const heat = useAppState((s) => s.heat)
   // Оценка всего метода лежит на его узле карты.
   const methodComplexity = useAppState((s) => s.project?.map.nodes.find((n) => n.id === s.blueprint?.methodId)?.complexity ?? null)
   const tree = useMemo(() => (blueprint ? buildTree(blueprint) : []), [blueprint])
@@ -17,6 +18,13 @@ export function BlueprintView() {
   if (!blueprint) return <p className="canvas-empty">Чертёж загружается…</p>
   return (
     <div className="bp-scroll">
+      {heat && <div className="bp-heat-summary" role="status">
+        {heat.loading ? 'Измеряется частота исполнения…' : heat.result && <>
+          <strong>Частота исполнения · прогонов: {heat.result.runs.toLocaleString('ru-RU')}</strong>
+          <span className="bp-heat-legend"><i aria-hidden="true" />Светлый → оранжевый: от 0 до {heat.result.maxCount.toLocaleString('ru-RU')} выполнений</span>
+          <span>{heat.result.note}</span>
+        </>}
+      </div>}
       <div className="bp-canvas" style={{ transform: `scale(${zoom / 100})` }}>
         <div className="bp-pill">Начало · {methodSignature(blueprint.label)} <ComplexityBadge complexity={methodComplexity} /></div>
         <div className="bp-arrow" aria-hidden="true" />

@@ -153,3 +153,93 @@ assert.ok(coveredText.includes('3 разных входах'))
 assert.doesNotMatch(coveredText, /строк|итерац|\d+ раз\b/)
 assert.ok(describeVerdict({ ...verdict, changedCovered: null }).detail.includes('покрытие изменений не измерено'))
 console.log(`OK: ${expressionCount} мок-выражений + ${realExpressionCount} настоящих + ${syntheticCount} синтетических; inclusive range, выбор оператора, краткий режим, диагностика, категории, смена эталона и текст покрытия обеих сторон`)
+
+// Частота исполнения: ноль приходит с сервера, отсутствие счётчика не означает ноль.
+const { executionCount, heatColor } = load('src/features/blueprint/heatModel.ts')
+const heatResult = { methodId: 'M:Heat#run()', runs: 1, counts: { zero: 0, loop: 1, body: 9 }, maxCount: 9, note: 'fixture только для переходов состояния' }
+assert.equal(executionCount(heatResult, 'zero'), 0)
+assert.equal(executionCount(heatResult, 'missing'), null)
+assert.equal(executionCount(null, 'zero'), null)
+assert.equal(executionCount({ ...heatResult, counts: { invalid: -1 } }, 'invalid'), null)
+assert.equal(heatColor(0, 9), 'rgb(255, 249, 240)')
+assert.equal(heatColor(9, 9), 'rgb(243, 153, 80)')
+assert.equal(heatColor(0, 0), 'rgb(255, 249, 240)')
+const heatProject = { ...fixed, id: 'heat-project', map: { nodes: [], edges: [] } }
+const heatBlueprint = { methodId: heatResult.methodId, label: 'run()', nodes: [], edges: [] }
+const heatRequest = { requestId: 1, projectId: heatProject.id, version: heatProject.version, methodId: heatResult.methodId, loading: true, result: null }
+let heatState = reducer(reducer(initialState, { type: 'projectLoaded', project: heatProject }), { type: 'methodOpened', blueprint: heatBlueprint, selectedNodeId: null })
+assert.equal(reducer({ ...heatState, level: 'map' }, { type: 'heatStarted', heat: heatRequest }).heat, null, 'С карты запрос не запускается')
+heatState = reducer(heatState, { type: 'heatStarted', heat: heatRequest })
+assert.equal(heatState.heat.loading, true)
+assert.equal(reducer(heatState, { type: 'heatLoaded', requestId: 0, result: heatResult }).heat.result, null, 'Старый запрос не заменяет новый')
+assert.equal(reducer(heatState, { type: 'heatLoaded', requestId: 1, result: { ...heatResult, methodId: 'another' } }).heat.result, null, 'Другой метод не получает чужие счётчики')
+const heatLoaded = reducer(heatState, { type: 'heatLoaded', requestId: 1, result: heatResult })
+assert.deepEqual(heatLoaded.heat.result, heatResult)
+assert.equal(heatLoaded.heat.loading, false)
+for (const action of [
+  { type: 'draftChanged', text: `${heatProject.source}\n` },
+  { type: 'projectSaved', project: { ...heatProject, version: heatProject.version + 1 } },
+  { type: 'patchApplied', project: heatProject },
+  { type: 'commandApplied', response: { ok: true, compileErrors: [], source: heatProject.source, version: heatProject.version + 1 } },
+  { type: 'methodOpened', blueprint: { ...heatBlueprint, methodId: 'another' }, selectedNodeId: null },
+  { type: 'blueprintRefreshed', blueprint: heatBlueprint },
+  { type: 'showMap' },
+  { type: 'projectLoaded', project: { ...heatProject, id: 'another-project' } },
+]) {
+  const changed = reducer(heatLoaded, action)
+  assert.equal(changed.heat, null, `${action.type}: измерение сброшено`)
+  assert.equal(reducer(changed, { type: 'heatLoaded', requestId: 1, result: heatResult }).heat, null, `${action.type}: поздний ответ игнорируется`)
+}
+assert.equal(reducer(heatLoaded, { type: 'heatCleared', requestId: 0 }).heat, heatLoaded.heat, 'Старая ошибка не убирает актуальное измерение')
+assert.equal(reducer(heatLoaded, { type: 'heatCleared' }).heat, null)
+console.log('OK: heat — реальные счётчики, отсутствие ≠ 0, шкала, загрузка, смена метода/проекта/версии и устаревшие ответы')
+
+// Асинхронный action проверяем на управляемом ответе API: запросы и ошибки не выдумывают результатов.
+let asyncState = heatState
+let heatCalls = 0
+let finishHeat
+const heatErrors = []
+const actionModule = { exports: {} }
+const actionSource = ts.transpileModule(readFileSync(path.join(root, 'src/state/heatActions.ts'), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText
+new Function('require', 'exports', 'module', actionSource)((name) => ({
+  '../api/heatApi': { measureHeat: () => { heatCalls++; return new Promise((resolve, reject) => { finishHeat = { resolve, reject } }) } },
+  './actions': { flushDraft: async () => {}, reportError: (error) => heatErrors.push(error.message) },
+  './store': { store: { getState: () => asyncState }, dispatch: (action) => { asyncState = reducer(asyncState, action) } },
+})[name], actionModule.exports, actionModule)
+const { toggleHeat } = actionModule.exports
+asyncState = { ...heatState, heat: null, level: 'map' }
+await toggleHeat()
+assert.equal(heatCalls, 0, 'Невыбранный метод не запрашивается')
+asyncState = { ...heatState, heat: null }
+let pendingHeat = toggleHeat()
+await Promise.resolve()
+await toggleHeat()
+assert.equal(heatCalls, 1, 'Повторный клик не запускает параллельное измерение')
+finishHeat.resolve(heatResult)
+await pendingHeat
+assert.deepEqual(asyncState.heat.result, heatResult)
+await toggleHeat()
+assert.equal(asyncState.heat, null, 'Готовое измерение выключается без запроса')
+pendingHeat = toggleHeat()
+await Promise.resolve()
+asyncState = reducer(asyncState, { type: 'draftChanged', text: 'changed' })
+finishHeat.resolve(heatResult)
+await pendingHeat
+assert.equal(asyncState.heat, null, 'Поздний ответ после правки игнорируется')
+asyncState = { ...heatState, heat: null }
+pendingHeat = toggleHeat()
+await Promise.resolve()
+finishHeat.reject(new Error('Точный текст ошибки сервера'))
+await pendingHeat
+assert.deepEqual(heatErrors, ['Точный текст ошибки сервера'])
+assert.equal(asyncState.heat, null)
+asyncState = { ...heatState, heat: null }
+pendingHeat = toggleHeat()
+await Promise.resolve()
+asyncState = reducer(asyncState, { type: 'showMap' })
+finishHeat.reject(new Error('Уже устаревшая ошибка'))
+await pendingHeat
+assert.equal(heatErrors.length, 1, 'Устаревшая ошибка не тревожит новый экран')
+console.log('OK: heat action — реальный запрос только открытого метода, защита двойного клика, поздние ответы/ошибки, серверный текст ошибки')

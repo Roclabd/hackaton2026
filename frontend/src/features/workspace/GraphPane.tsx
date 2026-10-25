@@ -4,6 +4,7 @@ import { blueprintSummary } from '../blueprint/blueprintTree'
 import { ClassMap } from '../map/ClassMap'
 import { className, methodName, selectedNode } from '../../state/selectors'
 import { dispatch, useAppState } from '../../state/store'
+import { toggleHeat } from '../../state/heatActions'
 
 const ZOOM_MIN = 70
 const ZOOM_MAX = 140
@@ -17,6 +18,7 @@ export function GraphPane() {
   const detailed = useAppState((s) => s.detailedExpressions)
   const zoom = useAppState((s) => s.zoom)
   const node = useAppState(selectedNode)
+  const heat = useAppState((s) => s.heat)
   const onMethod = level === 'method' && methodId !== null
   const setZoom = (value: number) => dispatch({ type: 'zoom', value: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, value)) })
 
@@ -31,6 +33,14 @@ export function GraphPane() {
           </>}
         </div>
         <div className="graph-actions">
+          {onMethod && <button type="button" className={`btn btn-small heat-toggle ${heat?.result ? 'is-on' : ''}`}
+            aria-label={heat?.loading ? 'Измеряется частота исполнения' : heat?.result ? 'Скрыть частоту исполнения' : 'Измерить частоту исполнения'}
+            aria-pressed={!!heat?.result} aria-busy={!!heat?.loading} disabled={heat?.loading}
+            title={heat?.loading ? 'Измеряется частота исполнения…' : heat?.result ? 'Скрыть частоту исполнения' : 'Измерить частоту исполнения на реальных запусках'}
+            onClick={() => void toggleHeat()}>
+            {heat?.loading ? <i className="heat-spinner" aria-hidden="true" /> : <Icon name="flame" />}
+            <span>{heat?.loading ? 'Измерение…' : 'Частота'}</span>
+          </button>}
           {onMethod && <button type="button" className="btn btn-small" aria-pressed={detailed}
             title={detailed ? 'Скрыть дерево выражений' : 'Показать дерево выражений'}
             onClick={() => dispatch({ type: 'toggleExpressions' })}>{detailed ? 'Подробно' : 'Кратко'}</button>}

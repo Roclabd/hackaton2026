@@ -1,4 +1,4 @@
-import type { Blueprint, CommandResponse, Finding, Intent, ProjectResponse, Verdict } from '../api/types'
+import type { Blueprint, CommandResponse, Finding, HeatResult, Intent, ProjectResponse, Verdict } from '../api/types'
 import { findExpression } from '../features/blueprint/expressionModel'
 
 export type Level = 'map' | 'method'
@@ -31,6 +31,15 @@ export interface Toast {
   tone: 'info' | 'error'
 }
 
+export interface HeatState {
+  requestId: number
+  projectId: string
+  version: number
+  methodId: string
+  loading: boolean
+  result: HeatResult | null
+}
+
 export interface State {
   project: ProjectResponse | null
   /** текст в редакторе; может опережать project.source, пока правка не сохранена */
@@ -39,6 +48,7 @@ export interface State {
   level: Level
   methodId: string | null
   blueprint: Blueprint | null
+  heat: HeatState | null
   selectedNodeId: string | null
   selectedExprId: string | null
   detailedExpressions: boolean
@@ -52,7 +62,7 @@ export interface State {
 }
 
 export const initialState: State = {
-  project: null, draft: '', baseline: null, level: 'map', methodId: null, blueprint: null,
+  project: null, draft: '', baseline: null, level: 'map', methodId: null, blueprint: null, heat: null,
   selectedNodeId: null, selectedExprId: null, detailedExpressions: true, findings: [], findingId: null, patchId: null, job: null,
   zoom: 100, dialog: null, toast: null,
 }
@@ -69,6 +79,9 @@ export type Action =
   | { type: 'select'; nodeId: string | null }
   | { type: 'selectExpr'; nodeId: string; expressionId: string }
   | { type: 'toggleExpressions' }
+  | { type: 'heatStarted'; heat: HeatState }
+  | { type: 'heatLoaded'; requestId: number; result: HeatResult }
+  | { type: 'heatCleared'; requestId?: number }
   | { type: 'baselineAccepted' }
   | { type: 'findingsLoaded'; findings: Finding[] }
   | { type: 'patchSelected'; findingId: string; patchId: string | null }
@@ -91,25 +104,25 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case 'projectSaved':
-      return { ...state, project: action.project, selectedExprId: null }
+      return { ...state, project: action.project, selectedExprId: null, heat: null }
     case 'patchApplied':
       return {
         ...state, project: action.project, draft: action.project.source,
         baseline: baselineFor(action.project), selectedExprId: null,
-        findingId: null, patchId: null,
+        findingId: null, patchId: null, heat: null,
       }
     case 'commandApplied':
       return applyCommand(state, action.response)
     case 'draftChanged':
-      return { ...state, draft: action.text, selectedExprId: null }
+      return { ...state, draft: action.text, selectedExprId: null, heat: null }
     case 'methodOpened':
-      return { ...state, level: 'method', methodId: action.blueprint.methodId, blueprint: action.blueprint, selectedNodeId: action.selectedNodeId, selectedExprId: null, zoom: 100 }
+      return { ...state, level: 'method', methodId: action.blueprint.methodId, blueprint: action.blueprint, selectedNodeId: action.selectedNodeId, selectedExprId: null, zoom: 100, heat: null }
     case 'blueprintRefreshed':
       return action.blueprint
-        ? { ...state, blueprint: action.blueprint, selectedNodeId: keepSelection(state.selectedNodeId, action.blueprint), selectedExprId: null }
-        : { ...state, level: 'map', blueprint: null, methodId: null, selectedNodeId: null, selectedExprId: null }
+        ? { ...state, blueprint: action.blueprint, selectedNodeId: keepSelection(state.selectedNodeId, action.blueprint), selectedExprId: null, heat: null }
+        : { ...state, level: 'map', blueprint: null, methodId: null, selectedNodeId: null, selectedExprId: null, heat: null }
     case 'showMap':
-      return { ...state, level: 'map', selectedNodeId: state.methodId, selectedExprId: null, zoom: 100 }
+      return { ...state, level: 'map', selectedNodeId: state.methodId, selectedExprId: null, zoom: 100, heat: null }
     case 'select':
       return { ...state, selectedNodeId: action.nodeId, selectedExprId: null }
     case 'selectExpr': {
@@ -119,6 +132,14 @@ export function reducer(state: State, action: Action): State {
     }
     case 'toggleExpressions':
       return { ...state, detailedExpressions: !state.detailedExpressions, selectedExprId: null }
+    case 'heatStarted':
+      return heatIsCurrent(state, action.heat) ? { ...state, heat: action.heat } : state
+    case 'heatLoaded':
+      return state.heat?.requestId === action.requestId && heatIsCurrent(state, state.heat)
+        && action.result.methodId === state.methodId
+        ? { ...state, heat: { ...state.heat, loading: false, result: action.result } } : state
+    case 'heatCleared':
+      return action.requestId === undefined || state.heat?.requestId === action.requestId ? { ...state, heat: null } : state
     case 'baselineAccepted':
       return state.baseline?.invalid && state.project && state.project.source === state.draft
         && !state.project.errors.length && !state.project.compileErrors?.length
@@ -160,11 +181,16 @@ function applyCommand(state: State, response: CommandResponse): State {
   }
   const selected = state.selectedNodeId
   return {
-    ...state, project, draft: response.source, selectedExprId: null,
+    ...state, project, draft: response.source, selectedExprId: null, heat: null,
     blueprint: response.blueprint ?? state.blueprint,
     methodId: response.methodId ?? state.methodId,
     selectedNodeId: selected ? response.idMap?.[selected] ?? selected : null,
   }
+}
+
+function heatIsCurrent(state: State, heat: HeatState): boolean {
+  return state.level === 'method' && state.methodId === heat.methodId && state.blueprint?.methodId === heat.methodId
+    && state.project?.id === heat.projectId && state.project.version === heat.version && state.draft === state.project.source
 }
 
 function baselineFor(project: ProjectResponse): Baseline {
