@@ -69,7 +69,31 @@ public class BaitR9 {
         return sep;
     }
 
+    // ПРИМАНКА: граница — число в коде (40), итераций всегда 40, от входа ничего не растёт.
+    static String separator() {
+        String line = "";
+        for (int i = 0; i < 40; i++) {
+            line = line + "=";
+        }
+        return line;
+    }
+
+    // ПРИМАНКА: обход локальной карты из трёх put подряд — размер задан текстом, роста нет.
+    static String fixedKeys() {
+        java.util.Map<String, Integer> ordered = new java.util.LinkedHashMap<>();
+        ordered.put("zeta", 3);
+        ordered.put("alpha", 1);
+        ordered.put("mid", 2);
+        String keys = "";
+        for (java.util.Map.Entry<String, Integer> entry : ordered.entrySet()) {
+            keys = keys + entry.getKey() + "=" + entry.getValue() + ";";
+        }
+        return keys;
+    }
+
     public static void main(String[] args) {
+        System.out.println(fixedKeys());
+        System.out.println(separator());
         System.out.println(joinBuilder(List.of("a", "b")));
         System.out.println(joinApi(List.of("a", "b")));
         System.out.println(printLabels(List.of(1, 2)));

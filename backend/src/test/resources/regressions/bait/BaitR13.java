@@ -65,7 +65,83 @@ public class BaitR13 {
         return s != null ? s : 0;
     }
 
+    // ---- Реестр: карты пополняются парой по одному ключу (как bookTitles / bookCopies) ----
+    private final Map<String, String> titles = new HashMap<>();
+    private final Map<String, Integer> stock = new HashMap<>();
+    private final Map<String, Integer> years = new HashMap<>();
+    private final List<String> log = new java.util.ArrayList<>();
+    private final List<String> loans = new java.util.ArrayList<>();
+
+    void addItem(String id, String title, int copies, int year) {
+        titles.put(id, title);
+        stock.put(id, copies);
+        years.put(id, year);
+        log.add("ADD " + id);
+    }
+
+    // Сброс всего реестра разом — пары карт не ломает.
+    void reset() {
+        titles.clear();
+        stock.clear();
+        years.clear();
+        log.clear();
+    }
+
+    // ПРИМАНКА: ключ — переменная for-each по keySet той же карты.
+    int totalStock() {
+        int total = 0;
+        for (String id : stock.keySet()) {
+            total = total + stock.get(id);
+        }
+        return total;
+    }
+
+    // ПРИМАНКА: ключ — e.getKey() из entrySet той же карты.
+    int oldestYear() {
+        int oldest = Integer.MAX_VALUE;
+        for (Map.Entry<String, Integer> e : years.entrySet()) {
+            if (years.get(e.getKey()) < oldest) {
+                oldest = years.get(e.getKey());
+            }
+        }
+        return oldest;
+    }
+
+    // ПРИМАНКА: ключ проверен containsKey у другой карты реестра, иначе исключение.
+    int take(String id) {
+        if (!titles.containsKey(id)) {
+            throw new IllegalArgumentException("нет " + id);
+        }
+        int copies = stock.get(id);
+        stock.put(id, copies - 1);
+        loans.add(id);
+        return copies;
+    }
+
+    // ПРИМАНКА: карта реестра, неизвестный ключ отсеян исключением выше по методу.
+    void giveBack(String id) {
+        if (!loans.remove(id)) {
+            throw new IllegalStateException("не выдавали " + id);
+        }
+        stock.put(id, stock.get(id) + 1);
+    }
+
+    // ПРИМАНКА: ключ из внутреннего журнала (записан в addItem), карта реестра.
+    int stockFromLog() {
+        int total = 0;
+        for (String event : log) {
+            String[] t = event.split(" ");
+            total = total + stock.get(t[1]);
+        }
+        return total;
+    }
+
     public static void main(String[] args) {
+        BaitR13 r = new BaitR13();
+        r.addItem("b1", "Book", 2, 1999);
+        r.take("b1");
+        r.giveBack("b1");
+        System.out.println(r.totalStock() + r.oldestYear() + r.stockFromLog());
         Map<String, Integer> m = new HashMap<>(Map.of("a", 2));
         System.out.println(countOf(m, "a") + safeCount(m, "z"));
         System.out.println(tally(List.of("x", "x")));
