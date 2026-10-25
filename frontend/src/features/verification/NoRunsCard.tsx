@@ -1,6 +1,6 @@
 import type { Verdict } from '../../api/types'
 import { Icon } from '../../components/Icon'
-import { selectByLine } from '../../state/actions'
+import { goToLine } from '../../state/actions'
 import { navigate } from '../../state/route'
 
 /** Строка из «…: строка 67, колонка 21: …» — текст причины собирает бэкенд (GateJob). */
@@ -16,8 +16,8 @@ export function NoRunsCard({ verdict }: { verdict: Verdict }) {
   const candidateBroken = verdict.status === 'BUILD_ERROR'
   const line = candidateBroken ? (verdict.buildErrors[0]?.line || null) : reasonLine(reason)
   const toCode = () => {
-    navigate('workspace')
-    if (line) selectByLine(line)
+    if (line) void goToLine(line)
+    else navigate('workspace')
   }
   return (
     <section className="pane no-runs">

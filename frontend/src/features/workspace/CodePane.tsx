@@ -6,7 +6,8 @@ import { expressionEditorRange } from '../../components/editor/editorRanges'
 import { problemDecorations } from '../../components/editor/problemDecorations'
 import { collectProblems } from '../../components/editor/problems'
 import { Icon } from '../../components/Icon'
-import { editDraft, selectByLine } from '../../state/actions'
+import { editDraft, goToLine, selectByLine } from '../../state/actions'
+import { onReveal, revealDone } from '../../state/reveal'
 import { selectedExpression, selectedNode } from '../../state/selectors'
 import { useAppState } from '../../state/store'
 import { BaselineNotice } from './BaselineNotice'
@@ -74,11 +75,25 @@ export function CodePane() {
     problemLayer.current.set(problemDecorations(monaco.current, model, problems))
   }, [editor, problems])
 
+  // Переход к строке извне (экран проверки, F8): курсор на строку, даже если узла в открытом методе нет.
+  useEffect(() => {
+    if (!editor) return
+    return onReveal((line) => {
+      const model = editor.getModel()
+      if (!model) return
+      const target = Math.max(1, Math.min(line, model.getLineCount()))
+      editor.revealLineInCenter(target)
+      editor.setPosition({ lineNumber: target, column: model.getLineFirstNonWhitespaceColumn(target) || 1 })
+      editor.focus()
+      revealDone()
+    })
+  }, [editor])
+
   const goTo = useCallback((index: number) => {
     const problem = problems[index]
     if (!editor || !problem) return
     setCurrent(index)
-    selectByLine(problem.line)
+    void goToLine(problem.line)
     const column = problem.column ?? editor.getModel()?.getLineFirstNonWhitespaceColumn(problem.line) ?? 1
     editor.revealLineInCenter(problem.line)
     editor.setPosition({ lineNumber: problem.line, column: Math.max(1, column) })

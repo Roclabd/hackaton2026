@@ -1,5 +1,6 @@
 import { api, ApiError } from '../api/client'
 import type { CompileError, ProjectResponse } from '../api/types'
+import { requestReveal } from './reveal'
 import { navigate } from './route'
 import { deepestNodeAt, methodAt } from './selectors'
 import { dispatch, store } from './store'
@@ -155,6 +156,22 @@ export async function editNode(nodeId: string, text: string): Promise<CompileErr
 }
 
 /** Клик по строке кода: выбрать самый вложенный узел чертежа (или метод на карте). */
+/**
+ * «Перейти к строке»: редактор прокручивается к ней всегда, а схема показывает её узел —
+ * если строка в другом методе, открывается его чертёж.
+ */
+export async function goToLine(line: number): Promise<void> {
+  navigate('workspace')
+  requestReveal(line)
+  const { level, blueprint, project } = store.getState()
+  if (level === 'method' && blueprint && deepestNodeAt(blueprint, line)) {
+    selectByLine(line)
+    return
+  }
+  const method = methodAt(project?.map.nodes ?? [], line)
+  if (method) await openMethod(method.id, line)
+}
+
 export function selectByLine(line: number): void {
   const { level, blueprint, project } = store.getState()
   if (level === 'method' && blueprint) {
