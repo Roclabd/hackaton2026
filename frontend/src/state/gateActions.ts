@@ -1,6 +1,6 @@
 import { api } from '../api/client'
 import type { Intent } from '../api/types'
-import { flushDraft, refreshBlueprint, refreshFindings, reportError, showToast } from './actions'
+import { flushDraft, isCurrentProject, refreshBlueprint, refreshFindings, reportError, showToast } from './actions'
 import type { JobState } from './reducer'
 import { navigate } from './route'
 import { currentPatch } from './selectors'
@@ -39,8 +39,10 @@ async function startCheck(candidate: Candidate): Promise<void> {
     const { jobId } = await api.startGate(project.id, {
       source: candidate.source, intent: candidate.intent, originalSource: baseline.source,
     })
+    // пока ждали ответа, открыли другой проект — эта проверка к нему не относится
+    if (!isCurrentProject(project.id)) return
     const started: JobState = {
-      id: jobId, verdict: null, candidateLabel: candidate.label, candidateSource: candidate.source, draftAtStart: draft,
+      id: jobId, projectId: project.id, verdict: null, candidateLabel: candidate.label, candidateSource: candidate.source, draftAtStart: draft,
       intent: candidate.intent, baselineVersion: baseline.version, projectVersion: project.version,
       fileName: project.fileName, methodLabel: blueprint?.label ?? null,
     }
@@ -74,6 +76,7 @@ export async function applyPatch(): Promise<void> {
   if (!state.project || !patch) return
   try {
     const project = await api.updateSource(state.project.id, patch.source, state.project.version)
+    if (!isCurrentProject(project.id)) return
     dispatch({ type: 'patchApplied', project })
     await Promise.all([refreshBlueprint(), refreshFindings()])
     showToast(`Изменение применено · версия ${project.version}`)

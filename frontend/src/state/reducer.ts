@@ -13,6 +13,8 @@ export interface Baseline {
 
 export interface JobState {
   id: string
+  /** проект, к которому относится проверка: экспорт берёт его, а не текущий */
+  projectId: string
   verdict: Verdict | null
   /** что проверяем: «код редактора» или название заплатки */
   candidateLabel: string
@@ -106,8 +108,11 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case 'projectSaved':
+      // поздний ответ сохранения уже закрытого проекта не должен подменить открытый
+      if (state.project?.id !== action.project.id) return state
       return { ...state, project: action.project, selectedExprId: null, heat: null }
     case 'patchApplied':
+      if (state.project?.id !== action.project.id) return state
       return {
         ...state, project: action.project, draft: action.project.source,
         baseline: baselineFor(action.project), selectedExprId: null,
@@ -152,7 +157,7 @@ export function reducer(state: State, action: Action): State {
     case 'patchSelected':
       return { ...state, findingId: action.findingId, patchId: action.patchId }
     case 'jobStarted':
-      return { ...state, job: action.job }
+      return state.project?.id === action.job.projectId ? { ...state, job: action.job } : state
     case 'jobUpdated':
       return state.job?.id === action.jobId ? { ...state, job: { ...state.job, verdict: action.verdict } } : state
     case 'jobFailed':

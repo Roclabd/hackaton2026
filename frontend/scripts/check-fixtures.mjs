@@ -333,3 +333,18 @@ assert.equal(problems[2].title, 'Несовпадение типов')
 assert.deepEqual(countByKind(problems), { syntax: 1, compile: 1, defect: 1, inefficiency: 1, deadCode: 1 })
 assert.equal(collectProblems(problemSource, [], [], []).length, 0)
 console.log('OK: проблемы в коде — виды, подвид javac, порядок для F8, строки находок')
+
+// Смена проекта: поздние ответы старого проекта (сохранение, запуск проверки) не смешиваются с открытым.
+const projectOf = (id, source) => ({ id, fileName: `${id}.java`, version: 1, source, errors: [], compileErrors: [], map: { nodes: [], edges: [] } })
+let switched = reducer(initialState, { type: 'projectLoaded', project: projectOf('A', 'code_A') })
+switched = reducer(switched, { type: 'draftChanged', text: 'edited_A' })
+switched = reducer(switched, { type: 'projectLoaded', project: projectOf('B', 'code_B') })
+const afterLateSave = reducer(switched, { type: 'projectSaved', project: { ...projectOf('A', 'edited_A'), version: 2 } })
+assert.equal(afterLateSave.project.id, 'B', 'поздний ответ сохранения A не подменяет открытый проект B')
+assert.equal(afterLateSave.project.source, 'code_B')
+assert.equal(reducer(switched, { type: 'patchApplied', project: projectOf('A', 'x') }).project.id, 'B')
+const lateJob = { id: 'job_A', projectId: 'A', verdict: null, candidateLabel: 'A', candidateSource: 'A', draftAtStart: 'A',
+  intent: 'REFACTOR', baselineVersion: 1, projectVersion: 1, fileName: 'A.java', methodLabel: null }
+assert.equal(reducer(switched, { type: 'jobStarted', job: lateJob }).job, null, 'поздний запуск проверки A не попадает в B')
+assert.equal(reducer(switched, { type: 'jobStarted', job: { ...lateJob, id: 'job_B', projectId: 'B' } }).job.id, 'job_B')
+console.log('OK: смена проекта — поздние сохранение, заплатка и запуск проверки старого проекта отбрасываются')

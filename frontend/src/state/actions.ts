@@ -27,7 +27,14 @@ function rememberProject(id: string) {
   try { sessionStorage.setItem(SESSION_KEY, id) } catch { /* хранилище недоступно — не страшно */ }
 }
 
+/** Ответ пришёл для проекта, который всё ещё открыт? Поздние ответы старого проекта отбрасываем. */
+export function isCurrentProject(projectId: string): boolean {
+  return store.getState().project?.id === projectId
+}
+
 async function openProject(project: ProjectResponse): Promise<void> {
+  // Сначала дописать несохранённую правку текущего проекта — иначе она пропадёт при переключении.
+  await flushDraft()
   dispatch({ type: 'projectLoaded', project })
   rememberProject(project.id)
   navigate('workspace')
@@ -66,7 +73,8 @@ export async function refreshFindings(): Promise<void> {
   const project = store.getState().project
   if (!project || project.errors.length) return
   try {
-    dispatch({ type: 'findingsLoaded', findings: await api.getFindings(project.id) })
+    const findings = await api.getFindings(project.id)
+    if (isCurrentProject(project.id)) dispatch({ type: 'findingsLoaded', findings })
   } catch (error) { reportError(error) }
 }
 
@@ -75,6 +83,7 @@ export async function openMethod(methodId: string, selectLine?: number): Promise
   if (!project) return
   try {
     const blueprint = await api.getMethod(project.id, methodId)
+    if (!isCurrentProject(project.id)) return
     const node = selectLine === undefined ? null : deepestNodeAt(blueprint, selectLine)
     dispatch({ type: 'methodOpened', blueprint, selectedNodeId: node?.id ?? null })
   } catch (error) { reportError(error) }
@@ -89,7 +98,8 @@ export async function refreshBlueprint(): Promise<void> {
     return
   }
   try {
-    dispatch({ type: 'blueprintRefreshed', blueprint: await api.getMethod(project.id, methodId) })
+    const blueprint = await api.getMethod(project.id, methodId)
+    if (isCurrentProject(project.id)) dispatch({ type: 'blueprintRefreshed', blueprint })
   } catch (error) { reportError(error) }
 }
 
@@ -144,6 +154,7 @@ export async function editNode(nodeId: string, text: string): Promise<CompileErr
   if (!project) return []
   try {
     const response = await api.editStatement(project.id, { type: 'editStatement', nodeId, text, baseVersion: project.version })
+    if (!isCurrentProject(project.id)) return []
     if (!response.ok) return response.compileErrors.length ? response.compileErrors : [{ line: 0, column: 0, text: 'Правка не применена' }]
     dispatch({ type: 'commandApplied', response })
     showToast(`Узел изменён · версия ${response.version}`)

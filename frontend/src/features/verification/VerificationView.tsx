@@ -70,7 +70,7 @@ function RunConditions({ job }: { job: JobState }) {
 
 /** «Экспорт теста»: активна у завершённой проверки, которая реально сравнила версии. */
 function ExportButton({ job }: { job: JobState }) {
-  const projectId = useAppState((s) => s.project?.id ?? null)
+  const projectId = useAppState((s) => (s.project?.id === job.projectId ? job.projectId : null))
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   const enabled = projectId !== null && canExport(job.verdict)
