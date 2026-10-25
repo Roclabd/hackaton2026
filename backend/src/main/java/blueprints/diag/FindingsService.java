@@ -41,6 +41,9 @@ public final class FindingsService {
         findings.addAll(new ZeroStartExtremumRule().find(context));
         findings.addAll(new MapUnboxingRule().find(context));
         findings.addAll(new BoxedEqualityRule().find(context));
+        findings.addAll(new NestedIndexLoopRule().find(context));
+        findings.addAll(new LinkedListIndexRule().find(context));
+        findings.addAll(new OwnSearchInLoopRule().find(context));
         return List.copyOf(findings);
     }
 }
